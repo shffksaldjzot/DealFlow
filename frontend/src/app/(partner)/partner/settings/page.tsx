@@ -6,8 +6,9 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
+import FileUpload from '@/components/common/FileUpload';
 import { useToast } from '@/components/ui/Toast';
-import { Building2 } from 'lucide-react';
+import { Building2, FileCheck } from 'lucide-react';
 import type { Organization } from '@/types/organization';
 
 export default function PartnerSettingsPage() {
@@ -16,12 +17,12 @@ export default function PartnerSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
-    name: '',
-    representativeName: '',
     contactPhone: '',
     contactEmail: '',
     address: '',
+    businessLicenseFileId: '',
   });
+  const [licenseFileName, setLicenseFileName] = useState('');
 
   useEffect(() => {
     api.get('/organizations/me')
@@ -29,11 +30,10 @@ export default function PartnerSettingsPage() {
         const data = extractData<Organization>(res);
         setOrg(data);
         setForm({
-          name: data.name || '',
-          representativeName: data.representativeName || '',
           contactPhone: data.contactPhone || '',
           contactEmail: data.contactEmail || '',
           address: data.address || '',
+          businessLicenseFileId: data.businessLicenseFileId || '',
         });
       })
       .catch(() => {})
@@ -86,12 +86,54 @@ export default function PartnerSettingsPage() {
           <Badge status={org.status} />
         </div>
         <div className="space-y-4">
-          <Input label="업체명" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <div>
+            <Input label="업체명" value={org.name} disabled />
+            <p className="text-xs text-gray-400 mt-1">변경이 필요하시면 운영사(DealFlow)로 연락해주세요</p>
+          </div>
           <Input label="사업자등록번호" value={org.businessNumber} disabled />
-          <Input label="대표자명" value={form.representativeName} onChange={(e) => setForm({ ...form, representativeName: e.target.value })} />
+          <div>
+            <Input label="대표자명" value={org.representativeName || ''} disabled />
+            <p className="text-xs text-gray-400 mt-1">변경이 필요하시면 운영사(DealFlow)로 연락해주세요</p>
+          </div>
           <Input label="연락처" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} />
           <Input label="이메일" type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
           <Input label="주소" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+
+          {/* Business License Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              사업자등록증
+            </label>
+            {form.businessLicenseFileId ? (
+              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
+                <FileCheck className="w-5 h-5 text-green-600" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-green-800">
+                    {licenseFileName || '사업자등록증 업로드 완료'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setForm({ ...form, businessLicenseFileId: '' }); setLicenseFileName(''); }}
+                  className="text-xs text-red-500 hover:text-red-700"
+                >
+                  삭제
+                </button>
+              </div>
+            ) : (
+              <FileUpload
+                label=""
+                accept=".pdf,.jpg,.jpeg,.png"
+                maxSizeMB={10}
+                helperText="사업자등록증 파일을 업로드하세요 (PDF, JPG, PNG)"
+                purpose="business_license"
+                onUploadComplete={(fId, fName) => {
+                  setForm({ ...form, businessLicenseFileId: fId });
+                  setLicenseFileName(fName);
+                }}
+              />
+            )}
+          </div>
         </div>
         <div className="mt-6">
           <Button onClick={handleSave} loading={saving}>저장</Button>

@@ -7,7 +7,7 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
-import { QrCode, Calendar, ChevronRight } from 'lucide-react';
+import { QrCode, Calendar, ChevronRight, Ban } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
 interface MyEvent {
@@ -17,17 +17,55 @@ interface MyEvent {
   event: { id: string; name: string; startDate: string; endDate: string; venue?: string };
 }
 
+type TabKey = 'approved' | 'pending' | 'rejected' | 'cancelled' | 'all';
+
+const tabs: { key: TabKey; label: string }[] = [
+  { key: 'approved', label: '진행중' },
+  { key: 'pending', label: '참가요청' },
+  { key: 'rejected', label: '거절' },
+  { key: 'cancelled', label: '취소' },
+  { key: 'all', label: '전체' },
+];
+
 export default function PartnerEventsPage() {
   const router = useRouter();
   const [events, setEvents] = useState<MyEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabKey>('approved');
+  const [cancelTarget, setCancelTarget] = useState<MyEvent | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
 
-  useEffect(() => {
+  const fetchEvents = () => {
     api.get('/event-partners/my-events')
       .then((res) => setEvents(extractData(res)))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { fetchEvents(); }, []);
+
+  const getCount = (tab: TabKey) => {
+    if (tab === 'all') return events.length;
+    return events.filter((e) => e.status === tab).length;
+  };
+
+  const filteredEvents = activeTab === 'all'
+    ? events
+    : events.filter((e) => e.status === activeTab);
+
+  const handleCancel = async () => {
+    if (!cancelTarget) return;
+    try {
+      await api.post(`/event-partners/${cancelTarget.eventId}/cancel`, {
+        reason: cancelReason || undefined,
+      });
+      setCancelTarget(null);
+      setCancelReason('');
+      fetchEvents();
+    } catch {
+      // error handled silently
+    }
+  };
 
   return (
     <div>
@@ -41,33 +79,62 @@ export default function PartnerEventsPage() {
         }
       />
 
+      {/* Tabs */}
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 overflow-x-auto">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+              activeTab === tab.key
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {tab.label}
+            {!loading && (
+              <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
+                activeTab === tab.key
+                  ? 'bg-blue-100 text-blue-600'
+                  : 'bg-gray-200 text-gray-500'
+              }`}>
+                {getCount(tab.key)}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
             <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />
           ))}
         </div>
-      ) : events.length === 0 ? (
+      ) : filteredEvents.length === 0 ? (
         <EmptyState
-          title="참여 중인 행사가 없습니다"
-          description="초대코드를 입력하여 행사에 참여하세요"
+          title={activeTab === 'all' ? '참여 중인 행사가 없습니다' : `${tabs.find(t => t.key === activeTab)?.label} 행사가 없습니다`}
+          description={activeTab === 'all' ? '초대코드를 입력하여 행사에 참여하세요' : undefined}
           action={
-            <Button onClick={() => router.push('/partner/events/join')}>
-              행사 참여하기
-            </Button>
+            activeTab === 'all' ? (
+              <Button onClick={() => router.push('/partner/events/join')}>
+                행사 참여하기
+              </Button>
+            ) : undefined
           }
         />
       ) : (
         <div className="space-y-3">
-          {events.map((ep) => (
+          {filteredEvents.map((ep) => (
             <Card
               key={ep.id}
-              hoverable
+              hoverable={ep.status === 'approved'}
               onClick={() => {
                 if (ep.status === 'approved') {
                   router.push(`/partner/events/${ep.eventId}`);
                 }
               }}
+              className={ep.status !== 'approved' ? 'opacity-75' : ''}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -79,13 +146,56 @@ export default function PartnerEventsPage() {
                     <Calendar className="w-3.5 h-3.5" />
                     {formatDate(ep.event.startDate)} ~ {formatDate(ep.event.endDate)}
                   </p>
+                  {ep.event.venue && (
+                    <p className="text-xs text-gray-400 mt-0.5">{ep.event.venue}</p>
+                  )}
                 </div>
-                {ep.status === 'approved' && (
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                )}
+                <div className="flex items-center gap-2">
+                  {ep.status === 'approved' && (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setCancelTarget(ep); }}
+                        className="text-xs text-red-500 hover:text-red-700 px-2 py-1"
+                      >
+                        <Ban className="w-3.5 h-3.5" />
+                      </button>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </>
+                  )}
+                </div>
               </div>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Cancel Confirmation Dialog */}
+      {cancelTarget && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-lg font-bold text-gray-900">참여 취소</h3>
+            <p className="text-sm text-gray-500">
+              <strong>{cancelTarget.event.name}</strong> 행사 참여를 취소하시겠습니까?
+            </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">취소 사유 (선택)</label>
+              <input
+                type="text"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="취소 사유를 입력하세요"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" onClick={() => { setCancelTarget(null); setCancelReason(''); }}>
+                닫기
+              </Button>
+              <Button variant="danger" onClick={handleCancel}>
+                참여 취소
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

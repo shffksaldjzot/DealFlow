@@ -14,6 +14,7 @@ export enum EventPartnerStatus {
   PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',
+  CANCELLED = 'cancelled',
 }
 
 @Entity('event_partners')
@@ -42,6 +43,15 @@ export class EventPartner {
 
   @Column({ name: 'approved_at', nullable: true })
   approvedAt: Date;
+
+  @Column({ name: 'cancelled_at', nullable: true })
+  cancelledAt: Date;
+
+  @Column({ name: 'cancelled_by', nullable: true })
+  cancelledBy: string;
+
+  @Column({ name: 'cancel_reason', nullable: true })
+  cancelReason: string;
 
   @ManyToOne(() => Event, (event) => event.partners)
   @JoinColumn({ name: 'event_id' })

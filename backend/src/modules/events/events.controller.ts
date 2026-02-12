@@ -10,6 +10,7 @@ import {
 import { EventsService } from './events.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventStatusDto } from './dto/update-event-status.dto';
@@ -31,6 +32,12 @@ export class EventsController {
   @Get()
   listMyEvents(@CurrentUser('id') userId: string) {
     return this.eventsService.listMyEvents(userId);
+  }
+
+  @Public()
+  @Get('public/:inviteCode')
+  getPublicEventInfo(@Param('inviteCode') inviteCode: string) {
+    return this.eventsService.getPublicEventInfo(inviteCode);
   }
 
   @Get(':id')

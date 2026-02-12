@@ -1,5 +1,5 @@
 export type EventStatus = 'draft' | 'active' | 'closed' | 'cancelled';
-export type EventPartnerStatus = 'pending' | 'approved' | 'rejected';
+export type EventPartnerStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
 
 export interface Event {
   id: string;
@@ -25,6 +25,21 @@ export interface EventPartner {
   status: EventPartnerStatus;
   commissionRate?: number;
   approvedAt?: string;
-  partner?: { id: string; name: string };
+  cancelledAt?: string;
+  cancelledBy?: string;
+  cancelReason?: string;
+  partner?: { id: string; name: string; contactPhone?: string; contactEmail?: string };
   createdAt: string;
+}
+
+export interface EventVisit {
+  id: string;
+  eventId: string;
+  customerId: string;
+  status: 'reserved' | 'cancelled';
+  visitDate: string;
+  guestCount: number;
+  memo?: string;
+  createdAt: string;
+  event?: Event;
 }

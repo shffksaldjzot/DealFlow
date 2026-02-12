@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsNumber, Min, Max } from 'class-validator';
+import { IsEnum, IsOptional, IsNumber, IsString, Min, Max } from 'class-validator';
 import { EventPartnerStatus } from '../entities/event-partner.entity';
 
 export class UpdatePartnerStatusDto {
@@ -10,4 +10,8 @@ export class UpdatePartnerStatusDto {
   @Min(0)
   @Max(100)
   commissionRate?: number;
+
+  @IsOptional()
+  @IsString()
+  cancelReason?: string;
 }

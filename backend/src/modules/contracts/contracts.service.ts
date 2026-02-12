@@ -110,7 +110,6 @@ export class ContractsService {
       qrCodeUrl: `/api/contract-flow/${qrCode}`,
       status: ContractStatus.PENDING,
       totalAmount: dto.totalAmount,
-      expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
       createdBy: userId,
     });
 

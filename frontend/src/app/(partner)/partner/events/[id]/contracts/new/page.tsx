@@ -1,12 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { QRCodeSVG } from 'qrcode.react';
 import api, { extractData } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import PageHeader from '@/components/layout/PageHeader';
 import { useToast } from '@/components/ui/Toast';
-import { CheckCircle2, QrCode } from 'lucide-react';
+import { CheckCircle2, QrCode, Copy, Check } from 'lucide-react';
 import type { ContractTemplate, Contract } from '@/types/contract';
 
 export default function NewContractPage() {
@@ -20,7 +21,7 @@ export default function NewContractPage() {
 
   const [templateId, setTemplateId] = useState('');
   const [totalAmount, setTotalAmount] = useState('');
-  const [expiresAt, setExpiresAt] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const [createdContract, setCreatedContract] = useState<Contract | null>(null);
 
@@ -43,14 +44,19 @@ export default function NewContractPage() {
       return;
     }
 
+    const rawAmount = totalAmount.replace(/,/g, '');
+    if (!rawAmount || isNaN(Number(rawAmount)) || Number(rawAmount) <= 0) {
+      toast('계약 금액을 올바르게 입력해주세요.', 'error');
+      return;
+    }
+
     setSubmitting(true);
     try {
       const payload: Record<string, any> = {
         eventId: id,
         templateId,
+        totalAmount: Number(rawAmount),
       };
-      if (totalAmount) payload.totalAmount = Number(totalAmount);
-      if (expiresAt) payload.expiresAt = new Date(expiresAt).toISOString();
 
       const contract = extractData<Contract>(await api.post('/contracts', payload));
       setCreatedContract(contract);
@@ -94,24 +100,38 @@ export default function NewContractPage() {
                 </span>
               </div>
 
-              {createdContract.qrCodeUrl && (
-                <div className="flex flex-col items-center p-6 bg-gray-50 rounded-xl">
-                  <QrCode className="w-6 h-6 text-gray-400 mb-2" />
-                  <p className="text-xs text-gray-500 mb-3">QR 코드</p>
-                  <img
-                    src={createdContract.qrCodeUrl}
-                    alt="Contract QR Code"
-                    className="w-48 h-48 border border-gray-200 rounded-lg"
-                  />
+              {createdContract.template?.name && (
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <span className="text-sm text-gray-500">템플릿</span>
+                  <span className="font-medium text-gray-900">
+                    {createdContract.template.name}
+                  </span>
                 </div>
               )}
 
-              {createdContract.qrCode && !createdContract.qrCodeUrl && (
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                  <span className="text-sm text-gray-500">QR 코드</span>
-                  <span className="font-mono text-sm text-gray-900 break-all">
-                    {createdContract.qrCode}
-                  </span>
+              {createdContract.qrCode && (
+                <div className="flex flex-col items-center p-6 bg-gray-50 rounded-xl">
+                  <p className="text-xs text-gray-500 mb-3">QR 코드</p>
+                  <div className="p-3 bg-white rounded-xl border border-gray-100">
+                    <QRCodeSVG
+                      value={`${typeof window !== 'undefined' ? window.location.origin : ''}/contract/${createdContract.qrCode}`}
+                      size={180}
+                      level="H"
+                      includeMargin
+                      fgColor="#1a1a1a"
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      const url = `${window.location.origin}/contract/${createdContract.qrCode}`;
+                      navigator.clipboard.writeText(url);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="mt-3 flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    {copied ? <><Check className="w-3.5 h-3.5" /> 복사됨</> : <><Copy className="w-3.5 h-3.5" /> 링크 복사</>}
+                  </button>
                 </div>
               )}
 
@@ -138,7 +158,7 @@ export default function NewContractPage() {
               <Button onClick={() => {
                 setCreatedContract(null);
                 setTotalAmount('');
-                setExpiresAt('');
+                setCopied(false);
               }}>
                 새 계약 생성
               </Button>
@@ -189,31 +209,20 @@ export default function NewContractPage() {
             {/* Total Amount */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                계약 금액 (선택)
+                계약 금액 <span className="text-red-500">*</span>
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={totalAmount}
-                onChange={(e) => setTotalAmount(e.target.value)}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, '');
+                  setTotalAmount(raw ? Number(raw).toLocaleString('ko-KR') : '');
+                }}
                 placeholder="금액을 입력하세요"
-                min="0"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-              <p className="mt-1 text-xs text-gray-400">비워두면 금액 없이 계약이 생성됩니다.</p>
-            </div>
-
-            {/* Expiry Date */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                만료일 (선택)
-              </label>
-              <input
-                type="date"
-                value={expiresAt}
-                onChange={(e) => setExpiresAt(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <p className="mt-1 text-xs text-gray-400">비워두면 만료일 없이 계약이 생성됩니다.</p>
+              <p className="mt-1 text-xs text-gray-400">숫자만 입력 (자동 콤마 포맷)</p>
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
@@ -224,7 +233,7 @@ export default function NewContractPage() {
               >
                 취소
               </Button>
-              <Button type="submit" loading={submitting}>
+              <Button type="submit" loading={submitting} disabled={!totalAmount}>
                 계약 생성
               </Button>
             </div>

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import api, { extractData } from '@/lib/api';
+import api from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import PageHeader from '@/components/layout/PageHeader';
@@ -39,20 +39,21 @@ export default function NewTemplatePage() {
     }
 
     if (!fileId) {
-      toast('파일을 업로드해주세요.', 'error');
+      toast('계약서 파일을 업로드해주세요.', 'error');
       return;
     }
 
     setSubmitting(true);
     try {
-      const fileType = getFileType(fileName);
-      await api.post('/contract-templates', {
+      const payload: any = {
         eventId: id,
         name: name.trim(),
-        fileId,
-        fileType,
         pageCount: 1,
-      });
+        fileId,
+        fileType: getFileType(fileName),
+      };
+
+      await api.post('/contract-templates', payload);
 
       toast('템플릿이 등록되었습니다.', 'success');
       router.push(`/partner/events/${id}`);
@@ -84,14 +85,21 @@ export default function NewTemplatePage() {
           </div>
 
           {/* File Upload */}
-          <FileUpload
-            label="계약서 파일"
-            accept=".pdf,.jpg,.jpeg,.png"
-            maxSizeMB={10}
-            helperText="PDF, JPG, PNG 파일을 업로드해주세요."
-            purpose="contract_template"
-            onUploadComplete={handleUploadComplete}
-          />
+          <div>
+            <FileUpload
+              label="계약서 파일"
+              accept=".pdf,.jpg,.jpeg,.png"
+              maxSizeMB={10}
+              helperText="PDF, JPG, PNG 파일을 업로드해주세요."
+              purpose="contract_template"
+              onUploadComplete={handleUploadComplete}
+            />
+            {fileId && (
+              <p className="text-xs text-green-600 mt-1">
+                파일 업로드 완료: {fileName}
+              </p>
+            )}
+          </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <Button

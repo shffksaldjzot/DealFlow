@@ -6,7 +6,7 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
-import { Calendar, FileText, QrCode, ChevronRight } from 'lucide-react';
+import { Calendar, FileText, QrCode, ChevronRight, Clock, CheckCircle, XCircle, Send, MapPin, Plus, Eye } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
 export default function PartnerDashboard() {
@@ -22,10 +22,21 @@ export default function PartnerDashboard() {
     ]).finally(() => setLoading(false));
   }, []);
 
-  const stats = [
-    { label: '참여 행사', value: String(events.length), icon: Calendar, color: 'text-blue-600 bg-blue-100', href: '/partner/events' },
-    { label: '전체 계약', value: String(contracts.length), icon: FileText, color: 'text-green-600 bg-green-100', href: '/partner/events' },
-    { label: '서명 완료', value: String(contracts.filter((c) => c.status === 'signed' || c.status === 'completed').length), icon: QrCode, color: 'text-purple-600 bg-purple-100', href: '/partner/events' },
+  const pendingEvents = events.filter((e) => e.status === 'pending').length;
+  const approvedEvents = events.filter((e) => e.status === 'approved').length;
+  const rejectedEvents = events.filter((e) => e.status === 'rejected').length;
+  const signedContracts = contracts.filter((c) => c.status === 'signed' || c.status === 'completed').length;
+  const activeEvents = events.filter((e) => e.status === 'approved');
+
+  const eventStats = [
+    { label: '승인완료', value: approvedEvents, icon: CheckCircle, color: 'text-green-600 bg-green-50' },
+    { label: '승인대기', value: pendingEvents, icon: Clock, color: 'text-yellow-600 bg-yellow-50' },
+    { label: '거절', value: rejectedEvents, icon: XCircle, color: 'text-red-600 bg-red-50' },
+  ];
+
+  const contractStats = [
+    { label: '전체 계약', value: contracts.length, icon: FileText, color: 'text-blue-600 bg-blue-50' },
+    { label: '서명 완료', value: signedContracts, icon: Send, color: 'text-purple-600 bg-purple-50' },
   ];
 
   return (
@@ -41,18 +52,20 @@ export default function PartnerDashboard() {
         }
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {stats.map((s, i) => {
+      {/* Event Status */}
+      <h3 className="text-sm font-semibold text-gray-700 mb-3">행사 현황</h3>
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        {eventStats.map((s, i) => {
           const Icon = s.icon;
           return (
-            <Card key={i} hoverable onClick={() => router.push(s.href)}>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${s.color}`}>
-                  <Icon className="w-6 h-6" />
+            <Card key={i} hoverable onClick={() => router.push('/partner/events')}>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>
+                  <Icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">{s.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{loading ? '-' : s.value}</p>
+                  <p className="text-xs text-gray-500">{s.label}</p>
+                  <p className="text-xl font-bold text-gray-900">{loading ? '-' : s.value}</p>
                 </div>
               </div>
             </Card>
@@ -60,6 +73,75 @@ export default function PartnerDashboard() {
         })}
       </div>
 
+      {/* Contract Stats */}
+      <h3 className="text-sm font-semibold text-gray-700 mb-3">계약 현황</h3>
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        {contractStats.map((s, i) => {
+          const Icon = s.icon;
+          return (
+            <Card key={i}>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">{s.label}</p>
+                  <p className="text-xl font-bold text-gray-900">{loading ? '-' : s.value}</p>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Active Events */}
+      {!loading && activeEvents.length > 0 && (
+        <>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">진행중인 행사</h3>
+          <div className="space-y-3 mb-6">
+            {activeEvents.map((ep: any) => (
+              <Card key={ep.id}>
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-bold text-gray-900">{ep.event.name}</h4>
+                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {formatDate(ep.event.startDate)} ~ {formatDate(ep.event.endDate)}
+                      </span>
+                      {ep.event.venue && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {ep.event.venue}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => router.push(`/partner/events/${ep.eventId}/contracts/new`)}
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1" />
+                      계약 생성
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => router.push(`/partner/events/${ep.eventId}`)}
+                    >
+                      <Eye className="w-3.5 h-3.5 mr-1" />
+                      상세보기
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Recent Contracts */}
       <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 계약</h3>
       {loading ? (
         <div className="space-y-3">
@@ -80,15 +162,17 @@ export default function PartnerDashboard() {
           {contracts.slice(0, 5).map((c: any) => (
             <Card key={c.id} hoverable onClick={() => router.push(`/partner/contracts/${c.id}`)}>
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-400 font-mono">{c.contractNumber}</p>
-                  <p className="font-semibold text-gray-900 mt-0.5">{c.event?.name || '계약서'}</p>
-                  <div className="flex items-center gap-2 mt-1">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-gray-900 truncate">{c.event?.name || '계약서'}</p>
                     <Badge status={c.status} />
-                    <span className="text-xs text-gray-400">{c.customer?.name || '미지정'}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <span className="font-mono">{c.contractNumber}</span>
+                    <span>{c.customer?.name || '미지정'}</span>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
               </div>
             </Card>
           ))}

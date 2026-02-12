@@ -201,6 +201,20 @@ export class EventsService {
       throw new NotFoundException('해당 파트너를 찾을 수 없습니다.');
     }
 
+    // Validate status transitions
+    const validTransitions: Record<string, string[]> = {
+      [EventPartnerStatus.PENDING]: [EventPartnerStatus.APPROVED, EventPartnerStatus.REJECTED],
+      [EventPartnerStatus.APPROVED]: [EventPartnerStatus.CANCELLED],
+      [EventPartnerStatus.REJECTED]: [],
+      [EventPartnerStatus.CANCELLED]: [],
+    };
+
+    if (!validTransitions[eventPartner.status]?.includes(dto.status)) {
+      throw new BadRequestException(
+        `'${eventPartner.status}' 상태에서 '${dto.status}' 상태로 변경할 수 없습니다.`,
+      );
+    }
+
     eventPartner.status = dto.status;
     if (dto.commissionRate !== undefined) {
       eventPartner.commissionRate = dto.commissionRate;
@@ -208,8 +222,41 @@ export class EventsService {
     if (dto.status === EventPartnerStatus.APPROVED) {
       eventPartner.approvedAt = new Date();
     }
+    if (dto.status === EventPartnerStatus.CANCELLED) {
+      eventPartner.cancelledAt = new Date();
+      eventPartner.cancelledBy = userId;
+      eventPartner.cancelReason = dto.cancelReason || null;
+    }
 
     return this.eventPartnerRepository.save(eventPartner);
+  }
+
+  async getPublicEventInfo(inviteCode: string): Promise<{
+    name: string;
+    description?: string;
+    venue?: string;
+    startDate: string;
+    endDate: string;
+    organizerName: string;
+    status: string;
+  }> {
+    const event = await this.eventRepository.findOne({
+      where: { inviteCode },
+      relations: ['organizer'],
+    });
+    if (!event) {
+      throw new NotFoundException('행사를 찾을 수 없습니다.');
+    }
+
+    return {
+      name: event.name,
+      description: event.description,
+      venue: event.venue,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      organizerName: event.organizer?.name || '',
+      status: event.status,
+    };
   }
 
   async getContractsSummary(
@@ -219,6 +266,7 @@ export class EventsService {
     total: number;
     byStatus: Record<string, number>;
     totalAmount: number;
+    contracts: Contract[];
   }> {
     const orgId = await this.getOrgIdForUser(userId);
 
@@ -242,6 +290,8 @@ export class EventsService {
 
     const contracts = await this.contractRepository.find({
       where: { eventId },
+      relations: ['customer', 'partner', 'template'],
+      order: { createdAt: 'DESC' },
     });
 
     const byStatus: Record<string, number> = {};
@@ -258,6 +308,7 @@ export class EventsService {
       total: contracts.length,
       byStatus,
       totalAmount,
+      contracts,
     };
   }
 }

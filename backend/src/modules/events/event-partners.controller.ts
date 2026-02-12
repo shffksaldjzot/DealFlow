@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseUUIDPipe } from '@nestjs/common';
 import { EventPartnersService } from './event-partners.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -23,5 +23,15 @@ export class EventPartnersController {
   @Roles('partner')
   listMyParticipatedEvents(@CurrentUser('id') userId: string) {
     return this.eventPartnersService.listMyParticipatedEvents(userId);
+  }
+
+  @Post(':eventId/cancel')
+  @Roles('partner')
+  cancelParticipation(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @CurrentUser('id') userId: string,
+    @Body() body: { reason?: string },
+  ) {
+    return this.eventPartnersService.cancelParticipation(userId, eventId, body.reason);
   }
 }

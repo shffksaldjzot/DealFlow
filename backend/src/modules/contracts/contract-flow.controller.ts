@@ -5,9 +5,11 @@ import {
   Body,
   Param,
   Req,
+  Res,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { ContractFlowService } from './contract-flow.service';
+import { FilesService } from '../files/files.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { FillContractDto } from './dto/fill-contract.dto';
 import { SignContractDto } from './dto/sign-contract.dto';
@@ -15,7 +17,10 @@ import { SignContractDto } from './dto/sign-contract.dto';
 @Controller('contract-flow')
 @Public()
 export class ContractFlowController {
-  constructor(private readonly contractFlowService: ContractFlowService) {}
+  constructor(
+    private readonly contractFlowService: ContractFlowService,
+    private readonly filesService: FilesService,
+  ) {}
 
   @Get(':qrCode')
   getContractByQr(@Param('qrCode') qrCode: string) {
@@ -39,6 +44,22 @@ export class ContractFlowController {
   ) {
     const userId = (req as any).user?.id || null;
     return this.contractFlowService.fillFields(qrCode, dto, userId);
+  }
+
+  @Get(':qrCode/template-file')
+  async getTemplateFile(
+    @Param('qrCode') qrCode: string,
+    @Res() res: Response,
+  ) {
+    const contract = await this.contractFlowService.getContractByQr(qrCode);
+    if (!contract.template?.fileId) {
+      res.status(404).json({ message: '템플릿 파일이 없습니다.' });
+      return;
+    }
+    const { filePath, file } = await this.filesService.getFilePath(contract.template.fileId);
+    res.setHeader('Content-Type', file.mimeType);
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(file.originalName)}"`);
+    res.sendFile(filePath);
   }
 
   @Post(':qrCode/sign')

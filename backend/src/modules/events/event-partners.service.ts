@@ -96,6 +96,33 @@ export class EventPartnersService {
     });
   }
 
+  async cancelParticipation(
+    userId: string,
+    eventId: string,
+    reason?: string,
+  ): Promise<EventPartner> {
+    const orgId = await this.getOrgIdForUser(userId);
+
+    const eventPartner = await this.eventPartnerRepository.findOne({
+      where: { eventId, partnerId: orgId },
+      relations: ['event'],
+    });
+    if (!eventPartner) {
+      throw new NotFoundException('참가 정보를 찾을 수 없습니다.');
+    }
+
+    if (eventPartner.status !== EventPartnerStatus.APPROVED) {
+      throw new ForbiddenException('승인된 상태에서만 참가 취소가 가능합니다.');
+    }
+
+    eventPartner.status = EventPartnerStatus.CANCELLED;
+    eventPartner.cancelledAt = new Date();
+    eventPartner.cancelledBy = userId;
+    eventPartner.cancelReason = reason || null;
+
+    return this.eventPartnerRepository.save(eventPartner);
+  }
+
   async listMyParticipatedEvents(userId: string): Promise<EventPartner[]> {
     const orgId = await this.getOrgIdForUser(userId);
 

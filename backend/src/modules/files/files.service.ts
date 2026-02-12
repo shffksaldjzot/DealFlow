@@ -32,8 +32,11 @@ export class FilesService {
       throw new BadRequestException('파일이 제공되지 않았습니다.');
     }
 
+    // Decode Korean filenames (multer receives latin1 encoding)
+    const decodedName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+
     // Generate a unique stored name
-    const ext = path.extname(file.originalname);
+    const ext = path.extname(decodedName);
     const storedName = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}${ext}`;
     const filePath = path.join(UPLOAD_DIR, storedName);
 
@@ -41,7 +44,7 @@ export class FilesService {
     fs.writeFileSync(filePath, file.buffer);
 
     const fileEntity = this.fileRepository.create({
-      originalName: file.originalname,
+      originalName: decodedName,
       storedName,
       s3Key: `uploads/${storedName}`, // local path simulating S3 key
       s3Bucket: 'local', // 'local' for dev, actual bucket name for prod
