@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
@@ -14,6 +15,7 @@ interface AdminEvent extends Event {
 }
 
 export default function AdminEventsPage() {
+  const router = useRouter();
   const [events, setEvents] = useState<AdminEvent[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -62,7 +64,12 @@ export default function AdminEventsPage() {
           ))}
         </div>
       ) : (
-        <Table columns={columns} data={events} emptyMessage="행사가 없습니다." />
+        <Table
+          columns={columns}
+          data={events}
+          emptyMessage="행사가 없습니다."
+          onRowClick={(e: AdminEvent) => router.push(`/admin/events/${e.id}`)}
+        />
       )}
     </div>
   );

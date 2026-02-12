@@ -6,9 +6,24 @@ import { User } from '../users/entities/user.entity';
 import { Organization } from '../organizations/entities/organization.entity';
 import { Event } from '../events/entities/event.entity';
 import { Contract } from '../contracts/entities/contract.entity';
+import { ContractFieldValue } from '../contracts/entities/contract-field-value.entity';
+import { ContractSignature } from '../contracts/entities/contract-signature.entity';
+import { ContractHistory } from '../contracts/entities/contract-history.entity';
+import { ActivityLog } from './entities/activity-log.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Organization, Event, Contract])],
+  imports: [
+    TypeOrmModule.forFeature([
+      User,
+      Organization,
+      Event,
+      Contract,
+      ContractFieldValue,
+      ContractSignature,
+      ContractHistory,
+      ActivityLog,
+    ]),
+  ],
   controllers: [AdminController],
   providers: [AdminService],
 })

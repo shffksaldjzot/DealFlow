@@ -32,6 +32,10 @@ export default function PartnerContractDetailPage() {
   useEffect(() => { fetchContract(); }, [id]);
 
   const handleCancel = async () => {
+    if (!cancelReason.trim()) {
+      toast('취소 사유를 입력해주세요.', 'error');
+      return;
+    }
     setCancelling(true);
     try {
       await api.post(`/contracts/${id}/cancel`, { reason: cancelReason });
@@ -190,7 +194,7 @@ export default function PartnerContractDetailPage() {
           />
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => setCancelModal(false)}>닫기</Button>
-            <Button variant="danger" onClick={handleCancel} loading={cancelling}>취소하기</Button>
+            <Button variant="danger" onClick={handleCancel} loading={cancelling} disabled={!cancelReason.trim()}>취소하기</Button>
           </div>
         </div>
       </Modal>

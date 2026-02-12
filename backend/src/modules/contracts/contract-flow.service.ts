@@ -244,7 +244,7 @@ export class ContractFlowService {
     await this.signatureRepository.save(
       this.signatureRepository.create({
         contractId: contract.id,
-        signerId: customerId || contract.createdBy,
+        signerId: customerId || contract.customerId || contract.createdBy || null,
         signatureData: dto.signatureData,
         signatureHash,
         ipAddress,

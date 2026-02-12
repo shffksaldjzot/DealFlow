@@ -17,7 +17,7 @@ export class ContractSignature {
   @Column({ name: 'contract_id' })
   contractId: string;
 
-  @Column({ name: 'signer_id' })
+  @Column({ name: 'signer_id', nullable: true })
   signerId: string;
 
   @Column({ name: 'signature_data', type: 'text' })

@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   ParseUUIDPipe,
@@ -66,6 +67,15 @@ export class EventsController {
     @Body() dto: UpdateEventStatusDto,
   ) {
     return this.eventsService.updateEventStatus(id, userId, dto);
+  }
+
+  @Delete(':id')
+  @Roles('organizer')
+  deleteEvent(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.eventsService.deleteEvent(id, userId);
   }
 
   @Get(':id/partners')

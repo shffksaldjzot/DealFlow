@@ -13,6 +13,7 @@ import {
   QrCode,
   Menu,
   X,
+  ClipboardList,
 } from 'lucide-react';
 
 interface NavItem {
@@ -43,6 +44,7 @@ const navItems: Record<string, NavItem[]> = {
     { label: '사용자 관리', href: '/admin/users', icon: <Users className="w-5 h-5" /> },
     { label: '행사 관리', href: '/admin/events', icon: <Calendar className="w-5 h-5" /> },
     { label: '계약 관리', href: '/admin/contracts', icon: <FileText className="w-5 h-5" /> },
+    { label: '활동 로그', href: '/admin/logs', icon: <ClipboardList className="w-5 h-5" /> },
   ],
   customer: [
     { label: '홈', href: '/customer', icon: <LayoutDashboard className="w-5 h-5" /> },

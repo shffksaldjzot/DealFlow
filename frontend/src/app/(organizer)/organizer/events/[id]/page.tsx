@@ -7,7 +7,8 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
-import { Calendar, MapPin, Copy, Check, Users, FileText, Link2, QrCode } from 'lucide-react';
+import { Calendar, MapPin, Copy, Check, Users, FileText, Link2, QrCode, Trash2 } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/utils';
 import type { Event } from '@/types/event';
@@ -20,6 +21,7 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [showQr, setShowQr] = useState<'partner' | 'visit' | null>(null);
+  const [deleteModal, setDeleteModal] = useState(false);
 
   useEffect(() => {
     api.get(`/events/${id}`)
@@ -44,6 +46,16 @@ export default function EventDetailPage() {
       toast('행사가 활성화되었습니다.', 'success');
     } catch {
       toast('상태 변경에 실패했습니다.', 'error');
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    try {
+      await api.delete(`/events/${id}`);
+      toast('행사가 삭제되었습니다.', 'success');
+      router.push('/organizer/events');
+    } catch {
+      toast('행사 삭제에 실패했습니다.', 'error');
     }
   };
 
@@ -193,6 +205,25 @@ export default function EventDetailPage() {
           수수료율: {event.commissionRate}%
         </span>
       </div>
+
+      {/* Delete Section */}
+      {event.status !== 'cancelled' && (
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <Button variant="danger" onClick={() => setDeleteModal(true)}>
+            <Trash2 className="w-4 h-4 mr-1" /> 행사 삭제
+          </Button>
+        </div>
+      )}
+
+      <Modal isOpen={deleteModal} onClose={() => setDeleteModal(false)} title="행사 삭제 확인">
+        <p className="text-sm text-gray-600 mb-4">
+          정말로 <strong>{event.name}</strong> 행사를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+        </p>
+        <div className="flex gap-2 justify-end">
+          <Button variant="outline" onClick={() => setDeleteModal(false)}>취소</Button>
+          <Button variant="danger" onClick={handleDeleteEvent}>삭제</Button>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -231,6 +231,19 @@ export class EventsService {
     return this.eventPartnerRepository.save(eventPartner);
   }
 
+  async deleteEvent(eventId: string, userId: string): Promise<void> {
+    const orgId = await this.getOrgIdForUser(userId);
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId, organizerId: orgId },
+    });
+    if (!event) {
+      throw new NotFoundException('이벤트를 찾을 수 없거나 삭제 권한이 없습니다.');
+    }
+
+    event.status = EventStatus.CANCELLED;
+    await this.eventRepository.save(event);
+  }
+
   async getPublicEventInfo(inviteCode: string): Promise<{
     name: string;
     description?: string;

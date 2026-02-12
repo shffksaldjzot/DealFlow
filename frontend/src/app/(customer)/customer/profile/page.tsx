@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
@@ -8,14 +8,44 @@ import { useToast } from '@/components/ui/Toast';
 import { User, Mail, Phone, Shield, MapPin, Lock } from 'lucide-react';
 import api from '@/lib/api';
 
+function parsePhone(phone: string): { area: string; mid: string; last: string } {
+  if (!phone) return { area: '010', mid: '', last: '' };
+  const cleaned = phone.replace(/-/g, '');
+  const areaCodes = ['010', '011', '016', '017', '018', '019'];
+  for (const code of areaCodes) {
+    if (cleaned.startsWith(code)) {
+      const rest = cleaned.slice(code.length);
+      return {
+        area: code,
+        mid: rest.slice(0, 4),
+        last: rest.slice(4, 8),
+      };
+    }
+  }
+  if (cleaned.length >= 3) {
+    return { area: cleaned.slice(0, 3), mid: cleaned.slice(3, 7), last: cleaned.slice(7, 11) };
+  }
+  return { area: '010', mid: '', last: '' };
+}
+
+function formatPhone(area: string, mid: string, last: string): string {
+  if (!mid && !last) return '';
+  return `${area}-${mid}-${last}`;
+}
+
 export default function CustomerProfile() {
   const { user, setUser } = useAuthStore();
   const { toast } = useToast();
   const [name, setName] = useState(user?.name || '');
-  const [phone, setPhone] = useState(user?.phone || '');
   const [address, setAddress] = useState(user?.address || '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // Phone 3-part
+  const parsed = parsePhone(user?.phone || '');
+  const [phoneArea, setPhoneArea] = useState(parsed.area);
+  const [phoneMid, setPhoneMid] = useState(parsed.mid);
+  const [phoneLast, setPhoneLast] = useState(parsed.last);
 
   // Password change
   const [currentPassword, setCurrentPassword] = useState('');
@@ -24,6 +54,7 @@ export default function CustomerProfile() {
   const [changingPassword, setChangingPassword] = useState(false);
 
   const handleSave = async () => {
+    const phone = formatPhone(phoneArea, phoneMid, phoneLast);
     setSaving(true);
     try {
       await api.patch('/auth/me', { name, phone, address });
@@ -73,6 +104,7 @@ export default function CustomerProfile() {
   };
 
   const passwordMismatch = newPasswordConfirm.length > 0 && newPassword !== newPasswordConfirm;
+  const phone = formatPhone(phoneArea, phoneMid, phoneLast);
 
   return (
     <div>
@@ -118,11 +150,35 @@ export default function CustomerProfile() {
 
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">연락처</label>
-            <Input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="010-0000-0000"
-            />
+            <div className="flex items-center gap-2">
+              <select
+                value={phoneArea}
+                onChange={(e) => setPhoneArea(e.target.value)}
+                className="border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-24"
+              >
+                {['010', '011', '016', '017', '018', '019'].map((code) => (
+                  <option key={code} value={code}>{code}</option>
+                ))}
+              </select>
+              <span className="text-gray-400">-</span>
+              <input
+                type="text"
+                maxLength={4}
+                value={phoneMid}
+                onChange={(e) => setPhoneMid(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="0000"
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+              />
+              <span className="text-gray-400">-</span>
+              <input
+                type="text"
+                maxLength={4}
+                value={phoneLast}
+                onChange={(e) => setPhoneLast(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="0000"
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+              />
+            </div>
           </div>
 
           <div>

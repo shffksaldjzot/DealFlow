@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
@@ -14,6 +15,7 @@ interface AdminContract extends Contract {
 }
 
 export default function AdminContractsPage() {
+  const router = useRouter();
   const [contracts, setContracts] = useState<AdminContract[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -63,7 +65,12 @@ export default function AdminContractsPage() {
           ))}
         </div>
       ) : (
-        <Table columns={columns} data={contracts} emptyMessage="계약이 없습니다." />
+        <Table
+          columns={columns}
+          data={contracts}
+          emptyMessage="계약이 없습니다."
+          onRowClick={(c: AdminContract) => router.push(`/admin/contracts/${c.id}`)}
+        />
       )}
     </div>
   );

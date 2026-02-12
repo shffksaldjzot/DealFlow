@@ -97,9 +97,19 @@ export default function PartnerDashboard() {
       {/* Active Events */}
       {!loading && activeEvents.length > 0 && (
         <>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">진행중인 행사</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-700">진행중인 행사</h3>
+            {activeEvents.length > 3 && (
+              <button
+                onClick={() => router.push('/partner/events')}
+                className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+              >
+                더보기 →
+              </button>
+            )}
+          </div>
           <div className="space-y-3 mb-6">
-            {activeEvents.map((ep: any) => (
+            {activeEvents.slice(0, 3).map((ep: any) => (
               <Card key={ep.id}>
                 <div className="space-y-3">
                   <div>
