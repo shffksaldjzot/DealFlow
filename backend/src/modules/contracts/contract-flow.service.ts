@@ -11,8 +11,10 @@ import { ContractField } from './entities/contract-field.entity';
 import { ContractFieldValue } from './entities/contract-field-value.entity';
 import { ContractSignature } from './entities/contract-signature.entity';
 import { ContractHistory } from './entities/contract-history.entity';
+import { OrganizationMember, MemberRole } from '../organizations/entities/organization-member.entity';
 import { FillContractDto } from './dto/fill-contract.dto';
 import { SignContractDto } from './dto/sign-contract.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ContractFlowService {
@@ -27,6 +29,9 @@ export class ContractFlowService {
     private readonly signatureRepository: Repository<ContractSignature>,
     @InjectRepository(ContractHistory)
     private readonly historyRepository: Repository<ContractHistory>,
+    @InjectRepository(OrganizationMember)
+    private readonly memberRepository: Repository<OrganizationMember>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private async findContractByQr(qrCode: string): Promise<Contract> {
@@ -240,6 +245,39 @@ export class ContractFlowService {
         metadata: { signatureHash },
       }),
     );
+
+    // Send notifications after successful signature
+    try {
+      // Notify the partner org owner
+      const partnerOwner = await this.memberRepository.findOne({
+        where: { organizationId: contract.partnerId, role: MemberRole.OWNER },
+      });
+      if (partnerOwner) {
+        await this.notificationsService.createNotification({
+          userId: partnerOwner.userId,
+          type: 'contract_signed',
+          title: '새로운 계약 서명이 완료되었습니다',
+          message: `계약번호 ${contract.contractNumber}의 서명이 완료되었습니다.`,
+          relatedId: contract.id,
+          relatedType: 'contract',
+        });
+      }
+
+      // Notify the customer
+      const customerUserId = customerId || contract.customerId;
+      if (customerUserId) {
+        await this.notificationsService.createNotification({
+          userId: customerUserId,
+          type: 'contract_signed',
+          title: '계약 서명이 완료되었습니다',
+          message: `계약번호 ${contract.contractNumber}의 서명이 완료되었습니다.`,
+          relatedId: contract.id,
+          relatedType: 'contract',
+        });
+      }
+    } catch {
+      // Do not fail the signature flow if notification fails
+    }
 
     return this.findContractByQr(qrCode);
   }

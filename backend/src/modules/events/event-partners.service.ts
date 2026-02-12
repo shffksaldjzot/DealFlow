@@ -11,7 +11,8 @@ import {
   EventPartner,
   EventPartnerStatus,
 } from './entities/event-partner.entity';
-import { OrganizationMember } from '../organizations/entities/organization-member.entity';
+import { OrganizationMember, MemberRole } from '../organizations/entities/organization-member.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class EventPartnersService {
@@ -22,6 +23,7 @@ export class EventPartnersService {
     private readonly eventPartnerRepository: Repository<EventPartner>,
     @InjectRepository(OrganizationMember)
     private readonly memberRepository: Repository<OrganizationMember>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private async getOrgIdForUser(userId: string): Promise<string> {
@@ -68,6 +70,26 @@ export class EventPartnersService {
     });
 
     const saved = await this.eventPartnerRepository.save(eventPartner);
+
+    // Notify the event organizer's org owner
+    try {
+      const organizerOwner = await this.memberRepository.findOne({
+        where: { organizationId: event.organizerId, role: MemberRole.OWNER },
+      });
+      if (organizerOwner) {
+        await this.notificationsService.createNotification({
+          userId: organizerOwner.userId,
+          type: 'partner_joined',
+          title: '새로운 파트너가 행사 참여를 요청했습니다',
+          message: `행사 "${event.name}"에 새로운 파트너가 참여를 요청했습니다.`,
+          relatedId: event.id,
+          relatedType: 'event',
+        });
+      }
+    } catch {
+      // Do not fail the join flow if notification fails
+    }
+
     return this.eventPartnerRepository.findOne({
       where: { id: saved.id },
       relations: ['event', 'event.organizer', 'partner'],

@@ -15,6 +15,7 @@ export interface Event {
   status: EventStatus;
   createdAt: string;
   organizer?: { id: string; name: string };
+  partners?: EventPartner[];
 }
 
 export interface EventPartner {

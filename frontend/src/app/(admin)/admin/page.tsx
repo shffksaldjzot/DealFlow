@@ -1,32 +1,63 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import PageHeader from '@/components/layout/PageHeader';
 import { Building2, Users, Calendar, FileText } from 'lucide-react';
 import api, { extractData } from '@/lib/api';
 
 interface DashboardStats {
-  totalOrganizers: number;
-  pendingOrganizers: number;
+  totalOrganizations: number;
+  pendingOrganizations: number;
   totalUsers: number;
   totalEvents: number;
+  activeEvents: number;
   totalContracts: number;
 }
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.get('/admin/dashboard')
       .then((res) => setStats(extractData(res)))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const cards = [
-    { label: '주관사', value: stats?.totalOrganizers || 0, sub: `승인 대기: ${stats?.pendingOrganizers || 0}`, icon: Building2, color: 'text-purple-600 bg-purple-100', href: '/admin/organizers' },
-    { label: '전체 사용자', value: stats?.totalUsers || 0, icon: Users, color: 'text-blue-600 bg-blue-100', href: '/admin/users' },
-    { label: '전체 행사', value: stats?.totalEvents || 0, icon: Calendar, color: 'text-green-600 bg-green-100', href: '/admin/events' },
-    { label: '전체 계약', value: stats?.totalContracts || 0, icon: FileText, color: 'text-orange-600 bg-orange-100', href: '/admin/contracts' },
+    {
+      label: '주관사',
+      value: stats?.totalOrganizations || 0,
+      sub: `승인 대기: ${stats?.pendingOrganizations || 0}`,
+      icon: Building2,
+      color: 'text-purple-600 bg-purple-100',
+      href: '/admin/organizers',
+    },
+    {
+      label: '전체 사용자',
+      value: stats?.totalUsers || 0,
+      icon: Users,
+      color: 'text-blue-600 bg-blue-100',
+      href: '/admin/users',
+    },
+    {
+      label: '전체 행사',
+      value: stats?.totalEvents || 0,
+      sub: `진행 중: ${stats?.activeEvents || 0}`,
+      icon: Calendar,
+      color: 'text-green-600 bg-green-100',
+      href: '/admin/events',
+    },
+    {
+      label: '전체 계약',
+      value: stats?.totalContracts || 0,
+      icon: FileText,
+      color: 'text-orange-600 bg-orange-100',
+      href: '/admin/contracts',
+    },
   ];
 
   return (
@@ -37,15 +68,15 @@ export default function AdminDashboard() {
         {cards.map((c, i) => {
           const Icon = c.icon;
           return (
-            <Card key={i} hoverable>
+            <Card key={i} hoverable onClick={() => router.push(c.href)}>
               <div className="flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${c.color}`}>
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{c.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{c.value}</p>
-                  {c.sub && <p className="text-xs text-gray-400">{c.sub}</p>}
+                  <p className="text-2xl font-bold text-gray-900">{loading ? '-' : c.value}</p>
+                  {c.sub && <p className="text-xs text-gray-400">{loading ? '' : c.sub}</p>}
                 </div>
               </div>
             </Card>

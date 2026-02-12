@@ -8,6 +8,7 @@ import { Event } from './entities/event.entity';
 import { EventPartner } from './entities/event-partner.entity';
 import { Contract } from '../contracts/entities/contract.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { OrganizationMember } from '../organizations/entities/organization-membe
       Contract,
       OrganizationMember,
     ]),
+    NotificationsModule,
   ],
   controllers: [EventsController, EventPartnersController],
   providers: [EventsService, EventPartnersService],

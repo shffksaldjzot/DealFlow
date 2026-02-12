@@ -14,6 +14,7 @@ import { ContractSignature } from './entities/contract-signature.entity';
 import { ContractHistory } from './entities/contract-history.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
 import { EventPartner } from '../events/entities/event-partner.entity';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EventPartner } from '../events/entities/event-partner.entity';
       OrganizationMember,
       EventPartner,
     ]),
+    NotificationsModule,
   ],
   controllers: [
     ContractsController,

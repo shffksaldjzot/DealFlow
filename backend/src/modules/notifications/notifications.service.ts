@@ -22,6 +22,12 @@ export class NotificationsService {
     });
   }
 
+  async getUnreadCount(userId: string): Promise<number> {
+    return this.notificationRepository.count({
+      where: { userId, status: NotificationStatus.PENDING },
+    });
+  }
+
   async markAsRead(notificationId: string, userId: string): Promise<Notification> {
     const notification = await this.notificationRepository.findOne({
       where: { id: notificationId, userId },
@@ -32,6 +38,30 @@ export class NotificationsService {
 
     notification.status = NotificationStatus.SENT;
     notification.sentAt = new Date();
+    return this.notificationRepository.save(notification);
+  }
+
+  async createNotification(data: {
+    userId: string;
+    type: string;
+    title: string;
+    message: string;
+    relatedId?: string;
+    relatedType?: string;
+  }): Promise<Notification> {
+    const notification = this.notificationRepository.create({
+      userId: data.userId,
+      type: NotificationType.PUSH,
+      title: data.title,
+      content: data.message,
+      contractId: data.relatedType === 'contract' ? data.relatedId : null,
+      status: NotificationStatus.PENDING,
+      metadata: {
+        relatedId: data.relatedId,
+        relatedType: data.relatedType,
+      },
+    });
+
     return this.notificationRepository.save(notification);
   }
 
