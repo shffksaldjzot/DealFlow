@@ -14,6 +14,7 @@ export interface Organization {
   status: OrgStatus;
   approvedAt?: string;
   createdAt: string;
+  members?: OrganizationMember[];
 }
 
 export interface OrganizationMember {

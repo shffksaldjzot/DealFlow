@@ -27,13 +27,13 @@ const navItems: Record<string, NavItem[]> = {
   organizer: [
     { label: '대시보드', href: '/organizer', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '행사 관리', href: '/organizer/events', icon: <Calendar className="w-5 h-5" /> },
-    { label: '업체 프로필', href: '/organizer/profile', icon: <Building2 className="w-5 h-5" /> },
+    { label: '조직 설정', href: '/organizer/settings', icon: <Settings className="w-5 h-5" /> },
   ],
   partner: [
     { label: '대시보드', href: '/partner', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '참여 행사', href: '/partner/events', icon: <Calendar className="w-5 h-5" /> },
     { label: '행사 참여', href: '/partner/events/join', icon: <QrCode className="w-5 h-5" /> },
-    { label: '업체 프로필', href: '/partner/profile', icon: <Building2 className="w-5 h-5" /> },
+    { label: '조직 설정', href: '/partner/settings', icon: <Settings className="w-5 h-5" /> },
   ],
   admin: [
     { label: '대시보드', href: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },

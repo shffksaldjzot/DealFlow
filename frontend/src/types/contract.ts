@@ -43,12 +43,21 @@ export interface Contract {
   signedPdfFileId?: string;
   totalAmount?: number;
   cancelReason?: string;
+  cancelledBy?: string;
+  cancelledAt?: string;
   signedAt?: string;
   completedAt?: string;
+  expiresAt?: string;
+  createdBy: string;
   createdAt: string;
+  updatedAt: string;
   template?: ContractTemplate;
   event?: { id: string; name: string };
+  partner?: { id: string; name: string };
   customer?: { id: string; name: string; email: string };
+  fieldValues?: { id: string; fieldId: string; value: string; field?: ContractField }[];
+  signatures?: { id: string; signedAt: string; signatureHash: string }[];
+  histories?: { id: string; fromStatus: string; toStatus: string; reason?: string; createdAt: string }[];
 }
 
 export interface ContractFieldValue {
