@@ -1,10 +1,11 @@
-import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   SocialLoginDto,
   EmailLoginDto,
   SignupDto,
   RefreshTokenDto,
+  ChangePasswordDto,
 } from './dto/login.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -40,5 +41,21 @@ export class AuthController {
   @Get('me')
   getMe(@CurrentUser('id') userId: string) {
     return this.authService.getMe(userId);
+  }
+
+  @Patch('me')
+  updateMe(
+    @CurrentUser('id') userId: string,
+    @Body() body: { name?: string; phone?: string; address?: string },
+  ) {
+    return this.authService.updateMe(userId, body);
+  }
+
+  @Patch('password')
+  changePassword(
+    @CurrentUser('id') userId: string,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(userId, dto.currentPassword, dto.newPassword);
   }
 }

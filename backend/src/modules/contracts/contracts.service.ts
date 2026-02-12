@@ -19,6 +19,7 @@ import { SaveFieldsDto } from './dto/save-fields.dto';
 import {
   generateContractNumber,
   generateQRCode,
+  generateShortCode,
 } from '../../common/utils/code-generator';
 
 @Injectable()
@@ -101,15 +102,28 @@ export class ContractsService {
       });
     }
 
+    let shortCode = generateShortCode();
+    let existingShort = await this.contractRepository.findOne({
+      where: { shortCode },
+    });
+    while (existingShort) {
+      shortCode = generateShortCode();
+      existingShort = await this.contractRepository.findOne({
+        where: { shortCode },
+      });
+    }
+
     const contract = this.contractRepository.create({
       contractNumber,
       templateId: dto.templateId,
       eventId: dto.eventId,
       partnerId: orgId,
       qrCode,
+      shortCode,
       qrCodeUrl: `/api/contract-flow/${qrCode}`,
       status: ContractStatus.PENDING,
       totalAmount: dto.totalAmount,
+      customerName: dto.customerName,
       createdBy: userId,
     });
 

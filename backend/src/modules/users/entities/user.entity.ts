@@ -58,6 +58,9 @@ export class User {
   @Column({ type: 'varchar', length: 20, default: UserStatus.ACTIVE })
   status: UserStatus;
 
+  @Column({ length: 500, nullable: true })
+  address: string;
+
   @Column({ name: 'profile_image', length: 500, nullable: true })
   profileImage: string;
 

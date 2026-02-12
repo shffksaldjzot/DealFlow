@@ -21,7 +21,9 @@ export default function NewContractPage() {
 
   const [templateId, setTemplateId] = useState('');
   const [totalAmount, setTotalAmount] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [copied, setCopied] = useState(false);
+  const [shortCodeCopied, setShortCodeCopied] = useState(false);
 
   const [createdContract, setCreatedContract] = useState<Contract | null>(null);
 
@@ -57,6 +59,9 @@ export default function NewContractPage() {
         templateId,
         totalAmount: Number(rawAmount),
       };
+      if (customerName.trim()) {
+        payload.customerName = customerName.trim();
+      }
 
       const contract = extractData<Contract>(await api.post('/contracts', payload));
       setCreatedContract(contract);
@@ -89,10 +94,30 @@ export default function NewContractPage() {
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">계약이 생성되었습니다</h3>
             <p className="text-sm text-gray-500 mb-6">
-              고객에게 QR 코드를 공유하여 계약을 진행하세요.
+              고객에게 QR 코드를 공유하거나 안내코드를 전달하세요.
             </p>
 
             <div className="w-full max-w-sm space-y-4">
+              {/* Short Code - prominent display */}
+              {createdContract.shortCode && (
+                <div className="flex flex-col items-center p-6 bg-blue-50 rounded-xl border-2 border-blue-200">
+                  <p className="text-xs text-blue-600 font-medium mb-2">고객 안내용 코드</p>
+                  <p className="text-3xl font-bold font-mono text-blue-900 tracking-widest mb-3">
+                    {createdContract.shortCode}
+                  </p>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(createdContract.shortCode!);
+                      setShortCodeCopied(true);
+                      setTimeout(() => setShortCodeCopied(false), 2000);
+                    }}
+                    className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    {shortCodeCopied ? <><Check className="w-3.5 h-3.5" /> 복사됨</> : <><Copy className="w-3.5 h-3.5" /> 코드 복사</>}
+                  </button>
+                </div>
+              )}
+
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <span className="text-sm text-gray-500">계약번호</span>
                 <span className="font-mono font-bold text-gray-900">
@@ -158,7 +183,9 @@ export default function NewContractPage() {
               <Button onClick={() => {
                 setCreatedContract(null);
                 setTotalAmount('');
+                setCustomerName('');
                 setCopied(false);
+                setShortCodeCopied(false);
               }}>
                 새 계약 생성
               </Button>
@@ -206,6 +233,20 @@ export default function NewContractPage() {
               </select>
             </div>
 
+            {/* Customer Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                고객명 <span className="text-xs text-gray-400">(선택)</span>
+              </label>
+              <input
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="고객 이름을 입력하세요"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
             {/* Total Amount */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -222,7 +263,6 @@ export default function NewContractPage() {
                 placeholder="금액을 입력하세요"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-              <p className="mt-1 text-xs text-gray-400">숫자만 입력 (자동 콤마 포맷)</p>
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">

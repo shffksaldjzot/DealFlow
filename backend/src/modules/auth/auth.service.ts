@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -130,6 +131,47 @@ export class AuthService {
     if (!user) throw new UnauthorizedException();
     const { passwordHash, ...result } = user;
     return result;
+  }
+
+  async updateMe(userId: string, data: { name?: string; phone?: string; address?: string }) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) throw new UnauthorizedException();
+
+    if (data.name !== undefined) user.name = data.name;
+    if (data.phone !== undefined) user.phone = data.phone;
+    if (data.address !== undefined) user.address = data.address;
+
+    const saved = await this.usersRepository.save(user);
+    const { passwordHash, ...result } = saved;
+    return result;
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.id = :id', { id: userId })
+      .getOne();
+
+    if (!user || !user.passwordHash) {
+      throw new BadRequestException('비밀번호를 변경할 수 없는 계정입니다.');
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isValid) {
+      throw new BadRequestException('현재 비밀번호가 올바르지 않습니다.');
+    }
+
+    if (newPassword.length < 8) {
+      throw new BadRequestException('새 비밀번호는 8자 이상이어야 합니다.');
+    }
+
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await this.usersRepository.save(user);
+
+    return { message: '비밀번호가 변경되었습니다.' };
   }
 
   private generateTokens(user: User): TokenResponseDto {

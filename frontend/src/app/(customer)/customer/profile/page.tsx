@@ -4,24 +4,65 @@ import { useAuthStore } from '@/stores/authStore';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { User, Mail, Phone, Shield } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
+import { User, Mail, Phone, Shield, MapPin, Lock } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function CustomerProfile() {
-  const { user } = useAuthStore();
+  const { user, setUser } = useAuthStore();
+  const { toast } = useToast();
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
+  const [address, setAddress] = useState(user?.address || '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // Password change
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.patch('/auth/me', { name, phone });
+      await api.patch('/auth/me', { name, phone, address });
+      if (user) {
+        setUser({ ...user, name, phone, address });
+      }
       setSaved(true);
+      toast('저장되었습니다.', 'success');
       setTimeout(() => setSaved(false), 2000);
-    } catch {}
+    } catch {
+      toast('저장에 실패했습니다.', 'error');
+    }
     setSaving(false);
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      toast('비밀번호를 입력해주세요.', 'error');
+      return;
+    }
+    if (newPassword.length < 8) {
+      toast('새 비밀번호는 8자 이상이어야 합니다.', 'error');
+      return;
+    }
+    if (newPassword !== newPasswordConfirm) {
+      toast('새 비밀번호가 일치하지 않습니다.', 'error');
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      await api.patch('/auth/password', { currentPassword, newPassword });
+      toast('비밀번호가 변경되었습니다.', 'success');
+      setCurrentPassword('');
+      setNewPassword('');
+      setNewPasswordConfirm('');
+    } catch (err: any) {
+      toast(err.response?.data?.message || '비밀번호 변경에 실패했습니다.', 'error');
+    }
+    setChangingPassword(false);
   };
 
   const roleLabels: Record<string, string> = {
@@ -30,6 +71,8 @@ export default function CustomerProfile() {
     partner: '협력업체',
     admin: '관리자',
   };
+
+  const passwordMismatch = newPasswordConfirm.length > 0 && newPassword !== newPasswordConfirm;
 
   return (
     <div>
@@ -81,6 +124,15 @@ export default function CustomerProfile() {
               placeholder="010-0000-0000"
             />
           </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">주소</label>
+            <Input
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="주소를 입력하세요"
+            />
+          </div>
         </div>
 
         <div className="mt-6 flex items-center gap-3">
@@ -88,6 +140,56 @@ export default function CustomerProfile() {
             {saving ? '저장 중...' : saved ? '저장 완료!' : '저장'}
           </Button>
           {saved && <span className="text-sm text-green-600">변경사항이 저장되었습니다</span>}
+        </div>
+      </Card>
+
+      {/* Password Change Card */}
+      <Card className="mb-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Lock className="w-5 h-5 text-gray-600" />
+          <h3 className="text-sm font-semibold text-gray-700">비밀번호 변경</h3>
+        </div>
+        <div className="space-y-4">
+          <Input
+            label="현재 비밀번호"
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="현재 비밀번호를 입력하세요"
+          />
+          <div>
+            <Input
+              label="새 비밀번호"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="8자 이상 입력하세요"
+            />
+            {newPassword.length > 0 && newPassword.length < 8 && (
+              <p className="text-xs text-red-500 mt-1">비밀번호는 8자 이상이어야 합니다</p>
+            )}
+          </div>
+          <div>
+            <Input
+              label="새 비밀번호 확인"
+              type="password"
+              value={newPasswordConfirm}
+              onChange={(e) => setNewPasswordConfirm(e.target.value)}
+              placeholder="새 비밀번호를 다시 입력하세요"
+            />
+            {passwordMismatch && (
+              <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+            )}
+          </div>
+        </div>
+        <div className="mt-4">
+          <Button
+            variant="outline"
+            onClick={handleChangePassword}
+            disabled={changingPassword || !currentPassword || !newPassword || !newPasswordConfirm || passwordMismatch}
+          >
+            {changingPassword ? '변경 중...' : '비밀번호 변경'}
+          </Button>
         </div>
       </Card>
 
@@ -105,6 +207,13 @@ export default function CustomerProfile() {
             <span className="text-gray-500">연락처:</span>
             <span className="text-gray-900">{phone || '미등록'}</span>
           </div>
+          {address && (
+            <div className="flex items-center gap-3 text-sm">
+              <MapPin className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-500">주소:</span>
+              <span className="text-gray-900">{address}</span>
+            </div>
+          )}
         </div>
       </Card>
     </div>

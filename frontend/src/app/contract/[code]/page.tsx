@@ -19,7 +19,7 @@ export default function ContractEntryPage() {
     api.get(`/contract-flow/${code}`)
       .then((res) => setContract(extractData(res)))
       .catch((err) => {
-        setError(err.response?.data?.message?.[0] || '계약서를 찾을 수 없습니다.');
+        setError(err.response?.data?.message?.[0] || '올바른 계약 코드를 입력해주세요.');
       })
       .finally(() => setLoading(false));
   }, [code]);

@@ -34,19 +34,37 @@ export class ContractFlowService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
-  private async findContractByQr(qrCode: string): Promise<Contract> {
-    const contract = await this.contractRepository.findOne({
-      where: { qrCode },
-      relations: [
-        'template',
-        'template.fields',
-        'event',
-        'partner',
-        'fieldValues',
-        'fieldValues.field',
-        'signatures',
-      ],
-    });
+  private async findContractByQr(code: string): Promise<Contract> {
+    // If code is 8 chars, try shortCode first; otherwise use qrCode
+    let contract: Contract | null = null;
+    if (code.length === 8) {
+      contract = await this.contractRepository.findOne({
+        where: { shortCode: code },
+        relations: [
+          'template',
+          'template.fields',
+          'event',
+          'partner',
+          'fieldValues',
+          'fieldValues.field',
+          'signatures',
+        ],
+      });
+    }
+    if (!contract) {
+      contract = await this.contractRepository.findOne({
+        where: { qrCode: code },
+        relations: [
+          'template',
+          'template.fields',
+          'event',
+          'partner',
+          'fieldValues',
+          'fieldValues.field',
+          'signatures',
+        ],
+      });
+    }
     if (!contract) {
       throw new NotFoundException('계약서를 찾을 수 없습니다.');
     }
@@ -72,6 +90,15 @@ export class ContractFlowService {
     customerId?: string,
   ): Promise<Contract> {
     const contract = await this.findContractByQr(qrCode);
+
+    if (contract.status === ContractStatus.IN_PROGRESS) {
+      // Already in progress – just update customer if needed and return as-is
+      if (customerId && !contract.customerId) {
+        contract.customerId = customerId;
+        await this.contractRepository.save(contract);
+      }
+      return this.findContractByQr(qrCode);
+    }
 
     if (contract.status !== ContractStatus.PENDING) {
       throw new BadRequestException(

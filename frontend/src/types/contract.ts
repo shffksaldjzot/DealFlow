@@ -38,7 +38,9 @@ export interface Contract {
   partnerId: string;
   customerId?: string;
   qrCode: string;
+  shortCode?: string;
   qrCodeUrl?: string;
+  customerName?: string;
   status: ContractStatus;
   signedPdfFileId?: string;
   totalAmount?: number;

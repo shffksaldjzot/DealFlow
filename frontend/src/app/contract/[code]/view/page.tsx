@@ -96,6 +96,45 @@ export default function ContractViewPage() {
   const hasTemplateFile = contract?.template?.fileId;
   const templateFileUrl = hasTemplateFile ? `/api/contract-flow/${code}/template-file` : null;
 
+  const renderFieldsForm = () => (
+    <Card padding="lg">
+      <h3 className="font-bold text-gray-900 mb-4">계약 정보 입력</h3>
+      <div className="space-y-4">
+        {fields
+          .filter((f) => f.fieldType !== 'signature')
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((field) => (
+            <div key={field.id}>
+              {field.fieldType === 'checkbox' ? (
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={fieldValues[field.id] === 'true'}
+                    onChange={(e) =>
+                      handleFieldChange(field.id, e.target.checked ? 'true' : 'false')
+                    }
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {field.label}
+                    {field.isRequired && <span className="text-red-500 ml-1">*</span>}
+                  </span>
+                </label>
+              ) : (
+                <Input
+                  label={`${field.label}${field.isRequired ? ' *' : ''}`}
+                  type={field.fieldType === 'amount' || field.fieldType === 'number' ? 'number' : field.fieldType === 'date' ? 'date' : 'text'}
+                  placeholder={field.placeholder || ''}
+                  value={fieldValues[field.id] || ''}
+                  onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                />
+              )}
+            </div>
+          ))}
+      </div>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -122,52 +161,44 @@ export default function ContractViewPage() {
           <span className="text-gray-400">3. 완료</span>
         </div>
 
-        {/* Contract Fields - with or without overlay */}
+        {/* Template file preview (read-only) + field form below */}
         {templateFileUrl && contract?.template?.fileType ? (
-          <ContractOverlay
-            fileUrl={templateFileUrl}
-            fileType={contract.template.fileType}
-            fields={fields}
-            fieldValues={fieldValues}
-            onFieldChange={handleFieldChange}
-          />
+          <>
+            {/* Template file preview */}
+            <Card padding="lg">
+              <h3 className="font-bold text-gray-900 mb-3">계약서 미리보기</h3>
+              {contract.template.fileType === 'pdf' ? (
+                <iframe
+                  src={templateFileUrl}
+                  className="w-full rounded-lg border border-gray-200"
+                  style={{ height: '500px' }}
+                  title="계약서 미리보기"
+                />
+              ) : (
+                <img
+                  src={templateFileUrl}
+                  alt="계약서 미리보기"
+                  className="w-full rounded-lg border border-gray-200"
+                />
+              )}
+            </Card>
+
+            {/* Overlay mode for field positioning */}
+            <ContractOverlay
+              fileUrl={templateFileUrl}
+              fileType={contract.template.fileType}
+              fields={fields}
+              fieldValues={fieldValues}
+              onFieldChange={handleFieldChange}
+            />
+
+            {/* Separate form for fields without overlay positions */}
+            {fields.filter(
+              (f) => f.fieldType !== 'signature' && (!f.positionX && !f.positionY),
+            ).length > 0 && renderFieldsForm()}
+          </>
         ) : (
-          <Card padding="lg">
-            <h3 className="font-bold text-gray-900 mb-4">계약 정보 입력</h3>
-            <div className="space-y-4">
-              {fields
-                .filter((f) => f.fieldType !== 'signature')
-                .sort((a, b) => a.sortOrder - b.sortOrder)
-                .map((field) => (
-                  <div key={field.id}>
-                    {field.fieldType === 'checkbox' ? (
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={fieldValues[field.id] === 'true'}
-                          onChange={(e) =>
-                            handleFieldChange(field.id, e.target.checked ? 'true' : 'false')
-                          }
-                          className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {field.label}
-                          {field.isRequired && <span className="text-red-500 ml-1">*</span>}
-                        </span>
-                      </label>
-                    ) : (
-                      <Input
-                        label={`${field.label}${field.isRequired ? ' *' : ''}`}
-                        type={field.fieldType === 'amount' || field.fieldType === 'number' ? 'number' : field.fieldType === 'date' ? 'date' : 'text'}
-                        placeholder={field.placeholder || ''}
-                        value={fieldValues[field.id] || ''}
-                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                      />
-                    )}
-                  </div>
-                ))}
-            </div>
-          </Card>
+          renderFieldsForm()
         )}
 
         {/* Agreement */}

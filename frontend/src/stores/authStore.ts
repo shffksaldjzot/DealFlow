@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import api, { extractData } from '@/lib/api';
 import type { User, UserRole, LoginResponse } from '@/types/user';
 
-type AuthUser = Pick<User, 'id' | 'email' | 'name' | 'role'> & { phone?: string; createdAt?: string };
+type AuthUser = Pick<User, 'id' | 'email' | 'name' | 'role'> & { phone?: string; address?: string; createdAt?: string };
 
 interface AuthState {
   user: AuthUser | null;
@@ -69,9 +69,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ isLoading: false });
         return;
       }
-      const data = extractData<User>(await api.get('/auth/me'));
+      const data = extractData<any>(await api.get('/auth/me'));
       set({
-        user: { id: data.id, email: data.email, name: data.name, role: data.role, phone: data.phone, createdAt: data.createdAt },
+        user: { id: data.id, email: data.email, name: data.name, role: data.role, phone: data.phone, address: data.address, createdAt: data.createdAt },
         isAuthenticated: true,
         isLoading: false,
       });

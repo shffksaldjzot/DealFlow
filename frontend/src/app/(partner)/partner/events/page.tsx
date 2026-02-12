@@ -7,7 +7,7 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
-import { QrCode, Calendar, ChevronRight, Ban } from 'lucide-react';
+import { QrCode, Calendar, ChevronRight } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
 interface MyEvent {
@@ -32,17 +32,13 @@ export default function PartnerEventsPage() {
   const [events, setEvents] = useState<MyEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('approved');
-  const [cancelTarget, setCancelTarget] = useState<MyEvent | null>(null);
-  const [cancelReason, setCancelReason] = useState('');
 
-  const fetchEvents = () => {
+  useEffect(() => {
     api.get('/event-partners/my-events')
       .then((res) => setEvents(extractData(res)))
       .catch(() => {})
       .finally(() => setLoading(false));
-  };
-
-  useEffect(() => { fetchEvents(); }, []);
+  }, []);
 
   const getCount = (tab: TabKey) => {
     if (tab === 'all') return events.length;
@@ -52,20 +48,6 @@ export default function PartnerEventsPage() {
   const filteredEvents = activeTab === 'all'
     ? events
     : events.filter((e) => e.status === activeTab);
-
-  const handleCancel = async () => {
-    if (!cancelTarget) return;
-    try {
-      await api.post(`/event-partners/${cancelTarget.eventId}/cancel`, {
-        reason: cancelReason || undefined,
-      });
-      setCancelTarget(null);
-      setCancelReason('');
-      fetchEvents();
-    } catch {
-      // error handled silently
-    }
-  };
 
   return (
     <div>
@@ -152,50 +134,12 @@ export default function PartnerEventsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   {ep.status === 'approved' && (
-                    <>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setCancelTarget(ep); }}
-                        className="text-xs text-red-500 hover:text-red-700 px-2 py-1"
-                      >
-                        <Ban className="w-3.5 h-3.5" />
-                      </button>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
                   )}
                 </div>
               </div>
             </Card>
           ))}
-        </div>
-      )}
-
-      {/* Cancel Confirmation Dialog */}
-      {cancelTarget && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">참여 취소</h3>
-            <p className="text-sm text-gray-500">
-              <strong>{cancelTarget.event.name}</strong> 행사 참여를 취소하시겠습니까?
-            </p>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">취소 사유 (선택)</label>
-              <input
-                type="text"
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                placeholder="취소 사유를 입력하세요"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="flex gap-3 justify-end">
-              <Button variant="secondary" onClick={() => { setCancelTarget(null); setCancelReason(''); }}>
-                닫기
-              </Button>
-              <Button variant="danger" onClick={handleCancel}>
-                참여 취소
-              </Button>
-            </div>
-          </div>
         </div>
       )}
     </div>

@@ -6,7 +6,7 @@ import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { FileText, ChevronRight, QrCode, Clock, CheckCircle, AlertCircle, Ticket, Search } from 'lucide-react';
+import { FileText, ChevronRight, QrCode, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera } from 'lucide-react';
 import { formatDateTime, formatDate } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
 import type { EventVisit } from '@/types/event';
@@ -18,6 +18,7 @@ export default function CustomerHome() {
   const [visits, setVisits] = useState<EventVisit[]>([]);
   const [loading, setLoading] = useState(true);
   const [contractCode, setContractCode] = useState('');
+  const [showCodeInput, setShowCodeInput] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -41,10 +42,19 @@ export default function CustomerHome() {
     }
   };
 
+  const handleQrScan = () => {
+    // Try to use camera API if available; otherwise show guidance
+    if (typeof navigator !== 'undefined' && 'mediaDevices' in navigator) {
+      // Most mobile browsers will handle QR via camera app
+      alert('카메라 앱에서 QR 코드를 스캔해주세요.\n또는 아래 코드 입력란에 계약 코드를 직접 입력할 수 있습니다.');
+    }
+    setShowCodeInput(true);
+  };
+
   return (
     <div>
       {/* Greeting */}
-      <div className="mb-6">
+      <div className="mb-4">
         <h2 className="text-2xl font-bold text-gray-900">
           안녕하세요, {user?.name || '고객'}님
         </h2>
@@ -53,28 +63,51 @@ export default function CustomerHome() {
         </p>
       </div>
 
-      {/* Contract Code Input */}
-      <Card className="mb-6">
-        <div className="flex items-center gap-2">
-          <Search className="w-5 h-5 text-gray-400 shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-gray-900 mb-2">계약 코드 입력</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={contractCode}
-                onChange={(e) => setContractCode(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleContractCodeSubmit()}
-                placeholder="계약 코드를 입력하세요"
-                className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <Button onClick={handleContractCodeSubmit} disabled={!contractCode.trim()}>
-                확인
-              </Button>
+      {/* QR Scan Button - prominent */}
+      <button
+        onClick={handleQrScan}
+        className="w-full mb-4 flex items-center justify-center gap-3 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-colors shadow-sm"
+      >
+        <Camera className="w-6 h-6" />
+        <span className="text-lg font-bold">QR 코드 스캔</span>
+      </button>
+
+      {/* Collapsible Contract Code Input */}
+      <div className="mb-6">
+        {!showCodeInput ? (
+          <button
+            onClick={() => setShowCodeInput(true)}
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors"
+          >
+            <Search className="w-4 h-4" />
+            <span>계약 코드 직접 입력</span>
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
+        ) : (
+          <Card>
+            <div className="flex items-center gap-2">
+              <Search className="w-5 h-5 text-gray-400 shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-900 mb-2">계약 코드 입력</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={contractCode}
+                    onChange={(e) => setContractCode(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => e.key === 'Enter' && handleContractCodeSubmit()}
+                    placeholder="계약 코드를 입력하세요"
+                    className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                    autoFocus
+                  />
+                  <Button onClick={handleContractCodeSubmit} disabled={!contractCode.trim()}>
+                    확인
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </Card>
+          </Card>
+        )}
+      </div>
 
       {/* Pending Signing Alert */}
       {!loading && pendingContracts.length > 0 && (

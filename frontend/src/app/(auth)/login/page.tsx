@@ -7,13 +7,6 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import type { UserRole } from '@/types/user';
 
-const roles: { value: UserRole; label: string }[] = [
-  { value: 'customer', label: '고객' },
-  { value: 'organizer', label: '주관사' },
-  { value: 'partner', label: '협력업체' },
-  { value: 'admin', label: '관리자' },
-];
-
 export default function LoginPage() {
   return (
     <Suspense>
@@ -26,8 +19,12 @@ function LoginForm() {
   const [step, setStep] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [name, setName] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const [capsLockOn, setCapsLockOn] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login, signup } = useAuthStore();
   const { toast } = useToast();
@@ -40,6 +37,12 @@ function LoginForm() {
     organizer: '/organizer',
     partner: '/partner',
     admin: '/admin',
+  };
+
+  const detectCapsLock = (e: React.KeyboardEvent) => {
+    if (e.getModifierState) {
+      setCapsLockOn(e.getModifierState('CapsLock'));
+    }
   };
 
   const handleLogin = async () => {
@@ -57,13 +60,18 @@ function LoginForm() {
     }
   };
 
+  const passwordMismatch = passwordConfirm.length > 0 && password !== passwordConfirm;
+  const signupValid =
+    email && password && password.length >= 8 && !passwordMismatch && passwordConfirm &&
+    name && selectedRole && agreeTerms && agreePrivacy;
+
   const handleSignup = async () => {
-    if (!email || !password || !name || !selectedRole) return;
+    if (!signupValid) return;
     setLoading(true);
     try {
       await signup({ email, password, name, role: selectedRole });
       toast('회원가입 완료!', 'success');
-      if (selectedRole === 'organizer' || selectedRole === 'partner') {
+      if (selectedRole === 'partner') {
         router.push('/signup/business');
       } else {
         router.push(roleHome[selectedRole]);
@@ -98,13 +106,20 @@ function LoginForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <Input
-                  label="비밀번호"
-                  type="password"
-                  placeholder="비밀번호를 입력하세요"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div>
+                  <Input
+                    label="비밀번호"
+                    type="password"
+                    placeholder="비밀번호를 입력하세요"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={detectCapsLock}
+                    onKeyUp={detectCapsLock}
+                  />
+                  {capsLockOn && (
+                    <p className="text-xs text-orange-500 mt-1">Caps Lock이 켜져 있습니다</p>
+                  )}
+                </div>
               </div>
               <div className="space-y-3">
                 <Button fullWidth size="lg" onClick={handleLogin} loading={loading}>
@@ -141,37 +156,97 @@ function LoginForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <Input
-                  label="비밀번호"
-                  type="password"
-                  placeholder="8자 이상 입력하세요"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    역할
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {roles.map((r) => (
+                  <Input
+                    label="비밀번호"
+                    type="password"
+                    placeholder="8자 이상 입력하세요"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  {password.length > 0 && password.length < 8 && (
+                    <p className="text-xs text-red-500 mt-1">비밀번호는 8자 이상이어야 합니다</p>
+                  )}
+                </div>
+                <div>
+                  <Input
+                    label="비밀번호 확인"
+                    type="password"
+                    placeholder="비밀번호를 다시 입력하세요"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                  />
+                  {passwordMismatch && (
+                    <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+                  )}
+                </div>
+                <div>
+                  <input type="hidden" />
+                  {selectedRole === 'partner' ? (
+                    <div className="flex items-center justify-between p-3 bg-blue-50 border-2 border-blue-500 rounded-xl">
+                      <div>
+                        <p className="text-sm font-medium text-blue-700">협력업체</p>
+                        <p className="text-xs text-blue-500">행사에 참여하여 계약을 관리합니다</p>
+                      </div>
                       <button
-                        key={r.value}
                         type="button"
-                        onClick={() => setSelectedRole(r.value)}
-                        className={`px-3 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
-                          selectedRole === r.value
-                            ? 'border-blue-500 bg-blue-50 text-blue-700'
-                            : 'border-gray-100 text-gray-600 hover:border-gray-200'
-                        }`}
+                        onClick={() => setSelectedRole('customer')}
+                        className="text-xs text-blue-600 hover:text-blue-800 underline"
                       >
-                        {r.label}
+                        고객으로 변경
                       </button>
-                    ))}
-                  </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="p-3 bg-blue-50 border-2 border-blue-500 rounded-xl mb-2">
+                        <p className="text-sm font-medium text-blue-700">고객</p>
+                        <p className="text-xs text-blue-500">계약서를 작성하고 서명합니다</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedRole('partner')}
+                        className="text-xs text-gray-500 hover:text-blue-600 underline"
+                      >
+                        협력업체이신가요?
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Terms & Privacy */}
+                <div className="space-y-3 pt-2">
+                  <label className="flex items-start gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agreeTerms}
+                      onChange={(e) => setAgreeTerms(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-0.5"
+                    />
+                    <span className="text-sm text-gray-600">
+                      <span className="underline text-gray-700">이용약관</span>에 동의합니다 <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agreePrivacy}
+                      onChange={(e) => setAgreePrivacy(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-0.5"
+                    />
+                    <span className="text-sm text-gray-600">
+                      <span className="underline text-gray-700">개인정보처리방침</span>에 동의합니다 <span className="text-red-500">*</span>
+                    </span>
+                  </label>
                 </div>
               </div>
               <div className="space-y-3">
-                <Button fullWidth size="lg" onClick={handleSignup} loading={loading}>
+                <Button
+                  fullWidth
+                  size="lg"
+                  onClick={handleSignup}
+                  loading={loading}
+                  disabled={!signupValid}
+                >
                   회원가입
                 </Button>
                 <div className="text-center">

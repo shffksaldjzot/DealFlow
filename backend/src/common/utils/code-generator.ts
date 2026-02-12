@@ -21,3 +21,12 @@ export function generateContractNumber(): string {
 export function generateQRCode(): string {
   return uuidv4().replace(/-/g, '').substring(0, 16).toUpperCase();
 }
+
+export function generateShortCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}

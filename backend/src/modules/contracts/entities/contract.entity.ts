@@ -44,8 +44,14 @@ export class Contract {
   @Column({ name: 'customer_id', nullable: true })
   customerId: string;
 
+  @Column({ name: 'customer_name', length: 100, nullable: true })
+  customerName: string;
+
   @Column({ name: 'qr_code', length: 100, unique: true })
   qrCode: string;
+
+  @Column({ name: 'short_code', length: 8, unique: true, nullable: true })
+  shortCode: string;
 
   @Column({ name: 'qr_code_url', length: 500, nullable: true })
   qrCodeUrl: string;

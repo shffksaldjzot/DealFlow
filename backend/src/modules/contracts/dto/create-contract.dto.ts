@@ -1,4 +1,4 @@
-import { IsUUID, IsNumber, Min } from 'class-validator';
+import { IsUUID, IsNumber, Min, IsOptional, IsString } from 'class-validator';
 
 export class CreateContractDto {
   @IsUUID()
@@ -10,4 +10,8 @@ export class CreateContractDto {
   @IsNumber()
   @Min(0)
   totalAmount: number;
+
+  @IsOptional()
+  @IsString()
+  customerName?: string;
 }

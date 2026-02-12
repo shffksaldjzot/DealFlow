@@ -23,6 +23,9 @@ export default function PartnerEventDetailPage() {
   const [templates, setTemplates] = useState<ContractTemplate[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -33,6 +36,21 @@ export default function PartnerEventDetailPage() {
       .catch(() => toast('데이터를 불러올 수 없습니다.', 'error'))
       .finally(() => setLoading(false));
   }, [id, toast]);
+
+  const handleCancelParticipation = async () => {
+    setCancelling(true);
+    try {
+      await api.post(`/event-partners/${id}/cancel`, {
+        reason: cancelReason || undefined,
+      });
+      toast('참여가 취소되었습니다.', 'success');
+      router.push('/partner/events');
+    } catch {
+      toast('참여 취소에 실패했습니다.', 'error');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -79,24 +97,17 @@ export default function PartnerEventDetailPage() {
 
   const contractColumns = [
     {
-      key: 'contractNumber',
-      header: '계약번호',
-      render: (item: Contract) => (
-        <span className="font-mono font-medium text-gray-900">{item.contractNumber}</span>
-      ),
-    },
-    {
-      key: 'template',
-      header: '템플릿',
-      render: (item: Contract) => (
-        <span className="text-gray-600">{item.template?.name || '-'}</span>
-      ),
+      key: 'status',
+      header: '상태',
+      render: (item: Contract) => <Badge status={item.status} />,
     },
     {
       key: 'customer',
       header: '고객',
       render: (item: Contract) => (
-        <span className="text-gray-600">{item.customer?.name || '미지정'}</span>
+        <span className="text-gray-600 truncate block min-w-0">
+          {item.customerName || item.customer?.name || '미지정'}
+        </span>
       ),
     },
     {
@@ -109,13 +120,24 @@ export default function PartnerEventDetailPage() {
       ),
     },
     {
-      key: 'status',
-      header: '상태',
-      render: (item: Contract) => <Badge status={item.status} />,
+      key: 'contractNumber',
+      header: '계약번호',
+      className: 'hidden sm:table-cell',
+      render: (item: Contract) => (
+        <span className="font-mono font-medium text-gray-900 text-xs">{item.contractNumber}</span>
+      ),
+    },
+    {
+      key: 'template',
+      header: '템플릿',
+      render: (item: Contract) => (
+        <span className="text-gray-600 truncate block min-w-0">{item.template?.name || '-'}</span>
+      ),
     },
     {
       key: 'createdAt',
       header: '생성일',
+      className: 'hidden sm:table-cell',
       render: (item: Contract) => (
         <span className="text-gray-500">{formatDate(item.createdAt)}</span>
       ),
@@ -243,15 +265,57 @@ export default function PartnerEventDetailPage() {
           </Card>
         ) : (
           <Card padding="none">
-            <Table
-              columns={contractColumns}
-              data={contracts}
-              onRowClick={(item) => router.push(`/partner/events/${id}/contracts/${item.id}`)}
-              emptyMessage="생성된 계약이 없습니다."
-            />
+            <div className="overflow-x-auto">
+              <Table
+                columns={contractColumns}
+                data={contracts}
+                onRowClick={(item) => router.push(`/partner/events/${id}/contracts/${item.id}`)}
+                emptyMessage="생성된 계약이 없습니다."
+              />
+            </div>
           </Card>
         )}
       </div>
+
+      {/* Cancel Participation - at the bottom */}
+      <div className="mt-12 pt-6 border-t border-gray-100">
+        <button
+          onClick={() => setShowCancelDialog(true)}
+          className="text-sm text-red-500 hover:text-red-700 underline"
+        >
+          참여 취소
+        </button>
+      </div>
+
+      {/* Cancel Confirmation Dialog */}
+      {showCancelDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-lg font-bold text-gray-900">참여 취소</h3>
+            <p className="text-sm text-gray-500">
+              <strong>{event.name}</strong> 행사 참여를 취소하시겠습니까?
+            </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">취소 사유 (선택)</label>
+              <input
+                type="text"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="취소 사유를 입력하세요"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" onClick={() => { setShowCancelDialog(false); setCancelReason(''); }}>
+                닫기
+              </Button>
+              <Button variant="danger" onClick={handleCancelParticipation} loading={cancelling}>
+                참여 취소
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
