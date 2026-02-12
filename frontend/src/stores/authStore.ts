@@ -3,8 +3,10 @@ import { create } from 'zustand';
 import api, { extractData } from '@/lib/api';
 import type { User, UserRole, LoginResponse } from '@/types/user';
 
+type AuthUser = Pick<User, 'id' | 'email' | 'name' | 'role'> & { phone?: string; createdAt?: string };
+
 interface AuthState {
-  user: Pick<User, 'id' | 'email' | 'name' | 'role'> | null;
+  user: AuthUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 
@@ -19,7 +21,7 @@ interface AuthState {
   socialLogin: (provider: string, accessToken: string, role?: UserRole) => Promise<void>;
   logout: () => void;
   fetchMe: () => Promise<void>;
-  setUser: (user: Pick<User, 'id' | 'email' | 'name' | 'role'>) => void;
+  setUser: (user: AuthUser) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -69,7 +71,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
       const data = extractData<User>(await api.get('/auth/me'));
       set({
-        user: { id: data.id, email: data.email, name: data.name, role: data.role },
+        user: { id: data.id, email: data.email, name: data.name, role: data.role, phone: data.phone, createdAt: data.createdAt },
         isAuthenticated: true,
         isLoading: false,
       });
