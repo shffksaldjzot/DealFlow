@@ -16,7 +16,7 @@ export default function PendingApproval() {
         <p className="text-gray-500 mb-8">
           업체 등록 신청이 완료되었습니다.
           <br />
-          관리자 승인 후 서비스를 이용하실 수 있습니다.
+          DealFlow 승인 후 서비스를 이용하실 수 있습니다.
           <br />
           <span className="text-sm text-gray-400 mt-2 block">
             승인까지 영업일 기준 1~2일 소요됩니다.

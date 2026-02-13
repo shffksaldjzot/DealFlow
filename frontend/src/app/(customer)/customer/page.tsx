@@ -1,12 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { FileText, ChevronRight, QrCode, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera } from 'lucide-react';
+import { FileText, ChevronRight, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera, X } from 'lucide-react';
 import { formatDateTime, formatDate } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
 import type { EventVisit } from '@/types/event';
@@ -19,6 +19,8 @@ export default function CustomerHome() {
   const [loading, setLoading] = useState(true);
   const [contractCode, setContractCode] = useState('');
   const [showCodeInput, setShowCodeInput] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const scannerRef = useRef<any>(null);
 
   useEffect(() => {
     Promise.all([
@@ -42,17 +44,111 @@ export default function CustomerHome() {
     }
   };
 
-  const handleQrScan = () => {
-    // Try to use camera API if available; otherwise show guidance
-    if (typeof navigator !== 'undefined' && 'mediaDevices' in navigator) {
-      // Most mobile browsers will handle QR via camera app
-      alert('카메라 앱에서 QR 코드를 스캔해주세요.\n또는 아래 코드 입력란에 계약 코드를 직접 입력할 수 있습니다.');
+  const stopScanner = useCallback(async () => {
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+        scannerRef.current.clear();
+      } catch {}
+      scannerRef.current = null;
     }
-    setShowCodeInput(true);
+    setShowScanner(false);
+  }, []);
+
+  const handleQrScan = async () => {
+    setShowScanner(true);
+
+    // Dynamically import to avoid SSR issues
+    const { Html5Qrcode } = await import('html5-qrcode');
+
+    // Wait for DOM element to render
+    setTimeout(async () => {
+      const el = document.getElementById('qr-reader');
+      if (!el) return;
+
+      const scanner = new Html5Qrcode('qr-reader');
+      scannerRef.current = scanner;
+
+      try {
+        await scanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          (decodedText: string) => {
+            // Extract contract code from URL or use as-is
+            let code = decodedText;
+            const match = decodedText.match(/\/contract\/([^/?\s]+)/);
+            if (match) {
+              code = match[1];
+            }
+            // Also handle /events/ URLs for visit QR
+            const eventMatch = decodedText.match(/\/events\/([^/?\s]+)\/(visit|join)/);
+            if (eventMatch) {
+              scanner.stop().catch(() => {});
+              scannerRef.current = null;
+              setShowScanner(false);
+              router.push(`/events/${eventMatch[1]}/${eventMatch[2]}`);
+              return;
+            }
+            scanner.stop().catch(() => {});
+            scannerRef.current = null;
+            setShowScanner(false);
+            router.push(`/contract/${code}`);
+          },
+          () => {}, // ignore scan failures
+        );
+      } catch {
+        setShowScanner(false);
+        // Fallback: try to open camera app via URL scheme
+        alert('카메라를 사용할 수 없습니다.\n카메라 권한을 확인하거나 아래 코드 입력란을 이용해주세요.');
+        setShowCodeInput(true);
+      }
+    }, 100);
   };
+
+  // Cleanup scanner on unmount
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.stop().catch(() => {});
+      }
+    };
+  }, []);
 
   return (
     <div>
+      {/* QR Scanner Modal */}
+      {showScanner && (
+        <div className="fixed inset-0 z-50 bg-black">
+          <div className="relative h-full flex flex-col">
+            <div className="flex items-center justify-between p-4">
+              <h3 className="text-white font-bold text-lg">QR 코드 스캔</h3>
+              <button
+                onClick={stopScanner}
+                className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+            </div>
+            <div className="flex-1 flex items-center justify-center px-4">
+              <div className="w-full max-w-sm">
+                <div id="qr-reader" className="rounded-2xl overflow-hidden" />
+                <p className="text-white/70 text-sm text-center mt-4">
+                  계약서 QR 코드 또는 방문예약 QR 코드를 스캔하세요
+                </p>
+              </div>
+            </div>
+            <div className="p-4 pb-8">
+              <button
+                onClick={() => { stopScanner(); setShowCodeInput(true); }}
+                className="w-full py-3 text-white/80 text-sm font-medium text-center"
+              >
+                코드 직접 입력하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Greeting */}
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-gray-900">
@@ -263,7 +359,7 @@ export default function CustomerHome() {
       <div className="bg-blue-50 rounded-2xl p-5 mt-6">
         <p className="text-sm font-medium text-blue-800 mb-1">QR 코드로 계약하기</p>
         <p className="text-sm text-blue-600">
-          협력업체에서 제공한 QR 코드를 스캔하거나 계약 코드를 직접 입력하여 계약을 진행할 수 있습니다.
+          QR 코드 스캔 버튼을 누르면 카메라가 실행됩니다. 계약서 QR 코드 또는 방문예약 QR 코드를 스캔하세요.
         </p>
       </div>
     </div>

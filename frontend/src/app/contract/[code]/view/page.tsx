@@ -94,7 +94,8 @@ export default function ContractViewPage() {
   }
 
   const hasTemplateFile = contract?.template?.fileId;
-  const templateFileUrl = hasTemplateFile ? `/api/contract-flow/${code}/template-file` : null;
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+  const templateFileUrl = hasTemplateFile ? `${apiBase}/contract-flow/${code}/template-file` : null;
 
   const renderFieldsForm = () => (
     <Card padding="lg">
