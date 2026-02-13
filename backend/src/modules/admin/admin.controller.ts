@@ -20,6 +20,7 @@ import {
   CreateUserDto,
   AdminUpdateEventDto,
   AdminUpdateContractStatusDto,
+  ResetPasswordDto,
 } from './dto/approve-organizer.dto';
 
 @Controller('admin')
@@ -92,6 +93,15 @@ export class AdminController {
     @CurrentUser('id') adminUserId: string,
   ) {
     return this.adminService.changeUserStatus(id, dto, adminUserId);
+  }
+
+  @Post('users/:id/reset-password')
+  resetPassword(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: ResetPasswordDto,
+    @CurrentUser('id') adminUserId: string,
+  ) {
+    return this.adminService.resetPassword(id, dto, adminUserId);
   }
 
   @Delete('users/:id')

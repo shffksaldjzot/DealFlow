@@ -10,17 +10,26 @@ import EmptyState from '@/components/common/EmptyState';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
 
+interface ContractsSummary {
+  total: number;
+  byStatus: Record<string, number>;
+  totalAmount: number;
+  contracts: Contract[];
+}
+
 export default function EventContractsPage() {
   const { id } = useParams<{ id: string }>();
-  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [summary, setSummary] = useState<ContractsSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.get(`/events/${id}/contracts`)
-      .then((res) => setContracts(extractData(res)))
+      .then((res) => setSummary(extractData(res)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
+
+  const contracts = summary?.contracts || [];
 
   const columns = [
     { key: 'contractNumber', header: '계약번호' },
@@ -28,6 +37,13 @@ export default function EventContractsPage() {
     { key: 'status', header: '상태', render: (c: Contract) => <Badge status={c.status} /> },
     { key: 'totalAmount', header: '금액', render: (c: Contract) => c.totalAmount ? formatCurrency(c.totalAmount) : '-' },
     { key: 'createdAt', header: '생성일', render: (c: Contract) => formatDateTime(c.createdAt) },
+  ];
+
+  const statusCards = [
+    { key: 'pending', label: '대기' },
+    { key: 'in_progress', label: '진행중' },
+    { key: 'completed', label: '완료' },
+    { key: 'cancelled', label: '취소' },
   ];
 
   return (
@@ -40,17 +56,29 @@ export default function EventContractsPage() {
 
       {/* Summary */}
       <div className="grid grid-cols-4 gap-3 mb-6">
-        {['pending', 'in_progress', 'completed', 'cancelled'].map((s) => (
-          <Card key={s} padding="sm">
+        {statusCards.map((s) => (
+          <Card key={s.key} padding="sm">
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-900">
-                {contracts.filter((c) => c.status === s).length}
+                {loading ? '-' : (summary?.byStatus[s.key] || 0)}
               </p>
-              <Badge status={s} />
+              <Badge status={s.key} />
             </div>
           </Card>
         ))}
       </div>
+
+      {/* Total Amount */}
+      {!loading && summary && (
+        <Card padding="sm" className="mb-6">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-500">총 계약금액</span>
+            <span className="text-xl font-bold text-gray-900">
+              {formatCurrency(summary.totalAmount)}
+            </span>
+          </div>
+        </Card>
+      )}
 
       {loading ? (
         <div className="h-48 bg-white rounded-2xl animate-pulse" />

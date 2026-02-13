@@ -33,6 +33,9 @@ export default function AdminUserDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [resetModal, setResetModal] = useState(false);
+  const [resetResult, setResetResult] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
 
   // Edit form
   const [name, setName] = useState('');
@@ -77,6 +80,20 @@ export default function AdminUserDetailPage() {
       router.push('/admin/users');
     } catch {
       toast('삭제에 실패했습니다.', 'error');
+    }
+  };
+
+  const handleResetPassword = async () => {
+    setResetting(true);
+    try {
+      const res = await api.post(`/admin/users/${id}/reset-password`, {});
+      const data = extractData<{ temporaryPassword: string }>(res);
+      setResetResult(data.temporaryPassword);
+      toast('비밀번호가 초기화되었습니다.', 'success');
+    } catch {
+      toast('비밀번호 초기화에 실패했습니다.', 'error');
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -202,6 +219,11 @@ export default function AdminUserDetailPage() {
           <Button onClick={handleSave} disabled={saving}>
             {saving ? '저장 중...' : '저장'}
           </Button>
+          {user.role !== 'admin' && (
+            <Button variant="secondary" onClick={() => { setResetResult(null); setResetModal(true); }}>
+              비밀번호 초기화
+            </Button>
+          )}
         </div>
       </Card>
 
@@ -240,6 +262,42 @@ export default function AdminUserDetailPage() {
           <Button variant="outline" onClick={() => setDeleteModal(false)}>취소</Button>
           <Button variant="danger" onClick={handleDelete}>삭제</Button>
         </div>
+      </Modal>
+
+      <Modal isOpen={resetModal} onClose={() => setResetModal(false)} title="비밀번호 초기화">
+        {resetResult ? (
+          <div>
+            <p className="text-sm text-gray-600 mb-3">
+              비밀번호가 초기화되었습니다. 아래 임시 비밀번호를 사용자에게 전달해주세요.
+            </p>
+            <div className="p-4 bg-blue-50 rounded-xl border-2 border-blue-200 text-center mb-4">
+              <p className="text-xs text-blue-600 font-medium mb-1">임시 비밀번호</p>
+              <p className="text-2xl font-bold font-mono text-blue-900 tracking-wider select-all">
+                {resetResult}
+              </p>
+            </div>
+            <p className="text-xs text-gray-400 mb-4">
+              사용자에게 로그인 후 반드시 비밀번호를 변경하도록 안내하세요.
+            </p>
+            <Button fullWidth onClick={() => { navigator.clipboard.writeText(resetResult); toast('임시 비밀번호가 복사되었습니다.', 'success'); }}>
+              비밀번호 복사
+            </Button>
+            <Button variant="secondary" fullWidth className="mt-2" onClick={() => setResetModal(false)}>
+              닫기
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <p className="text-sm text-gray-600 mb-4">
+              <strong>{user.name}</strong>의 비밀번호를 초기화하시겠습니까?
+              임시 비밀번호가 자동 생성됩니다.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setResetModal(false)}>취소</Button>
+              <Button onClick={handleResetPassword} loading={resetting}>초기화</Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

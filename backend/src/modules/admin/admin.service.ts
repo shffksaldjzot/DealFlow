@@ -8,6 +8,7 @@ import {
   OrgStatus,
   OrgType,
 } from '../organizations/entities/organization.entity';
+import { OrganizationMember, MemberRole } from '../organizations/entities/organization-member.entity';
 import { Event } from '../events/entities/event.entity';
 import { Contract, ContractStatus } from '../contracts/entities/contract.entity';
 import { ContractFieldValue } from '../contracts/entities/contract-field-value.entity';
@@ -22,6 +23,7 @@ import {
   CreateUserDto,
   AdminUpdateEventDto,
   AdminUpdateContractStatusDto,
+  ResetPasswordDto,
 } from './dto/approve-organizer.dto';
 
 @Injectable()
@@ -41,6 +43,8 @@ export class AdminService {
     private readonly signatureRepository: Repository<ContractSignature>,
     @InjectRepository(ContractHistory)
     private readonly historyRepository: Repository<ContractHistory>,
+    @InjectRepository(OrganizationMember)
+    private readonly memberRepository: Repository<OrganizationMember>,
     @InjectRepository(ActivityLog)
     private readonly activityLogRepository: Repository<ActivityLog>,
   ) {}
@@ -278,7 +282,7 @@ export class AdminService {
         'user.id',
         'membership.id',
         'membership.role',
-        'membership.createdAt',
+        'membership.joinedAt',
         'organization.id',
         'organization.name',
         'organization.type',
@@ -332,6 +336,30 @@ export class AdminService {
     });
 
     const saved = await this.userRepository.save(user);
+
+    // Auto-create organization and membership for organizer/partner roles
+    if (dto.role === 'organizer' || dto.role === 'partner') {
+      const orgType = dto.role === 'organizer' ? OrgType.ORGANIZER : OrgType.PARTNER;
+      const org = this.orgRepository.create({
+        type: orgType,
+        name: `${dto.name}`,
+        businessNumber: '0000000000',
+        status: OrgStatus.APPROVED,
+        approvedAt: new Date(),
+        approvedBy: adminUserId,
+      });
+      const savedOrg = await this.orgRepository.save(org);
+
+      const membership = this.memberRepository.create({
+        organizationId: savedOrg.id,
+        userId: saved.id,
+        role: MemberRole.OWNER,
+      });
+      await this.memberRepository.save(membership);
+
+      await this.logActivity('create_organization', `관리자가 사용자 "${dto.name}" 조직 자동 생성`, adminUserId, 'organization', savedOrg.id);
+    }
+
     await this.logActivity('create_user', `관리자가 사용자 "${dto.name}" (${dto.email}) 계정 생성`, adminUserId, 'user', saved.id);
     const { passwordHash: _, ...result } = saved;
     return result as Omit<User, 'passwordHash'>;
@@ -348,6 +376,49 @@ export class AdminService {
     user.status = UserStatus.WITHDRAWN;
     await this.userRepository.save(user);
     await this.logActivity('delete_user', `사용자 "${user.name}" 계정 삭제 (탈퇴 처리)`, adminUserId, 'user', userId);
+  }
+
+  async resetPassword(
+    userId: string,
+    dto: ResetPasswordDto,
+    adminUserId?: string,
+  ): Promise<{ temporaryPassword: string }> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    // Generate or use provided password
+    const temporaryPassword = dto.newPassword || this.generateTemporaryPassword();
+    const passwordHash = await bcrypt.hash(temporaryPassword, 10);
+
+    await this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ passwordHash })
+      .where('id = :id', { id: userId })
+      .execute();
+
+    await this.logActivity(
+      'reset_password',
+      `관리자가 사용자 "${user.name}" (${user.email}) 비밀번호 초기화`,
+      adminUserId,
+      'user',
+      userId,
+    );
+
+    return { temporaryPassword };
+  }
+
+  private generateTemporaryPassword(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 10; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password + '!';
   }
 
   async changeUserStatus(

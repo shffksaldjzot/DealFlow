@@ -73,3 +73,10 @@ export class AdminUpdateContractStatusDto {
   @IsString()
   reason?: string;
 }
+
+export class ResetPasswordDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(8)
+  newPassword?: string;
+}
