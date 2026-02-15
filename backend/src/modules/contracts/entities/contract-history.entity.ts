@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Contract } from './contract.entity';
+import { JSON_COLUMN_TYPE } from '../../../shared/database.utils';
 
 @Entity('contract_histories')
 export class ContractHistory {
@@ -28,7 +29,7 @@ export class ContractHistory {
   @Column({ type: 'text', nullable: true })
   reason: string;
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ type: JSON_COLUMN_TYPE, nullable: true })
   metadata: any;
 
   @ManyToOne(() => Contract, (c) => c.histories)

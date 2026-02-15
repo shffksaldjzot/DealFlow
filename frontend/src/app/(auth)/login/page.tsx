@@ -131,12 +131,18 @@ function LoginForm() {
                 <Button fullWidth size="lg" onClick={handleLogin} loading={loading}>
                   로그인
                 </Button>
-                <div className="text-center">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => router.push('/forgot-password')}
+                    className="text-sm text-gray-400 hover:text-gray-600"
+                  >
+                    비밀번호를 잊으셨나요?
+                  </button>
                   <button
                     onClick={() => setStep('signup')}
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
-                    계정이 없으신가요? 회원가입
+                    회원가입
                   </button>
                 </div>
               </div>

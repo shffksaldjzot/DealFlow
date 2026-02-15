@@ -127,7 +127,7 @@ export default function CustomerContractDetailPage() {
           <Button
             fullWidth
             size="lg"
-            onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/files/${contract.signedPdfFileId}/download`, '_blank')}
+            onClick={() => window.open(`/api/files/${contract.signedPdfFileId}/download`, '_blank')}
           >
             <Download className="w-4 h-4 mr-2" />
             계약서 PDF 다운로드

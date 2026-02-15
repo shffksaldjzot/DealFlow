@@ -13,6 +13,7 @@ import { ContractFieldValue } from './entities/contract-field-value.entity';
 import { ContractSignature } from './entities/contract-signature.entity';
 import { ContractHistory } from './entities/contract-history.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
+import { Organization } from '../organizations/entities/organization.entity';
 import { EventPartner } from '../events/entities/event-partner.entity';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { FilesModule } from '../files/files.module';
@@ -27,6 +28,7 @@ import { FilesModule } from '../files/files.module';
       ContractSignature,
       ContractHistory,
       OrganizationMember,
+      Organization,
       EventPartner,
     ]),
     NotificationsModule,

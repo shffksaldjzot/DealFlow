@@ -12,7 +12,9 @@ import {
   EventPartnerStatus,
 } from './entities/event-partner.entity';
 import { OrganizationMember, MemberRole } from '../organizations/entities/organization-member.entity';
+import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
 import { NotificationsService } from '../notifications/notifications.service';
+import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
 
 @Injectable()
 export class EventPartnersService {
@@ -23,16 +25,29 @@ export class EventPartnersService {
     private readonly eventPartnerRepository: Repository<EventPartner>,
     @InjectRepository(OrganizationMember)
     private readonly memberRepository: Repository<OrganizationMember>,
+    @InjectRepository(Organization)
+    private readonly orgRepository: Repository<Organization>,
     private readonly notificationsService: NotificationsService,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
-  private async getOrgIdForUser(userId: string): Promise<string> {
+  private async getOrgIdForUser(userId: string, requireApproved = false): Promise<string> {
     const membership = await this.memberRepository.findOne({
       where: { userId },
     });
     if (!membership) {
       throw new ForbiddenException('소속된 조직이 없습니다.');
     }
+
+    if (requireApproved) {
+      const org = await this.orgRepository.findOne({
+        where: { id: membership.organizationId },
+      });
+      if (!org || org.status !== OrgStatus.APPROVED) {
+        throw new ForbiddenException('조직이 아직 승인되지 않았습니다. 관리자 승인 후 이용 가능합니다.');
+      }
+    }
+
     return membership.organizationId;
   }
 
@@ -40,7 +55,7 @@ export class EventPartnersService {
     userId: string,
     inviteCode: string,
   ): Promise<EventPartner> {
-    const orgId = await this.getOrgIdForUser(userId);
+    const orgId = await this.getOrgIdForUser(userId, true);
 
     const event = await this.eventRepository.findOne({
       where: { inviteCode },
@@ -90,6 +105,14 @@ export class EventPartnersService {
       // Do not fail the join flow if notification fails
     }
 
+    await this.activityLogService.log(
+      'partner_join_request',
+      `협력업체가 행사 "${event.name}" 참가 신청`,
+      userId,
+      'event_partner',
+      saved.id,
+    );
+
     return this.eventPartnerRepository.findOne({
       where: { id: saved.id },
       relations: ['event', 'event.organizer', 'partner'],
@@ -120,7 +143,17 @@ export class EventPartnersService {
     eventPartner.cancelledBy = userId;
     eventPartner.cancelReason = reason || null;
 
-    return this.eventPartnerRepository.save(eventPartner);
+    const saved = await this.eventPartnerRepository.save(eventPartner);
+
+    await this.activityLogService.log(
+      'partner_cancel_participation',
+      `협력업체가 행사 참가 취소${reason ? `: ${reason}` : ''}`,
+      userId,
+      'event_partner',
+      eventPartner.id,
+    );
+
+    return saved;
   }
 
   async listMyParticipatedEvents(userId: string): Promise<EventPartner[]> {

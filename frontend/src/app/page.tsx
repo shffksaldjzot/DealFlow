@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { useEffect } from 'react';
+import api, { extractData } from '@/lib/api';
 
 export default function RootPage() {
   const { isAuthenticated, user, isLoading } = useAuthStore();
@@ -11,13 +12,36 @@ export default function RootPage() {
     if (isLoading) return;
 
     if (isAuthenticated && user) {
-      const roleHome: Record<string, string> = {
-        customer: '/customer',
-        organizer: '/organizer',
-        partner: '/partner',
-        admin: '/admin',
-      };
-      router.replace(roleHome[user.role] || '/login');
+      const needsOrgCheck = user.role === 'organizer' || user.role === 'partner';
+
+      if (needsOrgCheck) {
+        api.get('/organizations/me')
+          .then((res) => {
+            const org = extractData<any>(res);
+            if (!org || org.status !== 'approved') {
+              if (!org) {
+                router.replace('/signup/business');
+              } else {
+                router.replace('/pending-approval');
+              }
+            } else {
+              const roleHome: Record<string, string> = {
+                organizer: '/organizer',
+                partner: '/partner',
+              };
+              router.replace(roleHome[user.role] || '/login');
+            }
+          })
+          .catch(() => {
+            router.replace('/signup/business');
+          });
+      } else {
+        const roleHome: Record<string, string> = {
+          customer: '/customer',
+          admin: '/admin',
+        };
+        router.replace(roleHome[user.role] || '/login');
+      }
     } else {
       router.replace('/login');
     }

@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { JSON_COLUMN_TYPE } from '../../../shared/database.utils';
 
 export enum NotificationType {
   ALIMTALK = 'alimtalk',
@@ -53,7 +54,7 @@ export class Notification {
   @Column({ name: 'error_message', type: 'text', nullable: true })
   errorMessage: string;
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ type: JSON_COLUMN_TYPE, nullable: true })
   metadata: any;
 
   @ManyToOne(() => User)

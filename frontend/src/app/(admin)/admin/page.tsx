@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
-import { Building2, Users, Calendar, FileText, PenTool, Clock } from 'lucide-react';
+import { Building2, Users, Calendar, FileText, AlertCircle, KeyRound } from 'lucide-react';
 import api, { extractData } from '@/lib/api';
 import { formatDateTime } from '@/lib/utils';
 
@@ -20,6 +21,7 @@ interface DashboardStats {
   contractsByStatus: Record<string, number>;
   recentUsers: any[];
   recentContracts: any[];
+  passwordResetRequests: any[];
 }
 
 export default function AdminDashboard() {
@@ -34,21 +36,22 @@ export default function AdminDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
+  const totalPending = (stats?.pendingOrganizations || 0) + (stats?.pendingPartners || 0);
+
   const cards = [
-    {
-      label: '주관사',
-      value: stats?.totalOrganizations || 0,
-      sub: `주관사 승인 대기: ${stats?.pendingOrganizations || 0}`,
-      icon: Building2,
-      color: 'text-purple-600 bg-purple-100',
-      href: '/admin/organizers',
-    },
     {
       label: '전체 사용자',
       value: stats?.totalUsers || 0,
       icon: Users,
       color: 'text-blue-600 bg-blue-100',
       href: '/admin/users',
+    },
+    {
+      label: '전체 업체',
+      value: stats?.totalOrganizations || 0,
+      icon: Building2,
+      color: 'text-purple-600 bg-purple-100',
+      href: '/admin/organizers',
     },
     {
       label: '전체 행사',
@@ -79,6 +82,61 @@ export default function AdminDashboard() {
   return (
     <div>
       <PageHeader title="관리자 대시보드" subtitle="전체 시스템 현황" />
+
+      {/* Pending Approvals Alert */}
+      {!loading && totalPending > 0 && (
+        <div
+          className="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-red-100 transition-colors"
+          onClick={() => router.push('/admin/organizers')}
+        >
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-100">
+            <AlertCircle className="w-5 h-5 text-red-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-red-800">
+              승인 대기 {totalPending}건
+            </p>
+            <p className="text-xs text-red-600">
+              주관사 {stats?.pendingOrganizations || 0}건, 협력업체 {stats?.pendingPartners || 0}건 - 클릭하여 처리
+            </p>
+          </div>
+          <span className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-sm font-bold text-white bg-red-500 rounded-full">
+            {totalPending}
+          </span>
+        </div>
+      )}
+
+      {/* Password Reset Requests */}
+      {!loading && stats?.passwordResetRequests && stats.passwordResetRequests.length > 0 && (
+        <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-100">
+              <KeyRound className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-amber-800">
+                비밀번호 초기화 요청 {stats.passwordResetRequests.length}건
+              </p>
+              <p className="text-xs text-amber-600">사용자 관리에서 비밀번호를 초기화해주세요</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {stats.passwordResetRequests.map((req: any) => (
+              <div
+                key={req.id}
+                className="flex items-center justify-between p-3 bg-white rounded-xl cursor-pointer hover:bg-amber-50 transition-colors"
+                onClick={() => router.push(`/admin/users/${req.metadata?.targetUserId}`)}
+              >
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{req.metadata?.targetUserName}</p>
+                  <p className="text-xs text-gray-500">{req.metadata?.targetUserEmail}</p>
+                </div>
+                <Button size="sm" variant="outline">처리</Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {cards.map((c, i) => {

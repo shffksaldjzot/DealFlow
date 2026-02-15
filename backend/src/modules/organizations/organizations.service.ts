@@ -15,6 +15,7 @@ import { User } from '../users/entities/user.entity';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { AddMemberDto } from './dto/add-member.dto';
+import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
 
 @Injectable()
 export class OrganizationsService {
@@ -25,6 +26,7 @@ export class OrganizationsService {
     private readonly memberRepository: Repository<OrganizationMember>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async create(
@@ -52,6 +54,14 @@ export class OrganizationsService {
       role: MemberRole.OWNER,
     });
     await this.memberRepository.save(membership);
+
+    await this.activityLogService.log(
+      'register_organization',
+      `업체 "${dto.name}" 등록 신청 (${dto.type})`,
+      userId,
+      'organization',
+      savedOrg.id,
+    );
 
     return this.orgRepository.findOne({
       where: { id: savedOrg.id },

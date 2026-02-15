@@ -38,6 +38,7 @@ interface FieldEditorProps {
 export default function FieldEditor({ fields, onChange, templateImageUrl }: FieldEditorProps) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
+  const [imgError, setImgError] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const addField = (type: string) => {
@@ -112,11 +113,12 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
           className="relative bg-white border-2 border-dashed border-gray-200 rounded-xl overflow-hidden"
           style={{ aspectRatio: '210/297', maxHeight: '70vh' }}
         >
-          {templateImageUrl ? (
+          {templateImageUrl && !imgError ? (
             <img
               src={templateImageUrl}
               alt="Template"
               className="absolute inset-0 w-full h-full object-contain"
+              onError={() => setImgError(true)}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-gray-300">

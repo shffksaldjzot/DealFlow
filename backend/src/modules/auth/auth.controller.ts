@@ -7,6 +7,7 @@ import {
   RefreshTokenDto,
   ChangePasswordDto,
 } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -30,6 +31,12 @@ export class AuthController {
   @Post('signup')
   signup(@Body() dto: SignupDto) {
     return this.authService.signup(dto);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
   }
 
   @Public()

@@ -46,6 +46,7 @@ export default function NewContractPage() {
   const [fields, setFields] = useState<ContractField[]>([]);
   const [templateImageUrl, setTemplateImageUrl] = useState('');
   const [fieldsLoading, setFieldsLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   // Step 3: Customer info
   const [customerName, setCustomerName] = useState('');
@@ -80,9 +81,16 @@ export default function NewContractPage() {
 
       const tmpl = templates.find(t => t.id === templateId);
       if (tmpl?.fileId) {
-        setTemplateImageUrl(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/files/${tmpl.fileId}/download`
-        );
+        try {
+          const response = await api.get(`/files/${tmpl.fileId}/download`, { responseType: 'blob' });
+          const blob = response.data as Blob;
+          if (blob.size > 0 && blob.type?.startsWith('image/')) {
+            setTemplateImageUrl(URL.createObjectURL(blob));
+            setImageError(false);
+          }
+        } catch {
+          // File not available - fallback UI will show
+        }
       }
     } catch {
       toast('템플릿 필드를 불러오지 못했습니다.', 'error');
@@ -128,8 +136,9 @@ export default function NewContractPage() {
       setCreatedContract(contract);
       setStep('qr');
       toast('계약이 생성되었습니다.', 'success');
-    } catch {
-      toast('계약 생성에 실패했습니다.', 'error');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || '계약 생성에 실패했습니다.';
+      toast(Array.isArray(msg) ? msg[0] : msg, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -144,6 +153,7 @@ export default function NewContractPage() {
     setShortCodeCopied(false);
     setFields([]);
     setTemplateImageUrl('');
+    setImageError(false);
   };
 
   const currentStepIndex = STEPS.indexOf(step);
@@ -277,12 +287,13 @@ export default function NewContractPage() {
                   {selectedTemplate?.name} - 계약서 미리보기
                 </h3>
                 <div className="relative bg-white border-2 border-gray-100 rounded-xl overflow-hidden">
-                  {templateImageUrl && selectedTemplate?.fileType !== 'pdf' ? (
+                  {templateImageUrl && !imageError && selectedTemplate?.fileType !== 'pdf' ? (
                     <div className="relative">
                       <img
                         src={templateImageUrl}
                         alt="계약서 템플릿"
                         className="w-full"
+                        onError={() => setImageError(true)}
                       />
                       {/* Overlay fields */}
                       <div className="absolute inset-0">
@@ -305,7 +316,7 @@ export default function NewContractPage() {
                           ))}
                       </div>
                     </div>
-                  ) : templateImageUrl && selectedTemplate?.fileType === 'pdf' ? (
+                  ) : templateImageUrl && !imageError && selectedTemplate?.fileType === 'pdf' ? (
                     <iframe
                       src={templateImageUrl}
                       className="w-full"

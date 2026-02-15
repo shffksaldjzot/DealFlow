@@ -94,8 +94,24 @@ export default function ContractViewPage() {
   }
 
   const hasTemplateFile = contract?.template?.fileId;
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
-  const templateFileUrl = hasTemplateFile ? `${apiBase}/contract-flow/${code}/template-file` : null;
+  const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
+  const [templateImgError, setTemplateImgError] = useState(false);
+
+  useEffect(() => {
+    if (!hasTemplateFile || !code) return;
+    let revoked = false;
+    api.get(`/contract-flow/${code}/template-file`, { responseType: 'blob' })
+      .then((res) => {
+        if (revoked) return;
+        const blob = new Blob([res.data], { type: res.headers['content-type'] || 'application/octet-stream' });
+        setTemplateFileUrl(URL.createObjectURL(blob));
+        setTemplateImgError(false);
+      })
+      .catch(() => {});
+    return () => {
+      revoked = true;
+    };
+  }, [hasTemplateFile, code]);
 
   const renderFieldsForm = () => (
     <Card padding="lg">
@@ -175,12 +191,17 @@ export default function ContractViewPage() {
                   style={{ height: '500px' }}
                   title="계약서 미리보기"
                 />
-              ) : (
+              ) : !templateImgError ? (
                 <img
                   src={templateFileUrl}
                   alt="계약서 미리보기"
                   className="w-full rounded-lg border border-gray-200"
+                  onError={() => setTemplateImgError(true)}
                 />
+              ) : (
+                <div className="flex items-center justify-center py-16 text-gray-300 border border-gray-200 rounded-lg">
+                  <p className="text-sm">이미지를 불러올 수 없습니다</p>
+                </div>
               )}
             </Card>
 

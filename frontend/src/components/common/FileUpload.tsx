@@ -9,7 +9,7 @@ interface FileUploadProps {
   maxSizeMB?: number;
   label?: string;
   helperText?: string;
-  onUploadComplete?: (fileId: string, fileName: string) => void;
+  onUploadComplete?: (fileId: string, fileName: string, file?: File) => void;
   purpose?: string;
 }
 
@@ -47,7 +47,7 @@ export default function FileUpload({
       );
 
       setUploadedFile({ id: result.id, name: result.originalName });
-      onUploadComplete?.(result.id, result.originalName);
+      onUploadComplete?.(result.id, result.originalName, file);
     } catch {
       setError('파일 업로드에 실패했습니다.');
     } finally {

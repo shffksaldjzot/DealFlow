@@ -26,6 +26,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
       } else {
         message = res as string;
       }
+    } else {
+      // Log non-HTTP exceptions for debugging
+      const request = ctx.getRequest();
+      console.error('[UnhandledException]', {
+        method: request?.method,
+        url: request?.url,
+        error: exception instanceof Error ? exception.message : String(exception),
+        stack: exception instanceof Error ? exception.stack : undefined,
+      });
     }
 
     response.status(status).json({

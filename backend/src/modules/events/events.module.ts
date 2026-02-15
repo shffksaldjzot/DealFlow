@@ -11,6 +11,7 @@ import { EventPartner } from './entities/event-partner.entity';
 import { EventVisit } from './entities/event-visit.entity';
 import { Contract } from '../contracts/entities/contract.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
+import { Organization } from '../organizations/entities/organization.entity';
 import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
       EventVisit,
       Contract,
       OrganizationMember,
+      Organization,
     ]),
     NotificationsModule,
   ],

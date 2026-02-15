@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
 } from 'typeorm';
+import { JSON_COLUMN_TYPE } from '../../../shared/database.utils';
 
 @Entity('activity_logs')
 export class ActivityLog {
@@ -25,7 +26,7 @@ export class ActivityLog {
   @Column({ name: 'target_id', nullable: true })
   targetId: string;
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ type: JSON_COLUMN_TYPE, nullable: true })
   metadata: any;
 
   @CreateDateColumn({ name: 'created_at' })

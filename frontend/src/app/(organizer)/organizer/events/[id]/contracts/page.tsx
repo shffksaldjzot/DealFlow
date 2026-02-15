@@ -32,11 +32,12 @@ export default function EventContractsPage() {
   const contracts = summary?.contracts || [];
 
   const columns = [
-    { key: 'contractNumber', header: '계약번호' },
-    { key: 'customer', header: '고객', render: (c: Contract) => c.customer?.name || '-' },
-    { key: 'status', header: '상태', render: (c: Contract) => <Badge status={c.status} /> },
+    { key: 'partner', header: '업체명', render: (c: Contract) => (c as any).partner?.name || '-' },
+    { key: 'customer', header: '고객명', render: (c: Contract) => c.customerName || c.customer?.name || '-' },
     { key: 'totalAmount', header: '금액', render: (c: Contract) => c.totalAmount ? formatCurrency(c.totalAmount) : '-' },
+    { key: 'status', header: '상태', render: (c: Contract) => <Badge status={c.status} /> },
     { key: 'createdAt', header: '생성일', render: (c: Contract) => formatDateTime(c.createdAt) },
+    { key: 'contractNumber', header: '계약번호' },
   ];
 
   const statusCards = [

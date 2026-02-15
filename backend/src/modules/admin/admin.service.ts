@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User, UserRole, UserStatus, AuthProvider } from '../users/entities/user.entity';
 import {
@@ -15,6 +15,8 @@ import { ContractFieldValue } from '../contracts/entities/contract-field-value.e
 import { ContractSignature } from '../contracts/entities/contract-signature.entity';
 import { ContractHistory } from '../contracts/entities/contract-history.entity';
 import { ActivityLog } from './entities/activity-log.entity';
+import { Notification, NotificationStatus } from '../notifications/entities/notification.entity';
+import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
 import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
 import {
   RejectOrganizerDto,
@@ -47,7 +49,15 @@ export class AdminService {
     private readonly memberRepository: Repository<OrganizationMember>,
     @InjectRepository(ActivityLog)
     private readonly activityLogRepository: Repository<ActivityLog>,
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
+    private readonly activityLogService: ActivityLogService,
+    private readonly dataSource: DataSource,
   ) {}
+
+  private get isPostgres(): boolean {
+    return this.dataSource.options.type === 'postgres';
+  }
 
   // ─── Activity Log ────────────────────────────────────────
 
@@ -97,6 +107,7 @@ export class AdminService {
     contractsByStatus: Record<string, number>;
     recentUsers: any[];
     recentContracts: any[];
+    passwordResetRequests: any[];
   }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -148,6 +159,18 @@ export class AdminService {
       contractsByStatus[row.status] = parseInt(row.count, 10);
     }
 
+    // Get pending password reset requests
+    const passwordResetRequests = await this.notificationRepository.find({
+      where: {
+        status: NotificationStatus.PENDING,
+      },
+      order: { createdAt: 'DESC' },
+      take: 10,
+    });
+    const pendingPasswordResets = passwordResetRequests.filter(
+      (n) => n.metadata?.type === 'password_reset_request',
+    );
+
     return {
       totalOrganizations,
       totalEvents,
@@ -160,28 +183,37 @@ export class AdminService {
       contractsByStatus,
       recentUsers,
       recentContracts,
+      passwordResetRequests: pendingPasswordResets,
     };
   }
 
   // ─── Organizers ────────────────────────────────────────
 
   async listOrganizers(
-    pagination: PaginationDto,
+    pagination: PaginationDto & { status?: string },
   ): Promise<PaginatedResult<Organization>> {
-    const { page, limit, search } = pagination;
+    const { page, limit, search, status } = pagination;
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.orgRepository
       .createQueryBuilder('org')
       .leftJoinAndSelect('org.members', 'members')
       .leftJoinAndSelect('members.user', 'user')
-      .where('org.type = :type', { type: OrgType.ORGANIZER })
-      .orderBy('org.createdAt', 'DESC')
+      .orderBy(
+        `CASE WHEN org.status = 'pending' THEN 0 ELSE 1 END`,
+        'ASC',
+      )
+      .addOrderBy('org.createdAt', 'DESC')
       .skip(skip)
       .take(limit);
 
+    if (status && status !== 'all') {
+      queryBuilder.andWhere('org.status = :status', { status });
+    }
+
     if (search) {
-      queryBuilder.andWhere('org.name LIKE :search', {
+      const like = this.isPostgres ? 'ILIKE' : 'LIKE';
+      queryBuilder.andWhere(`org.name ${like} :search`, {
         search: `%${search}%`,
       });
     }
@@ -204,7 +236,7 @@ export class AdminService {
     org.rejectionReason = null;
 
     const saved = await this.orgRepository.save(org);
-    await this.logActivity('approve_organizer', `주관사 "${org.name}" 승인`, adminUserId, 'organization', orgId);
+    await this.activityLogService.log('approve_organizer', `주관사 "${org.name}" 승인`, adminUserId, 'organization', orgId);
     return saved;
   }
 
@@ -225,7 +257,7 @@ export class AdminService {
     org.approvedBy = adminUserId;
 
     const saved = await this.orgRepository.save(org);
-    await this.logActivity('reject_organizer', `주관사 "${org.name}" 거절: ${dto.reason}`, adminUserId, 'organization', orgId);
+    await this.activityLogService.log('reject_organizer', `주관사 "${org.name}" 거절: ${dto.reason}`, adminUserId, 'organization', orgId);
     return saved;
   }
 
@@ -254,8 +286,9 @@ export class AdminService {
       .take(limit);
 
     if (search) {
+      const like = this.isPostgres ? 'ILIKE' : 'LIKE';
       queryBuilder.andWhere(
-        '(user.name LIKE :search OR user.email LIKE :search)',
+        `(user.name ${like} :search OR user.email ${like} :search)`,
         { search: `%${search}%` },
       );
     }
@@ -310,7 +343,7 @@ export class AdminService {
     if (dto.phone !== undefined) user.phone = dto.phone;
 
     const saved = await this.userRepository.save(user);
-    await this.logActivity('update_user', `사용자 "${user.name}" 정보 수정`, adminUserId, 'user', userId);
+    await this.activityLogService.log('update_user', `사용자 "${user.name}" 정보 수정`, adminUserId, 'user', userId);
     const { passwordHash, ...result } = saved;
     return result as Omit<User, 'passwordHash'>;
   }
@@ -357,10 +390,10 @@ export class AdminService {
       });
       await this.memberRepository.save(membership);
 
-      await this.logActivity('create_organization', `관리자가 사용자 "${dto.name}" 조직 자동 생성`, adminUserId, 'organization', savedOrg.id);
+      await this.activityLogService.log('create_organization', `관리자가 사용자 "${dto.name}" 조직 자동 생성`, adminUserId, 'organization', savedOrg.id);
     }
 
-    await this.logActivity('create_user', `관리자가 사용자 "${dto.name}" (${dto.email}) 계정 생성`, adminUserId, 'user', saved.id);
+    await this.activityLogService.log('create_user', `관리자가 사용자 "${dto.name}" (${dto.email}) 계정 생성`, adminUserId, 'user', saved.id);
     const { passwordHash: _, ...result } = saved;
     return result as Omit<User, 'passwordHash'>;
   }
@@ -375,7 +408,7 @@ export class AdminService {
 
     user.status = UserStatus.WITHDRAWN;
     await this.userRepository.save(user);
-    await this.logActivity('delete_user', `사용자 "${user.name}" 계정 삭제 (탈퇴 처리)`, adminUserId, 'user', userId);
+    await this.activityLogService.log('delete_user', `사용자 "${user.name}" 계정 삭제 (탈퇴 처리)`, adminUserId, 'user', userId);
   }
 
   async resetPassword(
@@ -401,7 +434,7 @@ export class AdminService {
       .where('id = :id', { id: userId })
       .execute();
 
-    await this.logActivity(
+    await this.activityLogService.log(
       'reset_password',
       `관리자가 사용자 "${user.name}" (${user.email}) 비밀번호 초기화`,
       adminUserId,
@@ -409,7 +442,40 @@ export class AdminService {
       userId,
     );
 
+    // Mark related password reset notifications as sent
+    await this.notificationRepository
+      .createQueryBuilder()
+      .update()
+      .set({ status: NotificationStatus.SENT, sentAt: new Date() })
+      .where(
+        this.isPostgres
+          ? `metadata->>'targetUserId' = :userId`
+          : `json_extract(metadata, '$.targetUserId') = :userId`,
+        { userId },
+      )
+      .andWhere(
+        this.isPostgres
+          ? `metadata->>'type' = 'password_reset_request'`
+          : `json_extract(metadata, '$.type') = 'password_reset_request'`,
+      )
+      .andWhere('status = :status', { status: NotificationStatus.PENDING })
+      .execute();
+
+    // Kakao Alimtalk stub - send temporary password to user
+    if (user.phone) {
+      await this.sendKakaoAlimtalk(
+        user.phone,
+        `[DealFlow] 비밀번호가 초기화되었습니다.\n임시 비밀번호: ${temporaryPassword}\n로그인 후 반드시 비밀번호를 변경해주세요.`,
+      );
+    }
+
     return { temporaryPassword };
+  }
+
+  private async sendKakaoAlimtalk(phone: string, message: string): Promise<void> {
+    // TODO: Implement actual Kakao Alimtalk API integration
+    // For now, log the message that would be sent
+    console.log(`[KakaoAlimtalk] To: ${phone}, Message: ${message}`);
   }
 
   private generateTemporaryPassword(): string {
@@ -435,7 +501,7 @@ export class AdminService {
 
     user.status = dto.status as UserStatus;
     const saved = await this.userRepository.save(user);
-    await this.logActivity('change_user_status', `사용자 "${user.name}" 상태를 "${dto.status}"로 변경`, adminUserId, 'user', userId);
+    await this.activityLogService.log('change_user_status', `사용자 "${user.name}" 상태를 "${dto.status}"로 변경`, adminUserId, 'user', userId);
     const { passwordHash, ...result } = saved;
     return result as Omit<User, 'passwordHash'>;
   }
@@ -454,7 +520,8 @@ export class AdminService {
       .take(limit);
 
     if (search) {
-      queryBuilder.andWhere('event.name LIKE :search', {
+      const like = this.isPostgres ? 'ILIKE' : 'LIKE';
+      queryBuilder.andWhere(`event.name ${like} :search`, {
         search: `%${search}%`,
       });
     }
@@ -494,7 +561,7 @@ export class AdminService {
     if (dto.status !== undefined) event.status = dto.status as any;
 
     const saved = await this.eventRepository.save(event);
-    await this.logActivity('update_event', `행사 "${event.name}" 정보 수정`, adminUserId, 'event', eventId);
+    await this.activityLogService.log('update_event', `행사 "${event.name}" 정보 수정`, adminUserId, 'event', eventId);
     return saved;
   }
 
@@ -508,7 +575,7 @@ export class AdminService {
 
     event.status = 'cancelled' as any;
     await this.eventRepository.save(event);
-    await this.logActivity('delete_event', `행사 "${event.name}" 삭제 (취소 처리)`, adminUserId, 'event', eventId);
+    await this.activityLogService.log('delete_event', `행사 "${event.name}" 삭제 (취소 처리)`, adminUserId, 'event', eventId);
   }
 
   // ─── Contracts ────────────────────────────────────────
@@ -530,7 +597,8 @@ export class AdminService {
       .take(limit);
 
     if (search) {
-      queryBuilder.andWhere('contract.contractNumber LIKE :search', {
+      const like = this.isPostgres ? 'ILIKE' : 'LIKE';
+      queryBuilder.andWhere(`contract.contractNumber ${like} :search`, {
         search: `%${search}%`,
       });
     }
@@ -594,7 +662,7 @@ export class AdminService {
       }),
     );
 
-    await this.logActivity(
+    await this.activityLogService.log(
       'update_contract_status',
       `계약 ${contract.contractNumber} 상태를 "${fromStatus}" → "${dto.status}"로 변경`,
       adminUserId,

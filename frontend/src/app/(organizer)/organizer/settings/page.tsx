@@ -56,7 +56,7 @@ export default function OrganizerSettingsPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="조직 설정" />
+        <PageHeader title="업체 정보 관리" />
         <div className="h-64 bg-white rounded-2xl animate-pulse" />
       </div>
     );
@@ -65,11 +65,11 @@ export default function OrganizerSettingsPage() {
   if (!org) {
     return (
       <div>
-        <PageHeader title="조직 설정" />
+        <PageHeader title="업체 정보 관리" />
         <Card>
           <div className="text-center py-8">
             <Building2 className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-            <p className="text-gray-500">소속된 조직이 없습니다</p>
+            <p className="text-gray-500">등록된 업체 정보가 없습니다</p>
           </div>
         </Card>
       </div>
@@ -78,11 +78,11 @@ export default function OrganizerSettingsPage() {
 
   return (
     <div>
-      <PageHeader title="조직 설정" />
+      <PageHeader title="업체 정보 관리" subtitle="사업자 정보와 연락처를 관리할 수 있습니다" />
 
       <Card className="mb-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-700">조직 정보</h3>
+          <h3 className="text-sm font-semibold text-gray-700">기본 정보</h3>
           <Badge status={org.status} />
         </div>
         <div className="space-y-4">
@@ -127,7 +127,7 @@ export default function OrganizerSettingsPage() {
                 maxSizeMB={10}
                 helperText="사업자등록증 파일을 업로드하세요 (PDF, JPG, PNG)"
                 purpose="business_license"
-                onUploadComplete={(fId, fName) => {
+                onUploadComplete={(fId, fName, file) => {
                   setForm({ ...form, businessLicenseFileId: fId });
                   setLicenseFileName(fName);
                 }}

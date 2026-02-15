@@ -18,6 +18,7 @@ export default function ContractOverlay({
   onFieldChange,
 }: ContractOverlayProps) {
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   // Filter out signature fields (handled separately)
   const overlayFields = fields
@@ -40,13 +41,18 @@ export default function ContractOverlay({
             style={{ minHeight: '600px', height: '80vh' }}
             title="계약서 템플릿"
           />
-        ) : (
+        ) : !imgError ? (
           <img
             src={fileUrl}
             alt="계약서 템플릿"
             className="w-full"
             onLoad={() => setImgLoaded(true)}
+            onError={() => setImgError(true)}
           />
+        ) : (
+          <div className="flex items-center justify-center py-20 text-gray-300">
+            <p className="text-sm">이미지를 불러올 수 없습니다</p>
+          </div>
         )}
 
         {/* Positioned overlay fields (only if fields have position data) */}

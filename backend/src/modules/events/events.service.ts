@@ -13,11 +13,13 @@ import {
 } from './entities/event-partner.entity';
 import { Contract } from '../contracts/entities/contract.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
+import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateEventStatusDto } from './dto/update-event-status.dto';
 import { UpdatePartnerStatusDto } from './dto/update-partner-status.dto';
 import { generateInviteCode } from '../../common/utils/code-generator';
+import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
 
 @Injectable()
 export class EventsService {
@@ -30,20 +32,33 @@ export class EventsService {
     private readonly contractRepository: Repository<Contract>,
     @InjectRepository(OrganizationMember)
     private readonly memberRepository: Repository<OrganizationMember>,
+    @InjectRepository(Organization)
+    private readonly orgRepository: Repository<Organization>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
-  private async getOrgIdForUser(userId: string): Promise<string> {
+  private async getOrgIdForUser(userId: string, requireApproved = false): Promise<string> {
     const membership = await this.memberRepository.findOne({
       where: { userId },
     });
     if (!membership) {
       throw new ForbiddenException('소속된 조직이 없습니다.');
     }
+
+    if (requireApproved) {
+      const org = await this.orgRepository.findOne({
+        where: { id: membership.organizationId },
+      });
+      if (!org || org.status !== OrgStatus.APPROVED) {
+        throw new ForbiddenException('조직이 아직 승인되지 않았습니다. 관리자 승인 후 이용 가능합니다.');
+      }
+    }
+
     return membership.organizationId;
   }
 
   async create(userId: string, dto: CreateEventDto): Promise<Event> {
-    const orgId = await this.getOrgIdForUser(userId);
+    const orgId = await this.getOrgIdForUser(userId, true);
 
     let inviteCode = generateInviteCode();
     // Ensure invite code is unique
@@ -71,6 +86,15 @@ export class EventsService {
     });
 
     const saved = await this.eventRepository.save(event);
+
+    await this.activityLogService.log(
+      'create_event',
+      `행사 "${dto.name}" 생성`,
+      userId,
+      'event',
+      saved.id,
+    );
+
     return this.eventRepository.findOne({
       where: { id: saved.id },
       relations: ['organizer'],
@@ -159,8 +183,19 @@ export class EventsService {
       );
     }
 
+    const fromStatus = event.status;
     event.status = dto.status;
-    return this.eventRepository.save(event);
+    const saved = await this.eventRepository.save(event);
+
+    await this.activityLogService.log(
+      'update_event_status',
+      `행사 "${event.name}" 상태 변경: "${fromStatus}" → "${dto.status}"`,
+      userId,
+      'event',
+      eventId,
+    );
+
+    return saved;
   }
 
   async listPartners(eventId: string, userId: string): Promise<EventPartner[]> {
@@ -228,7 +263,22 @@ export class EventsService {
       eventPartner.cancelReason = dto.cancelReason || null;
     }
 
-    return this.eventPartnerRepository.save(eventPartner);
+    const saved = await this.eventPartnerRepository.save(eventPartner);
+
+    const actionMap: Record<string, string> = {
+      [EventPartnerStatus.APPROVED]: 'approve_partner',
+      [EventPartnerStatus.REJECTED]: 'reject_partner',
+      [EventPartnerStatus.CANCELLED]: 'cancel_partner',
+    };
+    await this.activityLogService.log(
+      actionMap[dto.status] || 'update_partner_status',
+      `행사 "${event.name}" 파트너 "${eventPartner.partner?.name || partnerId}" 상태 변경: "${dto.status}"`,
+      userId,
+      'event_partner',
+      eventPartner.id,
+    );
+
+    return saved;
   }
 
   async deleteEvent(eventId: string, userId: string): Promise<void> {
@@ -242,6 +292,14 @@ export class EventsService {
 
     event.status = EventStatus.CANCELLED;
     await this.eventRepository.save(event);
+
+    await this.activityLogService.log(
+      'delete_event',
+      `행사 "${event.name}" 삭제 (취소 처리)`,
+      userId,
+      'event',
+      eventId,
+    );
   }
 
   async getPublicEventInfo(inviteCode: string): Promise<{

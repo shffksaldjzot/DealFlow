@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import api, { extractData } from '@/lib/api';
 import {
   LayoutDashboard,
   Calendar,
@@ -14,12 +15,14 @@ import {
   Menu,
   X,
   ClipboardList,
+  UserCheck,
 } from 'lucide-react';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
+  badgeKey?: string;
 }
 
 interface SidebarProps {
@@ -30,17 +33,15 @@ const navItems: Record<string, NavItem[]> = {
   organizer: [
     { label: '대시보드', href: '/organizer', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '행사 관리', href: '/organizer/events', icon: <Calendar className="w-5 h-5" /> },
-    { label: '조직 설정', href: '/organizer/settings', icon: <Settings className="w-5 h-5" /> },
   ],
   partner: [
     { label: '대시보드', href: '/partner', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '참여 행사', href: '/partner/events', icon: <Calendar className="w-5 h-5" /> },
     { label: '행사 참여', href: '/partner/events/join', icon: <QrCode className="w-5 h-5" /> },
-    { label: '조직 설정', href: '/partner/settings', icon: <Settings className="w-5 h-5" /> },
   ],
   admin: [
     { label: '대시보드', href: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { label: '주관사 관리', href: '/admin/organizers', icon: <Building2 className="w-5 h-5" /> },
+    { label: '가입 승인/관리', href: '/admin/organizers', icon: <UserCheck className="w-5 h-5" />, badgeKey: 'pendingApprovals' },
     { label: '사용자 관리', href: '/admin/users', icon: <Users className="w-5 h-5" /> },
     { label: '행사 관리', href: '/admin/events', icon: <Calendar className="w-5 h-5" /> },
     { label: '계약 관리', href: '/admin/contracts', icon: <FileText className="w-5 h-5" /> },
@@ -53,7 +54,7 @@ const navItems: Record<string, NavItem[]> = {
   ],
 };
 
-function NavList({ items, role, onNavigate }: { items: NavItem[]; role: string; onNavigate?: () => void }) {
+function NavList({ items, role, badges, onNavigate }: { items: NavItem[]; role: string; badges?: Record<string, number>; onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -62,6 +63,7 @@ function NavList({ items, role, onNavigate }: { items: NavItem[]; role: string; 
         const isActive =
           pathname === item.href ||
           (item.href !== `/${role}` && pathname.startsWith(item.href));
+        const badgeCount = item.badgeKey && badges ? badges[item.badgeKey] : 0;
 
         return (
           <Link
@@ -78,7 +80,12 @@ function NavList({ items, role, onNavigate }: { items: NavItem[]; role: string; 
             <span className={isActive ? 'text-blue-600' : 'text-gray-400'}>
               {item.icon}
             </span>
-            {item.label}
+            <span className="flex-1">{item.label}</span>
+            {badgeCount > 0 && (
+              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
+                {badgeCount}
+              </span>
+            )}
           </Link>
         );
       })}
@@ -88,7 +95,20 @@ function NavList({ items, role, onNavigate }: { items: NavItem[]; role: string; 
 
 export default function Sidebar({ role }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [badges, setBadges] = useState<Record<string, number>>({});
   const items = navItems[role] || [];
+
+  useEffect(() => {
+    if (role === 'admin') {
+      api.get('/admin/dashboard')
+        .then((res) => {
+          const data = extractData<any>(res);
+          const pending = (data.pendingOrganizations || 0) + (data.pendingPartners || 0);
+          setBadges({ pendingApprovals: pending });
+        })
+        .catch(() => {});
+    }
+  }, [role]);
 
   return (
     <>
@@ -111,14 +131,14 @@ export default function Sidebar({ role }: SidebarProps) {
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <NavList items={items} role={role} onNavigate={() => setMobileOpen(false)} />
+            <NavList items={items} role={role} badges={badges} onNavigate={() => setMobileOpen(false)} />
           </aside>
         </div>
       )}
 
       {/* Desktop Sidebar */}
       <aside className="w-60 h-[calc(100vh-64px)] bg-white border-r border-gray-100 py-4 hidden lg:block sticky top-16">
-        <NavList items={items} role={role} />
+        <NavList items={items} role={role} badges={badges} />
       </aside>
     </>
   );

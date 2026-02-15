@@ -45,9 +45,13 @@ export class FilesController {
   ) {
     const { filePath, file } = await this.filesService.getFilePath(id);
     res.setHeader('Content-Type', file.mimeType);
+
+    // Image files use inline disposition for preview support
+    const isImage = /^image\/(jpeg|jpg|png|gif|webp|svg)/.test(file.mimeType);
+    const disposition = isImage ? 'inline' : 'attachment';
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="${encodeURIComponent(file.originalName)}"`,
+      `${disposition}; filename="${encodeURIComponent(file.originalName)}"`,
     );
     res.sendFile(filePath);
   }

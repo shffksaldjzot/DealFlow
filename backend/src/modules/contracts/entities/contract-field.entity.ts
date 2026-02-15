@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { ContractTemplate } from './contract-template.entity';
+import { JSON_COLUMN_TYPE } from '../../../shared/database.utils';
 
 export enum FieldType {
   TEXT = 'text',
@@ -58,7 +59,7 @@ export class ContractField {
   @Column({ name: 'default_value', type: 'text', nullable: true })
   defaultValue: string;
 
-  @Column({ name: 'validation_rule', type: 'simple-json', nullable: true })
+  @Column({ name: 'validation_rule', type: JSON_COLUMN_TYPE, nullable: true })
   validationRule: any;
 
   @ManyToOne(() => ContractTemplate, (template) => template.fields, {

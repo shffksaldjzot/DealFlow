@@ -11,6 +11,7 @@ import { ContractFieldValue } from '../contracts/entities/contract-field-value.e
 import { ContractSignature } from '../contracts/entities/contract-signature.entity';
 import { ContractHistory } from '../contracts/entities/contract-history.entity';
 import { ActivityLog } from './entities/activity-log.entity';
+import { Notification } from '../notifications/entities/notification.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ActivityLog } from './entities/activity-log.entity';
       ContractSignature,
       ContractHistory,
       ActivityLog,
+      Notification,
     ]),
   ],
   controllers: [AdminController],

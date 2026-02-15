@@ -122,8 +122,6 @@ export default function BusinessRegistration() {
     }
   };
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
-
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
@@ -132,8 +130,8 @@ export default function BusinessRegistration() {
           <p className="text-sm text-gray-500 mt-1">사업자 정보를 입력해주세요</p>
         </div>
 
-        <Card padding="lg">
-          <div className="space-y-4">
+        <Card padding="lg" className="overflow-hidden">
+          <div className="space-y-4 overflow-hidden">
             <Input
               label="업체명 *"
               placeholder="(주)딜플로우"
@@ -146,7 +144,7 @@ export default function BusinessRegistration() {
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 사업자등록번호 *
               </label>
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-[3fr_auto_2fr_auto_5fr] items-center gap-1">
                 <input
                   id="biz1"
                   type="text"
@@ -154,7 +152,7 @@ export default function BusinessRegistration() {
                   placeholder="000"
                   value={form.bizNum1}
                   onChange={(e) => handleBizNumChange('bizNum1', e.target.value, 3, 'biz2')}
-                  className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={3}
                 />
                 <span className="text-gray-400 font-bold">-</span>
@@ -165,7 +163,7 @@ export default function BusinessRegistration() {
                   placeholder="00"
                   value={form.bizNum2}
                   onChange={(e) => handleBizNumChange('bizNum2', e.target.value, 2, 'biz3')}
-                  className="w-16 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={2}
                 />
                 <span className="text-gray-400 font-bold">-</span>
@@ -176,7 +174,7 @@ export default function BusinessRegistration() {
                   placeholder="00000"
                   value={form.bizNum3}
                   onChange={(e) => handleBizNumChange('bizNum3', e.target.value, 5)}
-                  className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={5}
                 />
               </div>
@@ -194,7 +192,7 @@ export default function BusinessRegistration() {
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 연락처
               </label>
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-[3fr_auto_4fr_auto_4fr] items-center gap-1">
                 <input
                   id="ph1"
                   type="text"
@@ -202,7 +200,7 @@ export default function BusinessRegistration() {
                   placeholder="010"
                   value={form.phone1}
                   onChange={(e) => handlePhoneChange('phone1', e.target.value, 3, 'ph2')}
-                  className="w-20 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={3}
                 />
                 <span className="text-gray-400 font-bold">-</span>
@@ -213,7 +211,7 @@ export default function BusinessRegistration() {
                   placeholder="0000"
                   value={form.phone2}
                   onChange={(e) => handlePhoneChange('phone2', e.target.value, 4, 'ph3')}
-                  className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={4}
                 />
                 <span className="text-gray-400 font-bold">-</span>
@@ -224,7 +222,7 @@ export default function BusinessRegistration() {
                   placeholder="0000"
                   value={form.phone3}
                   onChange={(e) => handlePhoneChange('phone3', e.target.value, 4)}
-                  className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={4}
                 />
               </div>
@@ -275,12 +273,11 @@ export default function BusinessRegistration() {
               label="사업자등록증 *"
               accept=".pdf,.jpg,.jpeg,.png"
               purpose="business_license"
-              onUploadComplete={(fileId, fileName) => {
+              onUploadComplete={(fileId, fileName, file) => {
                 setForm({ ...form, businessLicenseFileId: fileId });
-                // Set preview URL for image files
-                const ext = fileName.toLowerCase().split('.').pop();
-                if (['jpg', 'jpeg', 'png'].includes(ext || '')) {
-                  setPreviewUrl(`${apiUrl}/files/${fileId}/download`);
+                // Use local blob URL for immediate preview
+                if (file && file.type.startsWith('image/')) {
+                  setPreviewUrl(URL.createObjectURL(file));
                 } else {
                   setPreviewUrl(null);
                 }

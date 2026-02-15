@@ -10,7 +10,7 @@ import Table from '@/components/ui/Table';
 import Input from '@/components/ui/Input';
 import Modal from '@/components/ui/Modal';
 import { formatDateTime } from '@/lib/utils';
-import type { User, UserStatus } from '@/types/user';
+import type { User } from '@/types/user';
 import type { PaginatedResult } from '@/types/api';
 
 export default function AdminUsersPage() {
@@ -21,7 +21,6 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [statusModal, setStatusModal] = useState<{ id: string; name: string; currentStatus: UserStatus } | null>(null);
   const [createModal, setCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState({ email: '', password: '', name: '', role: 'customer' });
   const [creating, setCreating] = useState(false);
@@ -39,18 +38,6 @@ export default function AdminUsersPage() {
   };
 
   useEffect(() => { fetchUsers(); }, [page, search]);
-
-  const handleStatusChange = async (status: UserStatus) => {
-    if (!statusModal) return;
-    try {
-      await api.patch(`/admin/users/${statusModal.id}/status`, { status });
-      toast(status === 'active' ? '사용자가 활성화되었습니다.' : '사용자가 정지되었습니다.', 'success');
-      setStatusModal(null);
-      fetchUsers();
-    } catch {
-      toast('상태 변경에 실패했습니다.', 'error');
-    }
-  };
 
   const handleCreate = async () => {
     if (!createForm.email || !createForm.password || !createForm.name) {
@@ -101,30 +88,6 @@ export default function AdminUsersPage() {
     { key: 'role', header: '역할', render: (u: User) => getRoleBadge(u.role) },
     { key: 'status', header: '상태', render: (u: User) => <Badge status={u.status} /> },
     { key: 'createdAt', header: '가입일', render: (u: User) => formatDateTime(u.createdAt) },
-    {
-      key: 'actions',
-      header: '',
-      render: (u: User) => (
-        <div className="flex gap-1">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={(e: React.MouseEvent) => { e.stopPropagation(); router.push(`/admin/users/${u.id}`); }}
-          >
-            상세
-          </Button>
-          {u.role !== 'admin' && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={(e: React.MouseEvent) => { e.stopPropagation(); setStatusModal({ id: u.id, name: u.name, currentStatus: u.status }); }}
-            >
-              상태
-            </Button>
-          )}
-        </div>
-      ),
-    },
   ];
 
   return (
@@ -159,34 +122,6 @@ export default function AdminUsersPage() {
           onRowClick={(u: User) => router.push(`/admin/users/${u.id}`)}
         />
       )}
-
-      {/* Status Change Modal */}
-      <Modal
-        isOpen={!!statusModal}
-        onClose={() => setStatusModal(null)}
-        title={`${statusModal?.name} 상태 변경`}
-      >
-        <p className="text-sm text-gray-600 mb-4">
-          현재 상태: <Badge status={statusModal?.currentStatus || ''} />
-        </p>
-        <div className="flex gap-2">
-          {statusModal?.currentStatus !== 'active' && (
-            <Button className="flex-1" onClick={() => handleStatusChange('active')}>
-              활성화
-            </Button>
-          )}
-          {statusModal?.currentStatus !== 'suspended' && (
-            <Button variant="danger" className="flex-1" onClick={() => handleStatusChange('suspended')}>
-              정지
-            </Button>
-          )}
-        </div>
-        <div className="mt-3">
-          <Button variant="secondary" fullWidth onClick={() => setStatusModal(null)}>
-            취소
-          </Button>
-        </div>
-      </Modal>
 
       {/* Create User Modal */}
       <Modal isOpen={createModal} onClose={() => setCreateModal(false)} title="계정 생성">

@@ -15,18 +15,28 @@ import {
   AuthProvider,
   UserStatus,
 } from '../users/entities/user.entity';
+import { OrganizationMember } from '../organizations/entities/organization-member.entity';
+import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
+import { Notification, NotificationType, NotificationStatus } from '../notifications/entities/notification.entity';
 import {
   EmailLoginDto,
   SignupDto,
   SocialLoginDto,
   TokenResponseDto,
 } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(OrganizationMember)
+    private memberRepository: Repository<OrganizationMember>,
+    @InjectRepository(Organization)
+    private orgRepository: Repository<Organization>,
+    @InjectRepository(Notification)
+    private notificationRepository: Repository<Notification>,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
@@ -78,6 +88,26 @@ export class AuthService {
 
     if (user.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException('비활성화된 계정입니다.');
+    }
+
+    // Block login for organizer/partner if org is not approved
+    if (user.role === UserRole.ORGANIZER || user.role === UserRole.PARTNER) {
+      const membership = await this.memberRepository.findOne({
+        where: { userId: user.id },
+      });
+      if (!membership) {
+        throw new UnauthorizedException(
+          '업체 등록이 필요합니다. 회원가입 후 업체 등록을 완료해주세요.',
+        );
+      }
+      const org = await this.orgRepository.findOne({
+        where: { id: membership.organizationId },
+      });
+      if (!org || org.status !== OrgStatus.APPROVED) {
+        throw new UnauthorizedException(
+          '관리자 승인 대기 중입니다. 승인 후 로그인 가능합니다.',
+        );
+      }
     }
 
     return this.generateTokens(user);
@@ -172,6 +202,45 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     return { message: '비밀번호가 변경되었습니다.' };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
+    const user = await this.usersRepository.findOne({
+      where: { email: dto.email },
+    });
+
+    if (!user) {
+      throw new BadRequestException('해당 이메일로 가입된 계정을 찾을 수 없습니다.');
+    }
+
+    if (!user.phone || user.phone.replace(/[^0-9]/g, '') !== dto.phone.replace(/[^0-9]/g, '')) {
+      throw new BadRequestException('이메일과 전화번호가 일치하지 않습니다.');
+    }
+
+    // Find admin users to notify
+    const admins = await this.usersRepository.find({
+      where: { role: UserRole.ADMIN, status: UserStatus.ACTIVE },
+    });
+
+    // Create notification for each admin
+    for (const admin of admins) {
+      const notification = this.notificationRepository.create({
+        userId: admin.id,
+        type: NotificationType.PUSH,
+        title: '비밀번호 초기화 요청',
+        content: `${user.name} (${user.email})님이 비밀번호 초기화를 요청했습니다. 사용자 관리에서 비밀번호를 초기화해주세요.`,
+        status: NotificationStatus.PENDING,
+        metadata: {
+          type: 'password_reset_request',
+          targetUserId: user.id,
+          targetUserName: user.name,
+          targetUserEmail: user.email,
+        },
+      });
+      await this.notificationRepository.save(notification);
+    }
+
+    return { message: '관리자에게 비밀번호 초기화 요청을 보냈습니다. 잠시 후 알려드리겠습니다.' };
   }
 
   private generateTokens(user: User): TokenResponseDto {

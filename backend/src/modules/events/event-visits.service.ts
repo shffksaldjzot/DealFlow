@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity';
 import { EventVisit } from './entities/event-visit.entity';
 import { CreateVisitDto } from './dto/create-visit.dto';
+import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
 
 @Injectable()
 export class EventVisitsService {
@@ -16,6 +17,7 @@ export class EventVisitsService {
     private readonly eventRepository: Repository<Event>,
     @InjectRepository(EventVisit)
     private readonly visitRepository: Repository<EventVisit>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async createReservation(
@@ -43,6 +45,15 @@ export class EventVisitsService {
     });
 
     const saved = await this.visitRepository.save(visit);
+
+    await this.activityLogService.log(
+      'visit_reservation',
+      `고객이 행사 "${event.name}" 방문 예약 (${dto.visitDate})`,
+      userId,
+      'event_visit',
+      saved.id,
+    );
+
     return this.visitRepository.findOne({
       where: { id: saved.id },
       relations: ['event'],
@@ -73,6 +84,16 @@ export class EventVisitsService {
     }
 
     visit.status = 'cancelled';
-    return this.visitRepository.save(visit);
+    const saved = await this.visitRepository.save(visit);
+
+    await this.activityLogService.log(
+      'visit_cancel',
+      `고객이 방문 예약 취소`,
+      userId,
+      'event_visit',
+      visitId,
+    );
+
+    return saved;
   }
 }

@@ -35,8 +35,9 @@ export default function CreateEventPage() {
       });
       toast('행사가 생성되었습니다!', 'success');
       router.push('/organizer/events');
-    } catch {
-      toast('행사 생성에 실패했습니다.', 'error');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || '행사 생성에 실패했습니다.';
+      toast(Array.isArray(msg) ? msg[0] : msg, 'error');
     } finally {
       setLoading(false);
     }

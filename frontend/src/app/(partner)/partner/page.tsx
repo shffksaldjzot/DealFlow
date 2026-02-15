@@ -178,8 +178,12 @@ export default function PartnerDashboard() {
                     <Badge status={c.status} />
                   </div>
                   <div className="flex items-center gap-3 text-xs text-gray-400">
-                    <span className="font-mono">{c.contractNumber}</span>
-                    <span>{c.customer?.name || '미지정'}</span>
+                    <span>{c.customerName || c.customer?.name || '미지정'}</span>
+                    {c.totalAmount != null && (
+                      <span className="font-medium text-gray-500">
+                        {Number(c.totalAmount).toLocaleString('ko-KR')}원
+                      </span>
+                    )}
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />

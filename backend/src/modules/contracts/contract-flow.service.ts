@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as crypto from 'crypto';
 import { Contract, ContractStatus } from './entities/contract.entity';
-import { ContractField } from './entities/contract-field.entity';
+import { ContractField, FieldType } from './entities/contract-field.entity';
 import { ContractFieldValue } from './entities/contract-field-value.entity';
 import { ContractSignature } from './entities/contract-signature.entity';
 import { ContractHistory } from './entities/contract-history.entity';
@@ -15,6 +15,7 @@ import { OrganizationMember, MemberRole } from '../organizations/entities/organi
 import { FillContractDto } from './dto/fill-contract.dto';
 import { SignContractDto } from './dto/sign-contract.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
 
 @Injectable()
 export class ContractFlowService {
@@ -32,6 +33,7 @@ export class ContractFlowService {
     @InjectRepository(OrganizationMember)
     private readonly memberRepository: Repository<OrganizationMember>,
     private readonly notificationsService: NotificationsService,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   private async findContractByQr(code: string): Promise<Contract> {
@@ -94,8 +96,7 @@ export class ContractFlowService {
     if (contract.status === ContractStatus.IN_PROGRESS) {
       // Already in progress – just update customer if needed and return as-is
       if (customerId && !contract.customerId) {
-        contract.customerId = customerId;
-        await this.contractRepository.save(contract);
+        await this.contractRepository.update(contract.id, { customerId });
       }
       return this.findContractByQr(qrCode);
     }
@@ -107,16 +108,18 @@ export class ContractFlowService {
     }
 
     const fromStatus = contract.status;
-    contract.status = ContractStatus.IN_PROGRESS;
+    const startUpdate: Partial<Contract> = {
+      status: ContractStatus.IN_PROGRESS,
+    };
     if (customerId) {
-      contract.customerId = customerId;
+      startUpdate.customerId = customerId;
     }
 
-    const saved = await this.contractRepository.save(contract);
+    await this.contractRepository.update(contract.id, startUpdate);
 
     await this.historyRepository.save(
       this.historyRepository.create({
-        contractId: saved.id,
+        contractId: contract.id,
         fromStatus,
         toStatus: ContractStatus.IN_PROGRESS,
         changedBy: customerId || null,
@@ -145,11 +148,13 @@ export class ContractFlowService {
 
     // If still pending, transition to in_progress
     if (contract.status === ContractStatus.PENDING) {
-      contract.status = ContractStatus.IN_PROGRESS;
+      const fillUpdate: Partial<Contract> = {
+        status: ContractStatus.IN_PROGRESS,
+      };
       if (customerId) {
-        contract.customerId = customerId;
+        fillUpdate.customerId = customerId;
       }
-      await this.contractRepository.save(contract);
+      await this.contractRepository.update(contract.id, fillUpdate);
 
       await this.historyRepository.save(
         this.historyRepository.create({
@@ -214,10 +219,13 @@ export class ContractFlowService {
       );
     }
 
-    // Validate required fields are filled
-    const requiredFields = await this.fieldRepository.find({
+    // Validate required fields are filled (exclude signature fields - handled separately)
+    const allRequiredFields = await this.fieldRepository.find({
       where: { templateId: contract.templateId, isRequired: true },
     });
+    const requiredFields = allRequiredFields.filter(
+      (f) => f.fieldType !== FieldType.SIGNATURE,
+    );
 
     const filledValues = await this.fieldValueRepository.find({
       where: { contractId: contract.id },
@@ -252,25 +260,35 @@ export class ContractFlowService {
       }),
     );
 
-    // Update contract status to signed
+    // Update contract status to signed (use update() to avoid cascade issues with loaded relations)
     const fromStatus = contract.status;
-    contract.status = ContractStatus.SIGNED;
-    contract.signedAt = new Date();
+    const updateData: Partial<Contract> = {
+      status: ContractStatus.SIGNED,
+      signedAt: new Date(),
+    };
     if (customerId) {
-      contract.customerId = customerId;
+      updateData.customerId = customerId;
     }
 
-    const saved = await this.contractRepository.save(contract);
+    await this.contractRepository.update(contract.id, updateData);
 
     await this.historyRepository.save(
       this.historyRepository.create({
-        contractId: saved.id,
+        contractId: contract.id,
         fromStatus,
         toStatus: ContractStatus.SIGNED,
         changedBy: customerId || null,
         reason: '고객 서명 완료',
         metadata: { signatureHash },
       }),
+    );
+
+    await this.activityLogService.log(
+      'contract_signed',
+      `계약서 ${contract.contractNumber} 고객 서명 완료`,
+      customerId || null,
+      'contract',
+      contract.id,
     );
 
     // Send notifications after successful signature

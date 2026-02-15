@@ -11,6 +11,7 @@ import { ContractTemplate } from './entities/contract-template.entity';
 import { ContractField } from './entities/contract-field.entity';
 import { ContractHistory } from './entities/contract-history.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
+import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
 import { EventPartner, EventPartnerStatus } from '../events/entities/event-partner.entity';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { CancelContractDto } from './dto/cancel-contract.dto';
@@ -21,6 +22,7 @@ import {
   generateQRCode,
   generateShortCode,
 } from '../../common/utils/code-generator';
+import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
 
 @Injectable()
 export class ContractsService {
@@ -35,17 +37,30 @@ export class ContractsService {
     private readonly historyRepository: Repository<ContractHistory>,
     @InjectRepository(OrganizationMember)
     private readonly memberRepository: Repository<OrganizationMember>,
+    @InjectRepository(Organization)
+    private readonly orgRepository: Repository<Organization>,
     @InjectRepository(EventPartner)
     private readonly eventPartnerRepository: Repository<EventPartner>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
-  private async getOrgIdForUser(userId: string): Promise<string> {
+  private async getOrgIdForUser(userId: string, requireApproved = false): Promise<string> {
     const membership = await this.memberRepository.findOne({
       where: { userId },
     });
     if (!membership) {
       throw new ForbiddenException('소속된 조직이 없습니다.');
     }
+
+    if (requireApproved) {
+      const org = await this.orgRepository.findOne({
+        where: { id: membership.organizationId },
+      });
+      if (!org || org.status !== OrgStatus.APPROVED) {
+        throw new ForbiddenException('조직이 아직 승인되지 않았습니다. 관리자 승인 후 이용 가능합니다.');
+      }
+    }
+
     return membership.organizationId;
   }
 
@@ -55,7 +70,7 @@ export class ContractsService {
     userId: string,
     dto: CreateContractDto,
   ): Promise<Contract> {
-    const orgId = await this.getOrgIdForUser(userId);
+    const orgId = await this.getOrgIdForUser(userId, true);
 
     // Verify partner is approved for this event
     const eventPartner = await this.eventPartnerRepository.findOne({
@@ -138,6 +153,14 @@ export class ContractsService {
         changedBy: userId,
         reason: '계약서 생성',
       }),
+    );
+
+    await this.activityLogService.log(
+      'create_contract',
+      `계약서 ${contractNumber} 생성 (고객: ${dto.customerName || '미정'})`,
+      userId,
+      'contract',
+      saved.id,
     );
 
     return this.contractRepository.findOne({
@@ -233,6 +256,14 @@ export class ContractsService {
         changedBy: userId,
         reason: dto.reason,
       }),
+    );
+
+    await this.activityLogService.log(
+      'cancel_contract',
+      `계약서 ${contract.contractNumber} 취소: ${dto.reason}`,
+      userId,
+      'contract',
+      contractId,
     );
 
     return saved;

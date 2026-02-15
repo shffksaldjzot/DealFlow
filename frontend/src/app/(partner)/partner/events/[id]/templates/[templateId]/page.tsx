@@ -28,9 +28,10 @@ export default function TemplateFieldEditorPage() {
         const existingFields = extractData<FieldDef[]>(await api.get(`/contract-templates/${templateId}/fields`));
         setFields(existingFields);
 
-        // Get template file URL
+        // Fetch template file via authenticated API and create blob URL
         if (tmpl.fileId) {
-          setTemplateImageUrl(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/files/${tmpl.fileId}/download`);
+          const fileRes = await api.get(`/files/${tmpl.fileId}/download`, { responseType: 'blob' });
+          setTemplateImageUrl(URL.createObjectURL(fileRes.data));
         }
       } catch {
         toast('템플릿을 불러오지 못했습니다.', 'error');
