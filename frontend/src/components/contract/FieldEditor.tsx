@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare } from 'lucide-react';
 
 export interface FieldDef {
   id?: string;
@@ -24,6 +24,7 @@ const FIELD_TYPES = [
   { value: 'text', label: '텍스트', icon: Type },
   { value: 'number', label: '숫자', icon: Hash },
   { value: 'date', label: '날짜', icon: Calendar },
+  { value: 'checkbox', label: '체크박스', icon: CheckSquare },
   { value: 'phone', label: '전화번호', icon: Phone },
   { value: 'email', label: '이메일', icon: Mail },
   { value: 'signature', label: '서명', icon: PenLine },
@@ -70,37 +71,54 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     onChange(updated);
   };
 
-  const handleMouseDown = useCallback((idx: number, e: React.MouseEvent) => {
-    e.preventDefault();
+  const startDrag = useCallback((idx: number, startX: number, startY: number) => {
     setSelectedIdx(idx);
     setDragging(idx);
 
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const startX = e.clientX;
-    const startY = e.clientY;
     const field = fields[idx];
     const startPosX = field.positionX;
     const startPosY = field.positionY;
 
-    const handleMouseMove = (moveE: MouseEvent) => {
-      const dx = ((moveE.clientX - startX) / rect.width) * 100;
-      const dy = ((moveE.clientY - startY) / rect.height) * 100;
+    const handleMove = (clientX: number, clientY: number) => {
+      const dx = ((clientX - startX) / rect.width) * 100;
+      const dy = ((clientY - startY) / rect.height) * 100;
       const newX = Math.max(0, Math.min(100 - field.width, startPosX + dx));
       const newY = Math.max(0, Math.min(100 - field.height, startPosY + dy));
       updateField(idx, { positionX: Math.round(newX * 10) / 10, positionY: Math.round(newY * 10) / 10 });
     };
 
-    const handleMouseUp = () => {
+    const handleMouseMove = (moveE: MouseEvent) => handleMove(moveE.clientX, moveE.clientY);
+    const handleTouchMove = (moveE: TouchEvent) => {
+      moveE.preventDefault();
+      handleMove(moveE.touches[0].clientX, moveE.touches[0].clientY);
+    };
+
+    const handleEnd = () => {
       setDragging(null);
       document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
     };
 
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
   }, [fields]);
+
+  const handleMouseDown = useCallback((idx: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    startDrag(idx, e.clientX, e.clientY);
+  }, [startDrag]);
+
+  const handleTouchStart = useCallback((idx: number, e: React.TouchEvent) => {
+    e.preventDefault();
+    startDrag(idx, e.touches[0].clientX, e.touches[0].clientY);
+  }, [startDrag]);
 
   const selected = selectedIdx !== null ? fields[selectedIdx] : null;
 
@@ -148,6 +166,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                   minHeight: '20px',
                 }}
                 onMouseDown={(e) => handleMouseDown(idx, e)}
+                onTouchStart={(e) => handleTouchStart(idx, e)}
               >
                 <Icon className="w-3 h-3 text-blue-500 shrink-0" />
                 <span className="truncate text-blue-700">{field.label}</span>

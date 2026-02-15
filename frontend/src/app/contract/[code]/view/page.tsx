@@ -178,47 +178,15 @@ export default function ContractViewPage() {
           <span className="text-gray-400">3. 완료</span>
         </div>
 
-        {/* Template file preview (read-only) + field form below */}
+        {/* Template file with overlay fields */}
         {templateFileUrl && contract?.template?.fileType ? (
-          <>
-            {/* Template file preview */}
-            <Card padding="lg">
-              <h3 className="font-bold text-gray-900 mb-3">계약서 미리보기</h3>
-              {contract.template.fileType === 'pdf' ? (
-                <iframe
-                  src={templateFileUrl}
-                  className="w-full rounded-lg border border-gray-200"
-                  style={{ height: '500px' }}
-                  title="계약서 미리보기"
-                />
-              ) : !templateImgError ? (
-                <img
-                  src={templateFileUrl}
-                  alt="계약서 미리보기"
-                  className="w-full rounded-lg border border-gray-200"
-                  onError={() => setTemplateImgError(true)}
-                />
-              ) : (
-                <div className="flex items-center justify-center py-16 text-gray-300 border border-gray-200 rounded-lg">
-                  <p className="text-sm">이미지를 불러올 수 없습니다</p>
-                </div>
-              )}
-            </Card>
-
-            {/* Overlay mode for field positioning */}
-            <ContractOverlay
-              fileUrl={templateFileUrl}
-              fileType={contract.template.fileType}
-              fields={fields}
-              fieldValues={fieldValues}
-              onFieldChange={handleFieldChange}
-            />
-
-            {/* Separate form for fields without overlay positions */}
-            {fields.filter(
-              (f) => f.fieldType !== 'signature' && (!f.positionX && !f.positionY),
-            ).length > 0 && renderFieldsForm()}
-          </>
+          <ContractOverlay
+            fileUrl={templateFileUrl}
+            fileType={contract.template.fileType}
+            fields={fields}
+            fieldValues={fieldValues}
+            onFieldChange={handleFieldChange}
+          />
         ) : (
           renderFieldsForm()
         )}

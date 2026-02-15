@@ -4,7 +4,6 @@ import { useParams, useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import Button from '@/components/ui/Button';
-import Skeleton from '@/components/ui/Skeleton';
 import type { Contract } from '@/types/contract';
 
 export default function ContractEntryPage() {

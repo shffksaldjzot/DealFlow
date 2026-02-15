@@ -25,9 +25,14 @@ export default function ContractOverlay({
     .filter((f) => f.fieldType !== 'signature')
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
-  // Check if we have positioned fields (positionX/Y > 0)
-  const hasPositionedFields = overlayFields.some(
+  // Fields with position data (show on image)
+  const positionedFields = overlayFields.filter(
     (f) => f.positionX > 0 || f.positionY > 0,
+  );
+
+  // Fields without position data (show in form)
+  const formFields = overlayFields.filter(
+    (f) => !f.positionX && !f.positionY,
   );
 
   return (
@@ -55,23 +60,22 @@ export default function ContractOverlay({
           </div>
         )}
 
-        {/* Positioned overlay fields (only if fields have position data) */}
-        {hasPositionedFields && fileType !== 'pdf' && imgLoaded && (
+        {/* Positioned overlay fields on image */}
+        {positionedFields.length > 0 && fileType !== 'pdf' && imgLoaded && (
           <div className="absolute inset-0">
-            {overlayFields
-              .filter((f) => f.positionX > 0 || f.positionY > 0)
-              .map((field) => (
-                <div
-                  key={field.id}
-                  className="absolute"
-                  style={{
-                    left: `${field.positionX}%`,
-                    top: `${field.positionY}%`,
-                    width: field.width ? `${field.width}%` : '20%',
-                    height: field.height ? `${field.height}%` : 'auto',
-                  }}
-                >
-                  {field.fieldType === 'checkbox' ? (
+            {positionedFields.map((field) => (
+              <div
+                key={field.id}
+                className="absolute"
+                style={{
+                  left: `${field.positionX}%`,
+                  top: `${field.positionY}%`,
+                  width: field.width ? `${field.width}%` : '20%',
+                  height: field.height ? `${field.height}%` : 'auto',
+                }}
+              >
+                {field.fieldType === 'checkbox' ? (
+                  <label className="flex items-center gap-1.5 bg-white/90 rounded px-1 py-0.5">
                     <input
                       type="checkbox"
                       checked={fieldValues[field.id] === 'true'}
@@ -80,67 +84,67 @@ export default function ContractOverlay({
                       }
                       className="w-5 h-5 rounded border-gray-300 text-blue-600"
                     />
-                  ) : (
-                    <input
-                      type={field.fieldType === 'date' ? 'date' : 'text'}
-                      placeholder={field.placeholder || field.label}
-                      value={fieldValues[field.id] || ''}
-                      onChange={(e) => onFieldChange(field.id, e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-blue-300 rounded bg-white/90 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  )}
-                </div>
-              ))}
+                    <span className="text-xs text-gray-700 truncate">{field.label}</span>
+                  </label>
+                ) : (
+                  <input
+                    type={field.fieldType === 'date' ? 'date' : field.fieldType === 'number' || field.fieldType === 'amount' ? 'number' : 'text'}
+                    placeholder={field.placeholder || field.label}
+                    value={fieldValues[field.id] || ''}
+                    onChange={(e) => onFieldChange(field.id, e.target.value)}
+                    className="w-full px-2 py-1 text-sm border border-blue-300 rounded bg-white/90 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
 
       {/* Form fields below the template (for fields without position or for PDFs) */}
-      {overlayFields.length > 0 && (
+      {(formFields.length > 0 || (fileType === 'pdf' && overlayFields.length > 0)) && (
         <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
           <h4 className="text-sm font-semibold text-gray-700">계약 정보 입력</h4>
-          {overlayFields
-            .filter((f) => !hasPositionedFields || fileType === 'pdf' || (f.positionX === 0 && f.positionY === 0))
-            .map((field) => (
-              <div key={field.id}>
-                {field.fieldType === 'checkbox' ? (
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={fieldValues[field.id] === 'true'}
-                      onChange={(e) =>
-                        onFieldChange(field.id, e.target.checked ? 'true' : 'false')
-                      }
-                      className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">
-                      {field.label}
-                      {field.isRequired && <span className="text-red-500 ml-1">*</span>}
-                    </span>
+          {(fileType === 'pdf' ? overlayFields : formFields).map((field) => (
+            <div key={field.id}>
+              {field.fieldType === 'checkbox' ? (
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={fieldValues[field.id] === 'true'}
+                    onChange={(e) =>
+                      onFieldChange(field.id, e.target.checked ? 'true' : 'false')
+                    }
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {field.label}
+                    {field.isRequired && <span className="text-red-500 ml-1">*</span>}
+                  </span>
+                </label>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {field.label}
+                    {field.isRequired && <span className="text-red-500 ml-1">*</span>}
                   </label>
-                ) : (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {field.label}
-                      {field.isRequired && <span className="text-red-500 ml-1">*</span>}
-                    </label>
-                    <input
-                      type={
-                        field.fieldType === 'amount' || field.fieldType === 'number'
-                          ? 'number'
-                          : field.fieldType === 'date'
-                            ? 'date'
-                            : 'text'
-                      }
-                      placeholder={field.placeholder || ''}
-                      value={fieldValues[field.id] || ''}
-                      onChange={(e) => onFieldChange(field.id, e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
+                  <input
+                    type={
+                      field.fieldType === 'amount' || field.fieldType === 'number'
+                        ? 'number'
+                        : field.fieldType === 'date'
+                          ? 'date'
+                          : 'text'
+                    }
+                    placeholder={field.placeholder || ''}
+                    value={fieldValues[field.id] || ''}
+                    onChange={(e) => onFieldChange(field.id, e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

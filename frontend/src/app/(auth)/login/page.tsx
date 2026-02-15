@@ -91,6 +91,8 @@ function LoginForm() {
     }
   };
 
+  const buildVersion = process.env.NEXT_PUBLIC_BUILD_VERSION || '260215';
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -304,6 +306,9 @@ function LoginForm() {
           <p>2. 서비스는 이용자의 귀책사유로 인한 서비스 이용 장애에 대해서는 책임을 지지 않습니다.</p>
         </div>
       </Modal>
+
+      {/* Build Version */}
+      <p className="text-center text-xs text-gray-300 mt-6">v{buildVersion}</p>
 
       {/* Privacy Modal */}
       <Modal isOpen={privacyModal} onClose={() => setPrivacyModal(false)} title="개인정보처리방침" size="lg">
