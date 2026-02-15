@@ -54,8 +54,10 @@ function LoginForm() {
       const { user } = useAuthStore.getState();
       toast('로그인 성공!', 'success');
       router.push(redirectUrl || roleHome[user?.role || 'customer']);
-    } catch {
-      toast('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.', 'error');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      const errorMessage = Array.isArray(msg) ? msg[0] : (msg || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+      toast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }

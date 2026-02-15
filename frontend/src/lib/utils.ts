@@ -31,7 +31,7 @@ export function formatCurrency(amount: number): string {
 
 export function getStatusLabel(status: string): string {
   const map: Record<string, string> = {
-    pending: '대기 중',
+    pending: '승인대기',
     approved: '승인됨',
     rejected: '거절됨',
     suspended: '정지됨',

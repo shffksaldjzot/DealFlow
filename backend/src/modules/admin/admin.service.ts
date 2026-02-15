@@ -190,7 +190,7 @@ export class AdminService {
   // ─── Organizers ────────────────────────────────────────
 
   async listOrganizers(
-    pagination: PaginationDto & { status?: string },
+    pagination: PaginationDto,
   ): Promise<PaginatedResult<Organization>> {
     const { page, limit, search, status } = pagination;
     const skip = (page - 1) * limit;
@@ -236,6 +236,18 @@ export class AdminService {
     org.rejectionReason = null;
 
     const saved = await this.orgRepository.save(org);
+
+    // Activate all member users of this org
+    const members = await this.memberRepository.find({
+      where: { organizationId: orgId },
+    });
+    for (const member of members) {
+      await this.userRepository.update(
+        { id: member.userId, status: UserStatus.PENDING },
+        { status: UserStatus.ACTIVE },
+      );
+    }
+
     await this.activityLogService.log('approve_organizer', `주관사 "${org.name}" 승인`, adminUserId, 'organization', orgId);
     return saved;
   }

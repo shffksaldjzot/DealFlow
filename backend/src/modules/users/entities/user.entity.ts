@@ -24,6 +24,7 @@ export enum AuthProvider {
 }
 
 export enum UserStatus {
+  PENDING = 'pending',
   ACTIVE = 'active',
   SUSPENDED = 'suspended',
   WITHDRAWN = 'withdrawn',
