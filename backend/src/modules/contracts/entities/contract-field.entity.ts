@@ -16,6 +16,8 @@ export enum FieldType {
   AMOUNT = 'amount',
   DATE = 'date',
   SIGNATURE = 'signature',
+  PHONE = 'phone',
+  EMAIL = 'email',
 }
 
 @Entity('contract_fields')

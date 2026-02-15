@@ -155,9 +155,12 @@ export class ContractsService {
       }),
     );
 
+    const partnerOrg = await this.orgRepository.findOne({ where: { id: orgId } });
+    const partnerName = partnerOrg?.name || '파트너';
+
     await this.activityLogService.log(
       'create_contract',
-      `계약서 ${contractNumber} 생성 (고객: ${dto.customerName || '미정'})`,
+      `"${partnerName}"이(가) 계약서 ${contractNumber} 생성 (고객: ${dto.customerName || '미정'})`,
       userId,
       'contract',
       saved.id,
@@ -258,9 +261,12 @@ export class ContractsService {
       }),
     );
 
+    const cancelOrg = await this.orgRepository.findOne({ where: { id: orgId } });
+    const cancelOrgName = cancelOrg?.name || '파트너';
+
     await this.activityLogService.log(
       'cancel_contract',
-      `계약서 ${contract.contractNumber} 취소: ${dto.reason}`,
+      `"${cancelOrgName}"이(가) 계약서 ${contract.contractNumber} 취소: ${dto.reason}`,
       userId,
       'contract',
       contractId,

@@ -13,6 +13,7 @@ interface ActivityLog {
   action: string;
   description: string;
   userId?: string;
+  userName?: string;
   targetType?: string;
   targetId?: string;
   metadata?: any;
@@ -106,6 +107,9 @@ export default function AdminLogsPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-900">{log.description}</p>
                     <div className="flex items-center gap-3 mt-1">
+                      {log.userName && (
+                        <span className="text-xs text-blue-600 font-medium">{log.userName}</span>
+                      )}
                       <span className="text-xs text-gray-400">{formatDateTime(log.createdAt)}</span>
                       {link && (
                         <button

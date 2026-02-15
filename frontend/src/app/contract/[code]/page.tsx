@@ -15,10 +15,17 @@ export default function ContractEntryPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.get(`/contract-flow/${code}`)
+    const trimmedCode = code?.replace(/\s/g, '');
+    if (!trimmedCode) {
+      setError('계약 코드가 비어있습니다.');
+      setLoading(false);
+      return;
+    }
+    api.get(`/contract-flow/${trimmedCode}`)
       .then((res) => setContract(extractData(res)))
       .catch((err) => {
-        setError(err.response?.data?.message?.[0] || '올바른 계약 코드를 입력해주세요.');
+        const msg = err.response?.data?.message;
+        setError(Array.isArray(msg) ? msg[0] : (msg || '올바른 계약 코드를 입력해주세요.'));
       })
       .finally(() => setLoading(false));
   }, [code]);

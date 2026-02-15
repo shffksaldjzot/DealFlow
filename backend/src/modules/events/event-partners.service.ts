@@ -86,6 +86,10 @@ export class EventPartnersService {
 
     const saved = await this.eventPartnerRepository.save(eventPartner);
 
+    // Get partner org name for logging
+    const partnerOrg = await this.orgRepository.findOne({ where: { id: orgId } });
+    const partnerName = partnerOrg?.name || '협력업체';
+
     // Notify the event organizer's org owner
     try {
       const organizerOwner = await this.memberRepository.findOne({
@@ -96,7 +100,7 @@ export class EventPartnersService {
           userId: organizerOwner.userId,
           type: 'partner_joined',
           title: '새로운 파트너가 행사 참여를 요청했습니다',
-          message: `행사 "${event.name}"에 새로운 파트너가 참여를 요청했습니다.`,
+          message: `행사 "${event.name}"에 "${partnerName}"이(가) 참여를 요청했습니다.`,
           relatedId: event.id,
           relatedType: 'event',
         });
@@ -107,7 +111,7 @@ export class EventPartnersService {
 
     await this.activityLogService.log(
       'partner_join_request',
-      `협력업체가 행사 "${event.name}" 참가 신청`,
+      `"${partnerName}"이(가) 행사 "${event.name}" 참가 신청`,
       userId,
       'event_partner',
       saved.id,
@@ -128,7 +132,7 @@ export class EventPartnersService {
 
     const eventPartner = await this.eventPartnerRepository.findOne({
       where: { eventId, partnerId: orgId },
-      relations: ['event'],
+      relations: ['event', 'partner'],
     });
     if (!eventPartner) {
       throw new NotFoundException('참가 정보를 찾을 수 없습니다.');
@@ -137,6 +141,8 @@ export class EventPartnersService {
     if (eventPartner.status !== EventPartnerStatus.APPROVED) {
       throw new ForbiddenException('승인된 상태에서만 참가 취소가 가능합니다.');
     }
+
+    const partnerName = eventPartner.partner?.name || '협력업체';
 
     eventPartner.status = EventPartnerStatus.CANCELLED;
     eventPartner.cancelledAt = new Date();
@@ -147,7 +153,7 @@ export class EventPartnersService {
 
     await this.activityLogService.log(
       'partner_cancel_participation',
-      `협력업체가 행사 참가 취소${reason ? `: ${reason}` : ''}`,
+      `"${partnerName}"이(가) 행사 "${eventPartner.event?.name}" 참가 취소${reason ? `: ${reason}` : ''}`,
       userId,
       'event_partner',
       eventPartner.id,

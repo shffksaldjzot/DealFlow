@@ -17,6 +17,9 @@ export default function OrganizerSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
+    name: '',
+    businessNumber: '',
+    representativeName: '',
     contactPhone: '',
     contactEmail: '',
     address: '',
@@ -30,6 +33,9 @@ export default function OrganizerSettingsPage() {
         const data = extractData<Organization>(res);
         setOrg(data);
         setForm({
+          name: data.name || '',
+          businessNumber: data.businessNumber || '',
+          representativeName: data.representativeName || '',
           contactPhone: data.contactPhone || '',
           contactEmail: data.contactEmail || '',
           address: data.address || '',
@@ -42,9 +48,16 @@ export default function OrganizerSettingsPage() {
 
   const handleSave = async () => {
     if (!org) return;
+    if (!form.name.trim()) {
+      toast('회사명을 입력해주세요.', 'error');
+      return;
+    }
     setSaving(true);
     try {
-      await api.patch(`/organizations/${org.id}`, form);
+      const updated = extractData<Organization>(
+        await api.patch(`/organizations/${org.id}`, form)
+      );
+      setOrg(updated);
       toast('저장되었습니다.', 'success');
     } catch {
       toast('저장에 실패했습니다.', 'error');
@@ -56,7 +69,7 @@ export default function OrganizerSettingsPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="업체 정보 관리" />
+        <PageHeader title="마이페이지" />
         <div className="h-64 bg-white rounded-2xl animate-pulse" />
       </div>
     );
@@ -65,7 +78,7 @@ export default function OrganizerSettingsPage() {
   if (!org) {
     return (
       <div>
-        <PageHeader title="업체 정보 관리" />
+        <PageHeader title="마이페이지" />
         <Card>
           <div className="text-center py-8">
             <Building2 className="w-8 h-8 text-gray-300 mx-auto mb-2" />
@@ -78,26 +91,33 @@ export default function OrganizerSettingsPage() {
 
   return (
     <div>
-      <PageHeader title="업체 정보 관리" subtitle="사업자 정보와 연락처를 관리할 수 있습니다" />
+      <PageHeader title="마이페이지" subtitle="사업자 정보와 연락처를 관리할 수 있습니다" />
 
+      {/* Business Info Card */}
       <Card className="mb-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-700">기본 정보</h3>
+          <h3 className="text-sm font-semibold text-gray-700">사업자 정보</h3>
           <Badge status={org.status} />
         </div>
         <div className="space-y-4">
-          <div>
-            <Input label="조직명" value={org.name} disabled />
-            <p className="text-xs text-gray-400 mt-1">변경이 필요하시면 운영사(DealFlow)로 연락해주세요</p>
-          </div>
-          <Input label="사업자등록번호" value={org.businessNumber} disabled />
-          <div>
-            <Input label="대표자명" value={org.representativeName || ''} disabled />
-            <p className="text-xs text-gray-400 mt-1">변경이 필요하시면 운영사(DealFlow)로 연락해주세요</p>
-          </div>
-          <Input label="연락처" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} />
-          <Input label="이메일" type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
-          <Input label="주소" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+          <Input
+            label="회사명"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="회사명을 입력하세요"
+          />
+          <Input
+            label="사업자등록번호"
+            value={form.businessNumber}
+            onChange={(e) => setForm({ ...form, businessNumber: e.target.value })}
+            placeholder="000-00-00000"
+          />
+          <Input
+            label="대표자명"
+            value={form.representativeName}
+            onChange={(e) => setForm({ ...form, representativeName: e.target.value })}
+            placeholder="대표자 이름"
+          />
 
           {/* Business License Upload */}
           <div>
@@ -117,7 +137,7 @@ export default function OrganizerSettingsPage() {
                   onClick={() => { setForm({ ...form, businessLicenseFileId: '' }); setLicenseFileName(''); }}
                   className="text-xs text-red-500 hover:text-red-700"
                 >
-                  삭제
+                  변경
                 </button>
               </div>
             ) : (
@@ -127,7 +147,7 @@ export default function OrganizerSettingsPage() {
                 maxSizeMB={10}
                 helperText="사업자등록증 파일을 업로드하세요 (PDF, JPG, PNG)"
                 purpose="business_license"
-                onUploadComplete={(fId, fName, file) => {
+                onUploadComplete={(fId, fName) => {
                   setForm({ ...form, businessLicenseFileId: fId });
                   setLicenseFileName(fName);
                 }}
@@ -135,10 +155,40 @@ export default function OrganizerSettingsPage() {
             )}
           </div>
         </div>
-        <div className="mt-6">
-          <Button onClick={handleSave} loading={saving}>저장</Button>
+      </Card>
+
+      {/* Contact Info Card */}
+      <Card className="mb-4">
+        <h3 className="text-sm font-semibold text-gray-700 mb-4">연락처 정보</h3>
+        <div className="space-y-4">
+          <Input
+            label="연락처"
+            value={form.contactPhone}
+            onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
+            placeholder="010-0000-0000"
+          />
+          <Input
+            label="이메일"
+            type="email"
+            value={form.contactEmail}
+            onChange={(e) => setForm({ ...form, contactEmail: e.target.value })}
+            placeholder="email@example.com"
+          />
+          <Input
+            label="주소"
+            value={form.address}
+            onChange={(e) => setForm({ ...form, address: e.target.value })}
+            placeholder="사업장 주소"
+          />
         </div>
       </Card>
+
+      {/* Save Button */}
+      <div className="mb-4">
+        <Button onClick={handleSave} loading={saving} className="w-full">
+          저장
+        </Button>
+      </div>
 
       {/* Members */}
       <Card>

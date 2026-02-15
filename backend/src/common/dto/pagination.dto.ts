@@ -22,6 +22,10 @@ export class PaginationDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
 }
 
 export class PaginatedResult<T> {

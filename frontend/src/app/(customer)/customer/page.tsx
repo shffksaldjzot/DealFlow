@@ -38,7 +38,7 @@ export default function CustomerHome() {
   const activeVisits = visits.filter((v) => v.status === 'reserved');
 
   const handleContractCodeSubmit = () => {
-    const trimmed = contractCode.trim();
+    const trimmed = contractCode.trim().replace(/\s/g, '');
     if (trimmed) {
       router.push(`/contract/${trimmed}`);
     }
@@ -189,10 +189,15 @@ export default function CustomerHome() {
                   <input
                     type="text"
                     value={contractCode}
-                    onChange={(e) => setContractCode(e.target.value.toUpperCase())}
+                    onChange={(e) => setContractCode(e.target.value.toUpperCase().replace(/\s/g, ''))}
                     onKeyDown={(e) => e.key === 'Enter' && handleContractCodeSubmit()}
-                    placeholder="계약 코드를 입력하세요"
-                    className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                    placeholder="8자리 코드 입력"
+                    maxLength={16}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono tracking-widest"
                     autoFocus
                   />
                   <Button onClick={handleContractCodeSubmit} disabled={!contractCode.trim()}>

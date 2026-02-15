@@ -80,17 +80,30 @@ export class AdminService {
     return this.activityLogRepository.save(log);
   }
 
-  async getActivityLogs(pagination: PaginationDto): Promise<PaginatedResult<ActivityLog>> {
+  async getActivityLogs(pagination: PaginationDto): Promise<PaginatedResult<any>> {
     const { page, limit } = pagination;
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.activityLogRepository.findAndCount({
+      relations: ['user'],
       order: { createdAt: 'DESC' },
       skip,
       take: limit,
     });
 
-    return new PaginatedResult(data, total, page, limit);
+    const sanitized = data.map((log) => ({
+      id: log.id,
+      action: log.action,
+      description: log.description,
+      userId: log.userId,
+      userName: log.user?.name || null,
+      targetType: log.targetType,
+      targetId: log.targetId,
+      metadata: log.metadata,
+      createdAt: log.createdAt,
+    }));
+
+    return new PaginatedResult(sanitized, total, page, limit);
   }
 
   // ─── Dashboard ────────────────────────────────────────
@@ -273,7 +286,7 @@ export class AdminService {
   // ─── Users ────────────────────────────────────────
 
   async listUsers(pagination: PaginationDto): Promise<PaginatedResult<any>> {
-    const { page, limit, search } = pagination;
+    const { page, limit, search, role, status } = pagination;
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.userRepository
@@ -299,6 +312,14 @@ export class AdminService {
       .orderBy('user.createdAt', 'DESC')
       .skip(skip)
       .take(limit);
+
+    if (role && role !== 'all') {
+      queryBuilder.andWhere('user.role = :role', { role });
+    }
+
+    if (status && status !== 'all') {
+      queryBuilder.andWhere('user.status = :status', { status });
+    }
 
     if (search) {
       const like = this.isPostgres ? 'ILIKE' : 'LIKE';

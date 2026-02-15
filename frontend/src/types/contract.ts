@@ -1,5 +1,5 @@
 export type ContractStatus = 'pending' | 'in_progress' | 'signed' | 'completed' | 'cancelled';
-export type FieldType = 'text' | 'number' | 'checkbox' | 'amount' | 'date' | 'signature';
+export type FieldType = 'text' | 'number' | 'checkbox' | 'amount' | 'date' | 'signature' | 'phone' | 'email';
 
 export interface ContractTemplate {
   id: string;

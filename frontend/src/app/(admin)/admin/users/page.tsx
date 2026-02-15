@@ -20,6 +20,8 @@ export default function AdminUsersPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [createModal, setCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState({ email: '', password: '', name: '', role: 'customer' });
@@ -27,7 +29,7 @@ export default function AdminUsersPage() {
 
   const fetchUsers = () => {
     setLoading(true);
-    api.get('/admin/users', { params: { page, limit: 20, search } })
+    api.get('/admin/users', { params: { page, limit: 20, search, role: roleFilter, status: statusFilter } })
       .then((res) => {
         const result = extractData<PaginatedResult<User>>(res);
         setUsers(result.data);
@@ -37,7 +39,7 @@ export default function AdminUsersPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchUsers(); }, [page, search]);
+  useEffect(() => { fetchUsers(); }, [page, search, roleFilter, statusFilter]);
 
   const handleCreate = async () => {
     if (!createForm.email || !createForm.password || !createForm.name) {
@@ -84,10 +86,11 @@ export default function AdminUsersPage() {
 
   const columns = [
     { key: 'name', header: '이름' },
-    { key: 'email', header: '이메일' },
+    { key: 'email', header: '이메일', className: 'hidden sm:table-cell' },
+    { key: 'phone', header: '연락처', render: (u: any) => <span className="text-gray-600 text-xs">{u.phone || '-'}</span> },
     { key: 'role', header: '역할', render: (u: User) => getRoleBadge(u.role) },
     { key: 'status', header: '상태', render: (u: any) => <Badge status={u.effectiveStatus || u.status} /> },
-    { key: 'createdAt', header: '가입일', render: (u: User) => formatDateTime(u.createdAt) },
+    { key: 'createdAt', header: '가입일', className: 'hidden sm:table-cell', render: (u: User) => formatDateTime(u.createdAt) },
   ];
 
   return (
@@ -100,12 +103,36 @@ export default function AdminUsersPage() {
         }
       />
 
-      <div className="mb-4 max-w-sm">
-        <Input
-          placeholder="이름 또는 이메일 검색"
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-        />
+      <div className="mb-4 flex flex-wrap gap-2 items-end">
+        <div className="flex-1 min-w-[180px] max-w-sm">
+          <Input
+            placeholder="이름 또는 이메일 검색"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          />
+        </div>
+        <select
+          value={roleFilter}
+          onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
+          className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">전체 역할</option>
+          <option value="admin">관리자</option>
+          <option value="organizer">주관사</option>
+          <option value="partner">파트너</option>
+          <option value="customer">고객</option>
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">전체 상태</option>
+          <option value="active">활성</option>
+          <option value="pending">대기</option>
+          <option value="inactive">비활성</option>
+          <option value="suspended">정지</option>
+        </select>
       </div>
 
       {loading ? (

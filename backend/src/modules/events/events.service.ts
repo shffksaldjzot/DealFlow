@@ -87,9 +87,12 @@ export class EventsService {
 
     const saved = await this.eventRepository.save(event);
 
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    const orgName = org?.name || '주관사';
+
     await this.activityLogService.log(
       'create_event',
-      `행사 "${dto.name}" 생성`,
+      `"${orgName}"이(가) 행사 "${dto.name}" 생성`,
       userId,
       'event',
       saved.id,
@@ -187,9 +190,12 @@ export class EventsService {
     event.status = dto.status;
     const saved = await this.eventRepository.save(event);
 
+    const statusOrg = await this.orgRepository.findOne({ where: { id: orgId } });
+    const statusOrgName = statusOrg?.name || '주관사';
+
     await this.activityLogService.log(
       'update_event_status',
-      `행사 "${event.name}" 상태 변경: "${fromStatus}" → "${dto.status}"`,
+      `"${statusOrgName}"이(가) 행사 "${event.name}" 상태 변경: "${fromStatus}" → "${dto.status}"`,
       userId,
       'event',
       eventId,
@@ -270,9 +276,19 @@ export class EventsService {
       [EventPartnerStatus.REJECTED]: 'reject_partner',
       [EventPartnerStatus.CANCELLED]: 'cancel_partner',
     };
+    const organizerOrg = await this.orgRepository.findOne({ where: { id: orgId } });
+    const organizerName = organizerOrg?.name || '주관사';
+    const partnerOrgName = eventPartner.partner?.name || partnerId;
+
+    const statusLabels: Record<string, string> = {
+      [EventPartnerStatus.APPROVED]: '승인',
+      [EventPartnerStatus.REJECTED]: '거절',
+      [EventPartnerStatus.CANCELLED]: '취소',
+    };
+
     await this.activityLogService.log(
       actionMap[dto.status] || 'update_partner_status',
-      `행사 "${event.name}" 파트너 "${eventPartner.partner?.name || partnerId}" 상태 변경: "${dto.status}"`,
+      `"${organizerName}"이(가) "${partnerOrgName}" 행사 "${event.name}" 참가 ${statusLabels[dto.status] || dto.status}`,
       userId,
       'event_partner',
       eventPartner.id,
@@ -293,9 +309,12 @@ export class EventsService {
     event.status = EventStatus.CANCELLED;
     await this.eventRepository.save(event);
 
+    const delOrg = await this.orgRepository.findOne({ where: { id: orgId } });
+    const delOrgName = delOrg?.name || '주관사';
+
     await this.activityLogService.log(
       'delete_event',
-      `행사 "${event.name}" 삭제 (취소 처리)`,
+      `"${delOrgName}"이(가) 행사 "${event.name}" 삭제 (취소 처리)`,
       userId,
       'event',
       eventId,

@@ -3,8 +3,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { JSON_COLUMN_TYPE } from '../../../shared/database.utils';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('activity_logs')
 export class ActivityLog {
@@ -19,6 +22,10 @@ export class ActivityLog {
 
   @Column({ name: 'user_id', nullable: true })
   userId: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @Column({ name: 'target_type', length: 50, nullable: true })
   targetType: string;
