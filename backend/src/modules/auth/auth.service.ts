@@ -296,4 +296,13 @@ export class AuthService {
       };
     }
   }
+
+  // TEMP: one-time admin password reset - REMOVE after use
+  async tempResetPassword(email: string, newPassword: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) return { message: 'not found' };
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await this.userRepository.save(user);
+    return { message: 'password reset done', email: user.email, role: user.role };
+  }
 }

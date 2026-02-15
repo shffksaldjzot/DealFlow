@@ -65,4 +65,14 @@ export class AuthController {
   ) {
     return this.authService.changePassword(userId, dto.currentPassword, dto.newPassword);
   }
+
+  // TEMP: one-time admin password reset - REMOVE after use
+  @Public()
+  @Post('temp-reset')
+  tempReset(@Body() body: { email: string; password: string; secret: string }) {
+    if (body.secret !== 'dealflow-temp-reset-2026') {
+      return { message: 'unauthorized' };
+    }
+    return this.authService.tempResetPassword(body.email, body.password);
+  }
 }
