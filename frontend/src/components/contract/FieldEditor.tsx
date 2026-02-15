@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate } from 'lucide-react';
 
 export interface FieldDef {
   id?: string;
@@ -28,6 +28,43 @@ const FIELD_TYPES = [
   { value: 'phone', label: '전화번호', icon: Phone },
   { value: 'email', label: '이메일', icon: Mail },
   { value: 'signature', label: '서명', icon: PenLine },
+];
+
+const FIELD_PRESETS: { name: string; description: string; fields: Omit<FieldDef, 'sortOrder'>[] }[] = [
+  {
+    name: '기본 계약서',
+    description: '이름, 연락처, 날짜, 금액, 서명',
+    fields: [
+      { fieldType: 'text', label: '이름', placeholder: '성명을 입력하세요', isRequired: true, pageNumber: 1, positionX: 15, positionY: 10, width: 30, height: 5 },
+      { fieldType: 'phone', label: '연락처', placeholder: '010-0000-0000', isRequired: true, pageNumber: 1, positionX: 15, positionY: 18, width: 30, height: 5 },
+      { fieldType: 'date', label: '계약일', isRequired: true, pageNumber: 1, positionX: 55, positionY: 10, width: 25, height: 5 },
+      { fieldType: 'number', label: '금액', placeholder: '계약 금액', isRequired: true, pageNumber: 1, positionX: 55, positionY: 18, width: 25, height: 5 },
+      { fieldType: 'signature', label: '서명', isRequired: true, pageNumber: 1, positionX: 35, positionY: 80, width: 30, height: 12 },
+    ],
+  },
+  {
+    name: '간단 동의서',
+    description: '이름, 동의 체크, 서명',
+    fields: [
+      { fieldType: 'text', label: '이름', placeholder: '성명', isRequired: true, pageNumber: 1, positionX: 15, positionY: 15, width: 30, height: 5 },
+      { fieldType: 'checkbox', label: '동의함', isRequired: true, pageNumber: 1, positionX: 15, positionY: 65, width: 25, height: 5 },
+      { fieldType: 'signature', label: '서명', isRequired: true, pageNumber: 1, positionX: 35, positionY: 80, width: 30, height: 12 },
+    ],
+  },
+  {
+    name: '상세 계약서',
+    description: '이름, 연락처, 이메일, 주소, 날짜, 금액, 동의, 서명',
+    fields: [
+      { fieldType: 'text', label: '성명', placeholder: '성명', isRequired: true, pageNumber: 1, positionX: 10, positionY: 8, width: 25, height: 5 },
+      { fieldType: 'phone', label: '연락처', placeholder: '010-0000-0000', isRequired: true, pageNumber: 1, positionX: 10, positionY: 16, width: 25, height: 5 },
+      { fieldType: 'email', label: '이메일', placeholder: 'email@example.com', isRequired: false, pageNumber: 1, positionX: 10, positionY: 24, width: 25, height: 5 },
+      { fieldType: 'text', label: '주소', placeholder: '주소 입력', isRequired: false, pageNumber: 1, positionX: 10, positionY: 32, width: 40, height: 5 },
+      { fieldType: 'date', label: '계약일', isRequired: true, pageNumber: 1, positionX: 55, positionY: 8, width: 25, height: 5 },
+      { fieldType: 'number', label: '계약금액', placeholder: '금액', isRequired: true, pageNumber: 1, positionX: 55, positionY: 16, width: 25, height: 5 },
+      { fieldType: 'checkbox', label: '약관 동의', isRequired: true, pageNumber: 1, positionX: 10, positionY: 70, width: 25, height: 5 },
+      { fieldType: 'signature', label: '서명', isRequired: true, pageNumber: 1, positionX: 35, positionY: 80, width: 30, height: 12 },
+    ],
+  },
 ];
 
 interface FieldEditorProps {
@@ -177,7 +214,33 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
       </div>
 
       {/* Sidebar */}
-      <div className="w-72 shrink-0 space-y-4">
+      <div className="w-72 shrink-0 space-y-4 overflow-y-auto max-h-[80vh]">
+        {/* Field Presets */}
+        {fields.length === 0 && (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-3">
+            <div className="flex items-center gap-1.5 mb-2">
+              <LayoutTemplate className="w-3.5 h-3.5 text-blue-600" />
+              <p className="text-xs font-semibold text-blue-700">필드 템플릿</p>
+            </div>
+            <div className="space-y-1.5">
+              {FIELD_PRESETS.map((preset) => (
+                <button
+                  key={preset.name}
+                  onClick={() => {
+                    const presetFields = preset.fields.map((f, i) => ({ ...f, sortOrder: i }));
+                    onChange(presetFields);
+                    setSelectedIdx(null);
+                  }}
+                  className="w-full text-left px-2.5 py-2 rounded-lg bg-white border border-blue-100 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                >
+                  <p className="text-xs font-medium text-gray-900">{preset.name}</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">{preset.description}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Add Field Buttons */}
         <div className="bg-white rounded-xl border border-gray-100 p-3">
           <p className="text-xs font-semibold text-gray-500 mb-2">필드 추가</p>

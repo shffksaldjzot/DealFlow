@@ -1,12 +1,13 @@
 'use client';
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import PageHeader from '@/components/layout/PageHeader';
 import FileUpload from '@/components/common/FileUpload';
 import { useToast } from '@/components/ui/Toast';
+import { Edit3 } from 'lucide-react';
 
 export default function NewTemplatePage() {
   const { id } = useParams<{ id: string }>();
@@ -53,10 +54,11 @@ export default function NewTemplatePage() {
         fileType: getFileType(fileName),
       };
 
-      await api.post('/contract-templates', payload);
+      const template = extractData<{ id: string }>(await api.post('/contract-templates', payload));
 
-      toast('템플릿이 등록되었습니다.', 'success');
-      router.push(`/partner/events/${id}`);
+      toast('템플릿이 등록되었습니다. 필드를 설정하세요.', 'success');
+      // Redirect to field editor so user can set up fields immediately
+      router.push(`/partner/events/${id}/templates/${template.id}`);
     } catch {
       toast('템플릿 등록에 실패했습니다.', 'error');
     } finally {
@@ -101,6 +103,16 @@ export default function NewTemplatePage() {
             )}
           </div>
 
+          {/* Info about next step */}
+          {fileId && (
+            <div className="bg-blue-50 rounded-xl p-3 flex items-start gap-2">
+              <Edit3 className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
+              <p className="text-xs text-blue-700">
+                등록 후 텍스트박스, 체크박스, 서명 등의 필드를 템플릿 위에 배치할 수 있습니다.
+              </p>
+            </div>
+          )}
+
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <Button
               type="button"
@@ -110,7 +122,7 @@ export default function NewTemplatePage() {
               취소
             </Button>
             <Button type="submit" loading={submitting} disabled={!name.trim() || !fileId}>
-              등록하기
+              등록 후 필드 설정
             </Button>
           </div>
         </form>

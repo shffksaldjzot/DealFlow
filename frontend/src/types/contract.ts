@@ -58,7 +58,7 @@ export interface Contract {
   partner?: { id: string; name: string };
   customer?: { id: string; name: string; email: string };
   fieldValues?: { id: string; fieldId: string; value: string; field?: ContractField }[];
-  signatures?: { id: string; signedAt: string; signatureHash: string }[];
+  signatures?: { id: string; signedAt: string; signatureHash: string; signatureData?: string }[];
   histories?: { id: string; fromStatus: string; toStatus: string; reason?: string; createdAt: string }[];
 }
 

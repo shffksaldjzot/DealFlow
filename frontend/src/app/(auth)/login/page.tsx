@@ -159,6 +159,37 @@ function LoginForm() {
               <h2 className="text-lg font-bold text-gray-900 mb-1">회원가입</h2>
               <p className="text-sm text-gray-500 mb-6">새 계정을 만듭니다</p>
               <div className="space-y-4 mb-6">
+                {/* Role Selection - FIRST */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">가입 유형 선택</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRole('customer')}
+                      className={`p-3 rounded-xl border-2 text-left transition-colors ${
+                        selectedRole === 'customer'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <p className={`text-sm font-medium ${selectedRole === 'customer' ? 'text-blue-700' : 'text-gray-700'}`}>고객</p>
+                      <p className={`text-xs mt-0.5 ${selectedRole === 'customer' ? 'text-blue-500' : 'text-gray-400'}`}>계약서를 작성하고 서명</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRole('partner')}
+                      className={`p-3 rounded-xl border-2 text-left transition-colors ${
+                        selectedRole === 'partner'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <p className={`text-sm font-medium ${selectedRole === 'partner' ? 'text-blue-700' : 'text-gray-700'}`}>협력업체</p>
+                      <p className={`text-xs mt-0.5 ${selectedRole === 'partner' ? 'text-blue-500' : 'text-gray-400'}`}>행사 참여 및 계약 관리</p>
+                    </button>
+                  </div>
+                </div>
+
                 <Input
                   label={selectedRole === 'partner' ? '업체명 (담당자명)' : '이름'}
                   placeholder={selectedRole === 'partner' ? '(주)OO무역 (홍길동)' : '홍길동'}
@@ -201,42 +232,22 @@ function LoginForm() {
                     <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
                   )}
                 </div>
-                <div>
-                  <input type="hidden" />
-                  {selectedRole === 'partner' ? (
-                    <div className="flex items-center justify-between p-3 bg-blue-50 border-2 border-blue-500 rounded-xl">
-                      <div>
-                        <p className="text-sm font-medium text-blue-700">협력업체</p>
-                        <p className="text-xs text-blue-500">행사에 참여하여 계약을 관리합니다</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedRole('customer')}
-                        className="text-xs text-blue-600 hover:text-blue-800 underline"
-                      >
-                        고객으로 변경
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="p-3 bg-blue-50 border-2 border-blue-500 rounded-xl mb-2">
-                        <p className="text-sm font-medium text-blue-700">고객</p>
-                        <p className="text-xs text-blue-500">계약서를 작성하고 서명합니다</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedRole('partner')}
-                        className="text-xs text-gray-500 hover:text-blue-600 underline"
-                      >
-                        협력업체이신가요?
-                      </button>
-                    </div>
-                  )}
-                </div>
 
-                {/* Terms & Privacy */}
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-start gap-2.5">
+                {/* Terms & Privacy with Agree All */}
+                <div className="space-y-3 pt-2 border-t border-gray-100">
+                  <div className="flex items-center gap-2.5 pb-2">
+                    <input
+                      type="checkbox"
+                      checked={agreeTerms && agreePrivacy}
+                      onChange={(e) => {
+                        setAgreeTerms(e.target.checked);
+                        setAgreePrivacy(e.target.checked);
+                      }}
+                      className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    />
+                    <span className="text-sm font-semibold text-gray-900">모두 동의합니다</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 pl-1">
                     <input
                       type="checkbox"
                       checked={agreeTerms}
@@ -247,7 +258,7 @@ function LoginForm() {
                       <button type="button" onClick={() => setTermsModal(true)} className="underline text-gray-700 hover:text-blue-600">이용약관</button>에 동의합니다 <span className="text-red-500">*</span>
                     </span>
                   </div>
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-start gap-2.5 pl-1">
                     <input
                       type="checkbox"
                       checked={agreePrivacy}

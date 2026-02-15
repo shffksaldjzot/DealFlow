@@ -7,7 +7,8 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import PageHeader from '@/components/layout/PageHeader';
 import { useToast } from '@/components/ui/Toast';
-import { CheckCircle2, Copy, Check, ChevronRight, FileText, Edit3, User, QrCode } from 'lucide-react';
+import { CheckCircle2, Copy, Check, ChevronRight, FileText, Edit3, User, QrCode, Plus } from 'lucide-react';
+import FieldEditor, { type FieldDef } from '@/components/contract/FieldEditor';
 import type { ContractTemplate, ContractField, Contract } from '@/types/contract';
 
 type Step = 'select' | 'editor' | 'info' | 'qr';
@@ -44,9 +45,12 @@ export default function NewContractPage() {
 
   // Step 2: Editor - template preview + fields
   const [fields, setFields] = useState<ContractField[]>([]);
+  const [editorFields, setEditorFields] = useState<FieldDef[]>([]);
   const [templateImageUrl, setTemplateImageUrl] = useState('');
   const [fieldsLoading, setFieldsLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [savingFields, setSavingFields] = useState(false);
 
   // Step 3: Customer info
   const [customerName, setCustomerName] = useState('');
@@ -78,6 +82,19 @@ export default function NewContractPage() {
         await api.get(`/contract-templates/${templateId}/fields`)
       );
       setFields(tmplFields);
+      setEditorFields(tmplFields.map((f, i) => ({
+        fieldType: f.fieldType,
+        label: f.label,
+        placeholder: f.placeholder,
+        isRequired: f.isRequired,
+        pageNumber: f.pageNumber,
+        positionX: f.positionX,
+        positionY: f.positionY,
+        width: f.width,
+        height: f.height,
+        sortOrder: i,
+        defaultValue: f.defaultValue,
+      })));
 
       const tmpl = templates.find(t => t.id === templateId);
       if (tmpl?.fileId) {
@@ -96,6 +113,37 @@ export default function NewContractPage() {
       toast('템플릿 필드를 불러오지 못했습니다.', 'error');
     } finally {
       setFieldsLoading(false);
+    }
+  };
+
+  const saveEditorFields = async () => {
+    setSavingFields(true);
+    try {
+      const fieldsToSave = editorFields.map((f, i) => ({
+        fieldType: f.fieldType,
+        label: f.label,
+        placeholder: f.placeholder || undefined,
+        isRequired: f.isRequired,
+        pageNumber: f.pageNumber,
+        positionX: f.positionX,
+        positionY: f.positionY,
+        width: f.width,
+        height: f.height,
+        sortOrder: i,
+        defaultValue: f.defaultValue || undefined,
+      }));
+      await api.post(`/contract-templates/${templateId}/fields`, { fields: fieldsToSave });
+      // Reload fields
+      const tmplFields = extractData<ContractField[]>(
+        await api.get(`/contract-templates/${templateId}/fields`)
+      );
+      setFields(tmplFields);
+      setEditMode(false);
+      toast('필드가 저장되었습니다.', 'success');
+    } catch {
+      toast('필드 저장에 실패했습니다.', 'error');
+    } finally {
+      setSavingFields(false);
     }
   };
 
@@ -279,13 +327,45 @@ export default function NewContractPage() {
         <div className="space-y-4">
           {fieldsLoading ? (
             <div className="h-96 bg-white rounded-2xl animate-pulse" />
+          ) : editMode ? (
+            <>
+              {/* Field Editor Mode */}
+              <Card>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    필드 편집 - {selectedTemplate?.name}
+                  </h3>
+                  <div className="flex gap-2">
+                    <Button variant="secondary" size="sm" onClick={() => setEditMode(false)}>
+                      취소
+                    </Button>
+                    <Button size="sm" onClick={saveEditorFields} loading={savingFields}>
+                      저장
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+              <div style={{ minHeight: '60vh' }}>
+                <FieldEditor
+                  fields={editorFields}
+                  onChange={setEditorFields}
+                  templateImageUrl={templateImageUrl}
+                />
+              </div>
+            </>
           ) : (
             <>
               {/* Template Preview */}
               <Card>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                  {selectedTemplate?.name} - 계약서 미리보기
-                </h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    {selectedTemplate?.name} - 계약서 미리보기
+                  </h3>
+                  <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
+                    <Edit3 className="w-3.5 h-3.5 mr-1" />
+                    필드 편집
+                  </Button>
+                </div>
                 <div className="relative bg-white border-2 border-gray-100 rounded-xl overflow-hidden">
                   {templateImageUrl && !imageError && selectedTemplate?.fileType !== 'pdf' ? (
                     <div className="relative">
@@ -335,7 +415,7 @@ export default function NewContractPage() {
               </Card>
 
               {/* Field Summary */}
-              {fields.length > 0 && (
+              {fields.length > 0 ? (
                 <Card padding="sm">
                   <h4 className="text-xs font-semibold text-gray-500 mb-2">입력 필드 ({fields.length}개)</h4>
                   <div className="flex flex-wrap gap-1.5">
@@ -352,6 +432,16 @@ export default function NewContractPage() {
                     ))}
                   </div>
                 </Card>
+              ) : (
+                <Card padding="sm">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-gray-500">필드가 없습니다. 텍스트박스, 체크박스 등을 추가하세요.</p>
+                    <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
+                      <Plus className="w-3.5 h-3.5 mr-1" />
+                      필드 추가
+                    </Button>
+                  </div>
+                </Card>
               )}
 
               <div className="flex justify-between gap-3">
@@ -359,7 +449,7 @@ export default function NewContractPage() {
                   이전
                 </Button>
                 <Button onClick={goToInfo}>
-                  서명하기
+                  다음: 고객 정보
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </div>

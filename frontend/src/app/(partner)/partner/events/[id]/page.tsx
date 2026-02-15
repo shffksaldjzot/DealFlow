@@ -227,7 +227,12 @@ export default function PartnerEventDetailPage() {
           </Card>
         ) : (
           <Card padding="none">
-            <Table columns={templateColumns} data={templates} emptyMessage="등록된 템플릿이 없습니다." />
+            <Table
+              columns={templateColumns}
+              data={templates}
+              onRowClick={(item) => router.push(`/partner/events/${id}/templates/${item.id}`)}
+              emptyMessage="등록된 템플릿이 없습니다."
+            />
           </Card>
         )}
       </div>
@@ -264,16 +269,27 @@ export default function PartnerEventDetailPage() {
             />
           </Card>
         ) : (
-          <Card padding="none">
-            <div className="overflow-x-auto">
-              <Table
-                columns={contractColumns}
-                data={contracts}
-                onRowClick={(item) => router.push(`/partner/events/${id}/contracts/${item.id}`)}
-                emptyMessage="생성된 계약이 없습니다."
-              />
-            </div>
-          </Card>
+          <>
+            <Card padding="none">
+              <div className="overflow-x-auto">
+                <Table
+                  columns={contractColumns}
+                  data={contracts}
+                  onRowClick={(item) => router.push(`/partner/events/${id}/contracts/${item.id}`)}
+                  emptyMessage="생성된 계약이 없습니다."
+                />
+              </div>
+            </Card>
+            {/* Total Amount Sum */}
+            <Card padding="sm" className="mt-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-500">합계 금액</span>
+                <span className="text-lg font-bold text-blue-600">
+                  {formatCurrency(contracts.reduce((sum, c) => sum + (c.totalAmount || 0), 0))}
+                </span>
+              </div>
+            </Card>
+          </>
         )}
       </div>
 
