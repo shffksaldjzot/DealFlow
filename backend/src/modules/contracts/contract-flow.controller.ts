@@ -56,10 +56,10 @@ export class ContractFlowController {
       res.status(404).json({ message: '템플릿 파일이 없습니다.' });
       return;
     }
-    const { filePath, file } = await this.filesService.getFilePath(contract.template.fileId);
+    const { buffer, file } = await this.filesService.getFileBuffer(contract.template.fileId);
     res.setHeader('Content-Type', file.mimeType);
     res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(file.originalName)}"`);
-    res.sendFile(filePath);
+    res.send(buffer);
   }
 
   @Post(':qrCode/sign')

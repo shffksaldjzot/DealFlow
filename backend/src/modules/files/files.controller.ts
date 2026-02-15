@@ -43,7 +43,7 @@ export class FilesController {
     @Param('id', ParseUUIDPipe) id: string,
     @Res() res: Response,
   ) {
-    const { filePath, file } = await this.filesService.getFilePath(id);
+    const { buffer, file } = await this.filesService.getFileBuffer(id);
     res.setHeader('Content-Type', file.mimeType);
 
     // Image files use inline disposition for preview support
@@ -53,6 +53,6 @@ export class FilesController {
       'Content-Disposition',
       `${disposition}; filename="${encodeURIComponent(file.originalName)}"`,
     );
-    res.sendFile(filePath);
+    res.send(buffer);
   }
 }

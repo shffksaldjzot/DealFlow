@@ -75,8 +75,8 @@ export class SignedPdfService {
       // Load template file
       let templateFileBuffer: Buffer | null = null;
       try {
-        const { filePath } = await this.filesService.getFilePath(contract.template.fileId);
-        templateFileBuffer = fs.readFileSync(filePath);
+        const { buffer } = await this.filesService.getFileBuffer(contract.template.fileId);
+        templateFileBuffer = buffer;
       } catch {
         this.logger.warn(`Template file not found for contract: ${contractId}`);
         return;

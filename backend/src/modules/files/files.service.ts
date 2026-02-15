@@ -2,24 +2,47 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as path from 'path';
 import * as fs from 'fs';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { FileEntity } from './entities/file.entity';
 
 const UPLOAD_DIR = path.resolve(process.cwd(), 'uploads');
 
 @Injectable()
 export class FilesService {
+  private readonly logger = new Logger(FilesService.name);
+  private s3Client: S3Client | null = null;
+  private bucketName: string;
+
   constructor(
     @InjectRepository(FileEntity)
     private readonly fileRepository: Repository<FileEntity>,
+    private readonly configService: ConfigService,
   ) {
-    // Ensure upload directory exists
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    const accountId = this.configService.get<string>('R2_ACCOUNT_ID');
+    if (accountId) {
+      this.s3Client = new S3Client({
+        region: 'auto',
+        endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+        credentials: {
+          accessKeyId: this.configService.get<string>('R2_ACCESS_KEY_ID'),
+          secretAccessKey: this.configService.get<string>('R2_SECRET_ACCESS_KEY'),
+        },
+      });
+      this.bucketName = this.configService.get<string>('R2_BUCKET_NAME') || 'dealflow-files';
+      this.logger.log('R2 storage configured');
+    } else {
+      // Local fallback for development
+      if (!fs.existsSync(UPLOAD_DIR)) {
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+      }
+      this.logger.log('Using local file storage (R2 not configured)');
     }
   }
 
@@ -38,16 +61,29 @@ export class FilesService {
     // Generate a unique stored name
     const ext = path.extname(decodedName);
     const storedName = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}${ext}`;
-    const filePath = path.join(UPLOAD_DIR, storedName);
+    const s3Key = `uploads/${storedName}`;
 
-    // Save file to local disk (dev mode)
-    fs.writeFileSync(filePath, file.buffer);
+    if (this.s3Client) {
+      // Upload to R2
+      await this.s3Client.send(
+        new PutObjectCommand({
+          Bucket: this.bucketName,
+          Key: s3Key,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        }),
+      );
+    } else {
+      // Save to local disk
+      const filePath = path.join(UPLOAD_DIR, storedName);
+      fs.writeFileSync(filePath, file.buffer);
+    }
 
     const fileEntity = this.fileRepository.create({
       originalName: decodedName,
       storedName,
-      s3Key: `uploads/${storedName}`, // local path simulating S3 key
-      s3Bucket: 'local', // 'local' for dev, actual bucket name for prod
+      s3Key,
+      s3Bucket: this.s3Client ? this.bucketName : 'local',
       mimeType: file.mimetype,
       fileSize: file.size,
       uploadedBy: userId,
@@ -67,7 +103,7 @@ export class FilesService {
     return file;
   }
 
-  async getFilePath(fileId: string): Promise<{ filePath: string; file: FileEntity }> {
+  async getFileBuffer(fileId: string): Promise<{ buffer: Buffer; file: FileEntity }> {
     const file = await this.fileRepository.findOne({
       where: { id: fileId },
     });
@@ -75,11 +111,26 @@ export class FilesService {
       throw new NotFoundException('파일을 찾을 수 없습니다.');
     }
 
+    if (this.s3Client && file.s3Bucket !== 'local') {
+      // Download from R2
+      const response = await this.s3Client.send(
+        new GetObjectCommand({
+          Bucket: file.s3Bucket,
+          Key: file.s3Key,
+        }),
+      );
+      const chunks: Buffer[] = [];
+      for await (const chunk of response.Body as any) {
+        chunks.push(Buffer.from(chunk));
+      }
+      return { buffer: Buffer.concat(chunks), file };
+    }
+
+    // Local fallback
     const filePath = path.join(UPLOAD_DIR, file.storedName);
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException('파일이 서버에서 찾을 수 없습니다.');
     }
-
-    return { filePath, file };
+    return { buffer: fs.readFileSync(filePath), file };
   }
 }
