@@ -499,6 +499,32 @@ export class AdminService {
     return password + '!';
   }
 
+  async approveUser(userId: string, adminUserId?: string): Promise<Omit<User, 'passwordHash'>> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    // Activate user
+    user.status = UserStatus.ACTIVE;
+    const saved = await this.userRepository.save(user);
+
+    // Also approve user's organization if exists
+    const membership = await this.memberRepository.findOne({ where: { userId } });
+    if (membership) {
+      const org = await this.orgRepository.findOne({ where: { id: membership.organizationId } });
+      if (org && org.status === OrgStatus.PENDING) {
+        org.status = OrgStatus.APPROVED;
+        org.approvedAt = new Date();
+        org.approvedBy = adminUserId;
+        await this.orgRepository.save(org);
+        await this.activityLogService.log('approve_organizer', `업체 "${org.name}" 승인 (사용자 승인)`, adminUserId, 'organization', org.id);
+      }
+    }
+
+    await this.activityLogService.log('approve_user', `사용자 "${user.name}" (${user.email}) 가입 승인`, adminUserId, 'user', userId);
+    const { passwordHash, ...result } = saved;
+    return result as Omit<User, 'passwordHash'>;
+  }
+
   async changeUserStatus(
     userId: string,
     dto: ChangeUserStatusDto,

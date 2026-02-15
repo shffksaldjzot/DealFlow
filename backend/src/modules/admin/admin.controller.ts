@@ -86,6 +86,14 @@ export class AdminController {
     return this.adminService.updateUser(id, dto, adminUserId);
   }
 
+  @Patch('users/:id/approve')
+  approveUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') adminUserId: string,
+  ) {
+    return this.adminService.approveUser(id, adminUserId);
+  }
+
   @Patch('users/:id/status')
   changeUserStatus(
     @Param('id', ParseUUIDPipe) id: string,

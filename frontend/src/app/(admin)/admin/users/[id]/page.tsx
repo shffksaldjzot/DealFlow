@@ -107,6 +107,16 @@ export default function AdminUserDetailPage() {
     }
   };
 
+  const handleApproveUser = async () => {
+    try {
+      await api.patch(`/admin/users/${id}/approve`);
+      toast('가입이 승인되었습니다.', 'success');
+      fetchUser();
+    } catch {
+      toast('승인에 실패했습니다.', 'error');
+    }
+  };
+
   const roleOptions = [
     { value: 'customer', label: '고객' },
     { value: 'partner', label: '협력업체' },
@@ -115,6 +125,7 @@ export default function AdminUserDetailPage() {
   ];
 
   const statusOptions = [
+    { value: 'pending', label: '승인대기' },
     { value: 'active', label: '활성' },
     { value: 'suspended', label: '정지' },
     { value: 'withdrawn', label: '탈퇴' },
@@ -148,6 +159,9 @@ export default function AdminUserDetailPage() {
         backHref="/admin/users"
         actions={
           <div className="flex gap-2">
+            {user.status === 'pending' && (
+              <Button size="sm" onClick={handleApproveUser}>가입 승인</Button>
+            )}
             {user.status === 'active' && user.role !== 'admin' && (
               <Button variant="danger" size="sm" onClick={() => handleStatusToggle('suspended')}>정지</Button>
             )}
