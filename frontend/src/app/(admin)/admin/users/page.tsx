@@ -86,7 +86,7 @@ export default function AdminUsersPage() {
     { key: 'name', header: '이름' },
     { key: 'email', header: '이메일' },
     { key: 'role', header: '역할', render: (u: User) => getRoleBadge(u.role) },
-    { key: 'status', header: '상태', render: (u: User) => <Badge status={u.status} /> },
+    { key: 'status', header: '상태', render: (u: any) => <Badge status={u.effectiveStatus || u.status} /> },
     { key: 'createdAt', header: '가입일', render: (u: User) => formatDateTime(u.createdAt) },
   ];
 

@@ -159,8 +159,14 @@ export default function AdminUserDetailPage() {
         backHref="/admin/users"
         actions={
           <div className="flex gap-2">
-            {user.status === 'pending' && (
+            {(user.status === 'pending' ||
+              ((user.role === 'partner' || user.role === 'organizer') &&
+               user.organizationMemberships?.some((m: any) => m.organization?.status === 'pending'))) && (
               <Button size="sm" onClick={handleApproveUser}>가입 승인</Button>
+            )}
+            {(user.role === 'partner' || user.role === 'organizer') &&
+              !user.organizationMemberships?.length && user.status === 'active' && (
+              <span className="text-xs text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-lg">업체 등록 미완료</span>
             )}
             {user.status === 'active' && user.role !== 'admin' && (
               <Button variant="danger" size="sm" onClick={() => handleStatusToggle('suspended')}>정지</Button>

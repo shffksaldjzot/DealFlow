@@ -275,12 +275,14 @@ export class AdminService {
 
   // ─── Users ────────────────────────────────────────
 
-  async listUsers(pagination: PaginationDto): Promise<PaginatedResult<Omit<User, 'passwordHash'>>> {
+  async listUsers(pagination: PaginationDto): Promise<PaginatedResult<any>> {
     const { page, limit, search } = pagination;
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.userRepository
       .createQueryBuilder('user')
+      .leftJoinAndSelect('user.organizationMemberships', 'membership')
+      .leftJoinAndSelect('membership.organization', 'org')
       .select([
         'user.id',
         'user.email',
@@ -292,6 +294,10 @@ export class AdminService {
         'user.address',
         'user.createdAt',
         'user.updatedAt',
+        'membership.id',
+        'org.id',
+        'org.status',
+        'org.name',
       ])
       .orderBy('user.createdAt', 'DESC')
       .skip(skip)
@@ -306,7 +312,22 @@ export class AdminService {
     }
 
     const [data, total] = await queryBuilder.getManyAndCount();
-    return new PaginatedResult(data, total, page, limit);
+
+    // Compute effective status: partner/organizer with pending org → 'pending'
+    const usersWithEffectiveStatus = data.map((u) => {
+      const orgStatus = u.organizationMemberships?.[0]?.organization?.status;
+      let effectiveStatus: string = u.status;
+      if ((u.role === 'partner' || u.role === 'organizer') && orgStatus && orgStatus !== 'approved') {
+        effectiveStatus = 'pending';
+      }
+      if ((u.role === 'partner' || u.role === 'organizer') && !u.organizationMemberships?.length) {
+        effectiveStatus = 'pending';
+      }
+      const { organizationMemberships, passwordHash, ...rest } = u;
+      return { ...rest, effectiveStatus, orgName: organizationMemberships?.[0]?.organization?.name || null };
+    });
+
+    return new PaginatedResult(usersWithEffectiveStatus, total, page, limit);
   }
 
   async getUserDetail(userId: string): Promise<any> {

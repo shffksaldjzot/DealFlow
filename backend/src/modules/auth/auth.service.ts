@@ -86,11 +86,7 @@ export class AuthService {
       throw new UnauthorizedException('이메일 또는 비밀번호가 올바르지 않습니다.');
     }
 
-    if (user.status === UserStatus.PENDING) {
-      throw new UnauthorizedException('가입 승인 대기 중입니다. 관리자 승인 후 로그인 가능합니다.');
-    }
-
-    if (user.status === UserStatus.SUSPENDED || user.status === UserStatus.WITHDRAWN) {
+    if (user.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException('비활성화된 계정입니다.');
     }
 
@@ -127,7 +123,6 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
-    const isPendingRole = dto.role === UserRole.PARTNER || dto.role === UserRole.ORGANIZER;
     const user = this.usersRepository.create({
       email: dto.email,
       name: dto.name,
@@ -135,7 +130,7 @@ export class AuthService {
       role: dto.role,
       authProvider: AuthProvider.EMAIL,
       passwordHash,
-      status: isPendingRole ? UserStatus.PENDING : UserStatus.ACTIVE,
+      status: UserStatus.ACTIVE,
     });
     const saved = await this.usersRepository.save(user);
 
