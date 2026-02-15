@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Modal from '@/components/ui/Modal';
 import PageHeader from '@/components/layout/PageHeader';
+import ContractDetailView from '@/components/contract/ContractDetailView';
 import { useToast } from '@/components/ui/Toast';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
 
@@ -20,11 +21,23 @@ export default function AdminContractDetailPage() {
   const [newStatus, setNewStatus] = useState('');
   const [statusReason, setStatusReason] = useState('');
   const [saving, setSaving] = useState(false);
+  const [templateImageUrl, setTemplateImageUrl] = useState<string | null>(null);
 
   const fetchContract = () => {
     setLoading(true);
     api.get(`/admin/contracts/${id}`)
-      .then((res) => setContract(extractData(res)))
+      .then((res) => {
+        const data = extractData<any>(res);
+        setContract(data);
+        if (data?.template?.fileId) {
+          api.get(`/files/${data.template.fileId}/download`, { responseType: 'blob' })
+            .then((fileRes) => {
+              const blob = fileRes.data as Blob;
+              if (blob.size > 0) setTemplateImageUrl(URL.createObjectURL(blob));
+            })
+            .catch(() => {});
+        }
+      })
       .catch(() => toast('계약을 불러올 수 없습니다.', 'error'))
       .finally(() => setLoading(false));
   };
@@ -139,6 +152,9 @@ export default function AdminContractDetailPage() {
           )}
         </div>
       </Card>
+
+      {/* Contract Image + Download */}
+      <ContractDetailView contract={contract} templateImageUrl={templateImageUrl} />
 
       {/* Field Values */}
       {contract.fieldValues && contract.fieldValues.length > 0 && (

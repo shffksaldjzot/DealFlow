@@ -9,6 +9,7 @@ import { Repository, In } from 'typeorm';
 import { Contract, ContractStatus } from './entities/contract.entity';
 import { ContractTemplate } from './entities/contract-template.entity';
 import { ContractField } from './entities/contract-field.entity';
+import { ContractFieldValue } from './entities/contract-field-value.entity';
 import { ContractHistory } from './entities/contract-history.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
 import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
@@ -17,6 +18,7 @@ import { CreateContractDto } from './dto/create-contract.dto';
 import { CancelContractDto } from './dto/cancel-contract.dto';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { SaveFieldsDto } from './dto/save-fields.dto';
+import { FillContractDto } from './dto/fill-contract.dto';
 import {
   generateContractNumber,
   generateQRCode,
@@ -33,6 +35,8 @@ export class ContractsService {
     private readonly templateRepository: Repository<ContractTemplate>,
     @InjectRepository(ContractField)
     private readonly fieldRepository: Repository<ContractField>,
+    @InjectRepository(ContractFieldValue)
+    private readonly fieldValueRepository: Repository<ContractFieldValue>,
     @InjectRepository(ContractHistory)
     private readonly historyRepository: Repository<ContractHistory>,
     @InjectRepository(OrganizationMember)
@@ -292,6 +296,58 @@ export class ContractsService {
       qrCodeUrl: contract.qrCodeUrl,
       contractNumber: contract.contractNumber,
     };
+  }
+
+  async prefillContract(
+    contractId: string,
+    userId: string,
+    dto: FillContractDto,
+  ): Promise<ContractFieldValue[]> {
+    const orgId = await this.getOrgIdForUser(userId);
+    const contract = await this.contractRepository.findOne({
+      where: { id: contractId, partnerId: orgId },
+    });
+    if (!contract) {
+      throw new NotFoundException('계약서를 찾을 수 없습니다.');
+    }
+    if (contract.status !== ContractStatus.PENDING) {
+      throw new BadRequestException('대기 상태의 계약서만 사전입력할 수 있습니다.');
+    }
+
+    // Validate field IDs belong to this template
+    const templateFields = await this.fieldRepository.find({
+      where: { templateId: contract.templateId },
+    });
+    const validFieldIds = new Set(templateFields.map((f) => f.id));
+
+    for (const fv of dto.fieldValues) {
+      if (!validFieldIds.has(fv.fieldId)) {
+        throw new BadRequestException(
+          `필드 ID ${fv.fieldId}는 이 템플릿에 속하지 않습니다.`,
+        );
+      }
+    }
+
+    // Upsert field values (without changing contract status)
+    const savedValues: ContractFieldValue[] = [];
+    for (const fv of dto.fieldValues) {
+      let existing = await this.fieldValueRepository.findOne({
+        where: { contractId: contract.id, fieldId: fv.fieldId },
+      });
+      if (existing) {
+        existing.value = fv.value;
+        savedValues.push(await this.fieldValueRepository.save(existing));
+      } else {
+        const newValue = this.fieldValueRepository.create({
+          contractId: contract.id,
+          fieldId: fv.fieldId,
+          value: fv.value,
+        });
+        savedValues.push(await this.fieldValueRepository.save(newValue));
+      }
+    }
+
+    return savedValues;
   }
 
   // ---------- Template CRUD ----------

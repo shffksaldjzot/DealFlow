@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import PageHeader from '@/components/layout/PageHeader';
 import QRCodeDisplay from '@/components/contract/QRCodeDisplay';
+import ContractDetailView from '@/components/contract/ContractDetailView';
 import { useToast } from '@/components/ui/Toast';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
 import { XCircle, User, FileText, Clock } from 'lucide-react';
@@ -21,10 +22,22 @@ export default function PartnerContractDetailPage() {
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
+  const [templateImageUrl, setTemplateImageUrl] = useState<string | null>(null);
 
   const fetchContract = () => {
     api.get(`/contracts/${id}`)
-      .then((res) => setContract(extractData(res)))
+      .then((res) => {
+        const data = extractData<Contract>(res);
+        setContract(data);
+        if (data.template?.fileId) {
+          api.get(`/files/${data.template.fileId}/download`, { responseType: 'blob' })
+            .then((fileRes) => {
+              const blob = fileRes.data as Blob;
+              if (blob.size > 0) setTemplateImageUrl(URL.createObjectURL(blob));
+            })
+            .catch(() => {});
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   };
@@ -108,6 +121,9 @@ export default function PartnerContractDetailPage() {
           />
         </div>
       )}
+
+      {/* Contract Image + Download */}
+      <ContractDetailView contract={contract} templateImageUrl={templateImageUrl} />
 
       {/* Info */}
       <Card className="mb-4">

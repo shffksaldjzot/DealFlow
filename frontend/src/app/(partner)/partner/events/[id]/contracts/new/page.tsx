@@ -9,6 +9,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import { useToast } from '@/components/ui/Toast';
 import { CheckCircle2, Copy, Check, ChevronRight, FileText, Edit3, User, QrCode, Plus } from 'lucide-react';
 import FieldEditor, { type FieldDef } from '@/components/contract/FieldEditor';
+import ContractOverlay from '@/components/contract/ContractOverlay';
 import type { ContractTemplate, ContractField, Contract } from '@/types/contract';
 
 type Step = 'select' | 'editor' | 'info' | 'qr';
@@ -51,6 +52,7 @@ export default function NewContractPage() {
   const [imageError, setImageError] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [savingFields, setSavingFields] = useState(false);
+  const [partnerFieldValues, setPartnerFieldValues] = useState<Record<string, string>>({});
 
   // Step 3: Customer info
   const [customerName, setCustomerName] = useState('');
@@ -181,6 +183,19 @@ export default function NewContractPage() {
       };
 
       const contract = extractData<Contract>(await api.post('/contracts', payload));
+
+      // Save partner-prefilled field values
+      const filledEntries = Object.entries(partnerFieldValues).filter(([, v]) => v);
+      if (filledEntries.length > 0) {
+        try {
+          await api.post(`/contracts/${contract.id}/prefill`, {
+            fieldValues: filledEntries.map(([fieldId, value]) => ({ fieldId, value })),
+          });
+        } catch {
+          // Non-critical: continue even if prefill fails
+        }
+      }
+
       setCreatedContract(contract);
       setStep('qr');
       toast('계약이 생성되었습니다.', 'success');
@@ -200,6 +215,7 @@ export default function NewContractPage() {
     setCopied(false);
     setShortCodeCopied(false);
     setFields([]);
+    setPartnerFieldValues({});
     setTemplateImageUrl('');
     setImageError(false);
   };
@@ -355,63 +371,40 @@ export default function NewContractPage() {
             </>
           ) : (
             <>
-              {/* Template Preview */}
+              {/* Template Preview with Field Input */}
               <Card>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-gray-700">
-                    {selectedTemplate?.name} - 계약서 미리보기
+                    {selectedTemplate?.name} - 사전 입력
                   </h3>
                   <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
                     <Edit3 className="w-3.5 h-3.5 mr-1" />
                     필드 편집
                   </Button>
                 </div>
-                <div className="relative bg-white border-2 border-gray-100 rounded-xl overflow-hidden">
-                  {templateImageUrl && !imageError && selectedTemplate?.fileType !== 'pdf' ? (
-                    <div className="relative">
-                      <img
-                        src={templateImageUrl}
-                        alt="계약서 템플릿"
-                        className="w-full"
-                        onError={() => setImageError(true)}
-                      />
-                      {/* Overlay fields */}
-                      <div className="absolute inset-0">
-                        {fields
-                          .filter(f => f.positionX > 0 || f.positionY > 0)
-                          .map((field) => (
-                            <div
-                              key={field.id}
-                              className="absolute border-2 border-blue-300/60 bg-blue-50/50 rounded flex items-center px-1 text-xs"
-                              style={{
-                                left: `${field.positionX}%`,
-                                top: `${field.positionY}%`,
-                                width: `${field.width}%`,
-                                height: `${field.height}%`,
-                                minHeight: '20px',
-                              }}
-                            >
-                              <span className="truncate text-blue-700">{field.label}</span>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  ) : templateImageUrl && !imageError && selectedTemplate?.fileType === 'pdf' ? (
-                    <iframe
-                      src={templateImageUrl}
-                      className="w-full"
-                      style={{ minHeight: '500px', height: '60vh' }}
-                      title="계약서 템플릿"
-                    />
-                  ) : (
+                <p className="text-xs text-gray-400 mb-3">
+                  고객이 작성할 항목을 미리 입력할 수 있습니다. (선택사항)
+                </p>
+                {templateImageUrl && !imageError ? (
+                  <ContractOverlay
+                    fileUrl={templateImageUrl}
+                    fileType={selectedTemplate?.fileType || 'jpg'}
+                    fields={fields}
+                    fieldValues={partnerFieldValues}
+                    onFieldChange={(fieldId, value) =>
+                      setPartnerFieldValues((prev) => ({ ...prev, [fieldId]: value }))
+                    }
+                  />
+                ) : (
+                  <div className="relative bg-white border-2 border-gray-100 rounded-xl overflow-hidden">
                     <div className="flex items-center justify-center py-20 text-gray-300">
                       <div className="text-center">
                         <FileText className="w-12 h-12 mx-auto mb-2" />
                         <p className="text-sm">템플릿 미리보기</p>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </Card>
 
               {/* Field Summary */}
@@ -423,11 +416,13 @@ export default function NewContractPage() {
                       <span
                         key={f.id}
                         className={`inline-flex items-center px-2 py-1 rounded-md text-xs ${
+                          partnerFieldValues[f.id] ? 'bg-green-50 text-green-700' :
                           f.isRequired ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-500'
                         }`}
                       >
                         {f.label}
                         {f.isRequired && <span className="text-red-400 ml-0.5">*</span>}
+                        {partnerFieldValues[f.id] && <span className="ml-1">✓</span>}
                       </span>
                     ))}
                   </div>

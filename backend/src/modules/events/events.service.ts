@@ -349,6 +349,45 @@ export class EventsService {
     };
   }
 
+  async getEventContractDetail(
+    eventId: string,
+    contractId: string,
+    userId: string,
+  ): Promise<Contract> {
+    const orgId = await this.getOrgIdForUser(userId);
+
+    // Verify organizer access
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId },
+    });
+    if (!event) {
+      throw new NotFoundException('이벤트를 찾을 수 없습니다.');
+    }
+    if (event.organizerId !== orgId) {
+      throw new ForbiddenException('이벤트에 대한 접근 권한이 없습니다.');
+    }
+
+    const contract = await this.contractRepository.findOne({
+      where: { id: contractId, eventId },
+      relations: [
+        'template',
+        'template.fields',
+        'event',
+        'partner',
+        'customer',
+        'fieldValues',
+        'fieldValues.field',
+        'signatures',
+        'histories',
+      ],
+    });
+    if (!contract) {
+      throw new NotFoundException('계약서를 찾을 수 없습니다.');
+    }
+
+    return contract;
+  }
+
   async getContractsSummary(
     eventId: string,
     userId: string,

@@ -16,6 +16,7 @@ import { FillContractDto } from './dto/fill-contract.dto';
 import { SignContractDto } from './dto/sign-contract.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
+import { SignedPdfService } from './signed-pdf.service';
 
 @Injectable()
 export class ContractFlowService {
@@ -34,6 +35,7 @@ export class ContractFlowService {
     private readonly memberRepository: Repository<OrganizationMember>,
     private readonly notificationsService: NotificationsService,
     private readonly activityLogService: ActivityLogService,
+    private readonly signedPdfService: SignedPdfService,
   ) {}
 
   private async findContractByQr(code: string): Promise<Contract> {
@@ -290,6 +292,9 @@ export class ContractFlowService {
       'contract',
       contract.id,
     );
+
+    // Generate signed PDF (fire-and-forget)
+    this.signedPdfService.generateSignedPdf(contract.id).catch(() => {});
 
     // Send notifications after successful signature
     try {

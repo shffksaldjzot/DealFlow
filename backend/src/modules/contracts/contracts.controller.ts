@@ -14,6 +14,7 @@ import { CreateContractDto } from './dto/create-contract.dto';
 import { CancelContractDto } from './dto/cancel-contract.dto';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { SaveFieldsDto } from './dto/save-fields.dto';
+import { FillContractDto } from './dto/fill-contract.dto';
 
 @Controller('contracts')
 @Roles('partner')
@@ -51,6 +52,15 @@ export class ContractsController {
     @Body() dto: CancelContractDto,
   ) {
     return this.contractsService.cancelContract(id, userId, dto);
+  }
+
+  @Post(':id/prefill')
+  prefillContract(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: FillContractDto,
+  ) {
+    return this.contractsService.prefillContract(id, userId, dto);
   }
 
   @Get(':id/qr')

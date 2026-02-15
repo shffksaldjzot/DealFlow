@@ -6,6 +6,7 @@ import { ContractFlowController } from './contract-flow.controller';
 import { CustomerContractsController } from './customer-contracts.controller';
 import { ContractsService } from './contracts.service';
 import { ContractFlowService } from './contract-flow.service';
+import { SignedPdfService } from './signed-pdf.service';
 import { Contract } from './entities/contract.entity';
 import { ContractTemplate } from './entities/contract-template.entity';
 import { ContractField } from './entities/contract-field.entity';
@@ -40,7 +41,7 @@ import { FilesModule } from '../files/files.module';
     ContractFlowController,
     CustomerContractsController,
   ],
-  providers: [ContractsService, ContractFlowService],
-  exports: [ContractsService, ContractFlowService],
+  providers: [ContractsService, ContractFlowService, SignedPdfService],
+  exports: [ContractsService, ContractFlowService, SignedPdfService],
 })
 export class ContractsModule {}

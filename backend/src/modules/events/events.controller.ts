@@ -105,4 +105,13 @@ export class EventsController {
   ) {
     return this.eventsService.getContractsSummary(id, userId);
   }
+
+  @Get(':id/contracts/:contractId')
+  getContractDetail(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('contractId', ParseUUIDPipe) contractId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.eventsService.getEventContractDetail(id, contractId, userId);
+  }
 }

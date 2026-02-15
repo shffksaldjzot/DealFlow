@@ -1,11 +1,22 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import api, { extractData } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import { CheckCircle2, Download, FileText } from 'lucide-react';
+import type { Contract } from '@/types/contract';
 
 export default function ContractCompletePage() {
   const { code } = useParams<{ code: string }>();
   const router = useRouter();
+  const [contract, setContract] = useState<Contract | null>(null);
+
+  useEffect(() => {
+    // Fetch the contract data to get signedPdfFileId
+    api.get(`/contract-flow/${code}`)
+      .then((res) => setContract(extractData<Contract>(res)))
+      .catch(() => {});
+  }, [code]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -31,9 +42,20 @@ export default function ContractCompletePage() {
           </p>
 
           <div className="space-y-3">
+            {contract?.signedPdfFileId && (
+              <Button
+                fullWidth
+                size="lg"
+                onClick={() => window.open(`/api/files/${contract.signedPdfFileId}/download`, '_blank')}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                계약서 PDF 다운로드
+              </Button>
+            )}
             <Button
               fullWidth
               size="lg"
+              variant={contract?.signedPdfFileId ? 'secondary' : 'primary'}
               onClick={() => router.push('/customer/contracts')}
             >
               <FileText className="w-4 h-4 mr-2" />

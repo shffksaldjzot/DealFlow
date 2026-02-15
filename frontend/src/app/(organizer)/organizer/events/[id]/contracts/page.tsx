@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -19,6 +19,7 @@ interface ContractsSummary {
 
 export default function EventContractsPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [summary, setSummary] = useState<ContractsSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -86,7 +87,11 @@ export default function EventContractsPage() {
       ) : contracts.length === 0 ? (
         <EmptyState title="계약이 없습니다" />
       ) : (
-        <Table columns={columns} data={contracts} />
+        <Table
+          columns={columns}
+          data={contracts}
+          onRowClick={(c) => router.push(`/organizer/events/${id}/contracts/${c.id}`)}
+        />
       )}
     </div>
   );
