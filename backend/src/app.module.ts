@@ -13,6 +13,7 @@ import { FilesModule } from './modules/files/files.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ActivityLogModule } from './shared/activity-log/activity-log.module';
+import { SeedModule } from './shared/seed/seed.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ActivityLogModule } from './shared/activity-log/activity-log.module';
     FilesModule,
     AdminModule,
     NotificationsModule,
+    SeedModule,
   ],
   providers: [
     {
