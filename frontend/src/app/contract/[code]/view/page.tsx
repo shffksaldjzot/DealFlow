@@ -1,13 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import { useToast } from '@/components/ui/Toast';
 import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
-import ContractOverlay from '@/components/contract/ContractOverlay';
+import { ZoomIn, X } from 'lucide-react';
 import type { Contract, ContractField } from '@/types/contract';
 
 export default function ContractViewPage() {
@@ -22,12 +21,12 @@ export default function ContractViewPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
-  const [templateImgError, setTemplateImgError] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       try {
-        // Start filling
         const res = await api.post(`/contract-flow/${code}/start`);
         const c = extractData<Contract>(res);
         setContract(c);
@@ -59,7 +58,7 @@ export default function ContractViewPage() {
         if (revoked) return;
         const blob = new Blob([res.data], { type: res.headers['content-type'] || 'application/octet-stream' });
         setTemplateFileUrl(URL.createObjectURL(blob));
-        setTemplateImgError(false);
+        setImgError(false);
       })
       .catch(() => {});
     return () => {
@@ -67,21 +66,7 @@ export default function ContractViewPage() {
     };
   }, [hasTemplateFile, code]);
 
-  const handleFieldChange = (fieldId: string, value: string) => {
-    setFieldValues((prev) => ({ ...prev, [fieldId]: value }));
-  };
-
   const handleSaveAndSign = async () => {
-    // Validate required fields
-    const missing = fields
-      .filter((f) => f.isRequired && f.fieldType !== 'signature' && !fieldValues[f.id])
-      .map((f) => f.label);
-
-    if (missing.length > 0) {
-      toast(`필수 항목을 작성해주세요: ${missing.join(', ')}`, 'error');
-      return;
-    }
-
     if (!agreed) {
       toast('계약 내용에 동의해주세요.', 'error');
       return;
@@ -89,14 +74,14 @@ export default function ContractViewPage() {
 
     setSaving(true);
     try {
-      // Save field values
-      const fvArray = Object.entries(fieldValues).map(([fieldId, value]) => ({
-        fieldId,
-        value,
-      }));
-      await api.post(`/contract-flow/${code}/fill`, { fieldValues: fvArray });
+      // Save prefilled field values (from partner)
+      const fvArray = Object.entries(fieldValues)
+        .filter(([, v]) => v)
+        .map(([fieldId, value]) => ({ fieldId, value }));
+      if (fvArray.length > 0) {
+        await api.post(`/contract-flow/${code}/fill`, { fieldValues: fvArray });
+      }
 
-      // Navigate to signature page
       router.push(`/contract/${code}/sign`);
     } catch {
       toast('저장에 실패했습니다.', 'error');
@@ -113,44 +98,79 @@ export default function ContractViewPage() {
     );
   }
 
-  const renderFieldsForm = () => (
-    <Card padding="lg">
-      <h3 className="font-bold text-gray-900 mb-4">계약 정보 입력</h3>
-      <div className="space-y-4">
-        {fields
-          .filter((f) => f.fieldType !== 'signature')
-          .sort((a, b) => a.sortOrder - b.sortOrder)
-          .map((field) => (
-            <div key={field.id}>
-              {field.fieldType === 'checkbox' ? (
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={fieldValues[field.id] === 'true'}
-                    onChange={(e) =>
-                      handleFieldChange(field.id, e.target.checked ? 'true' : 'false')
-                    }
-                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {field.label}
-                    {field.isRequired && <span className="text-red-500 ml-1">*</span>}
-                  </span>
-                </label>
-              ) : (
-                <Input
-                  label={`${field.label}${field.isRequired ? ' *' : ''}`}
-                  type={field.fieldType === 'amount' || field.fieldType === 'number' ? 'number' : field.fieldType === 'date' ? 'date' : 'text'}
-                  placeholder={field.placeholder || ''}
-                  value={fieldValues[field.id] || ''}
-                  onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                />
-              )}
-            </div>
-          ))}
+  const isPdf = contract?.template?.fileType === 'pdf';
+
+  // Render contract image as read-only with field values overlaid
+  const renderContractImage = (isLightbox = false) => {
+    if (!templateFileUrl || imgError) return null;
+
+    if (isPdf) {
+      return (
+        <iframe
+          src={templateFileUrl}
+          className="w-full"
+          style={{ minHeight: isLightbox ? '80vh' : '500px', height: '60vh' }}
+          title="계약서"
+        />
+      );
+    }
+
+    return (
+      <div className="relative">
+        <img
+          src={templateFileUrl}
+          alt="계약서"
+          className="w-full"
+          onError={() => setImgError(true)}
+        />
+        {/* Read-only field value overlays */}
+        <div className="absolute inset-0">
+          {fields
+            .filter(f => f.fieldType !== 'signature' && (f.positionX > 0 || f.positionY > 0))
+            .map((field) => {
+              const value = fieldValues[field.id];
+              if (!value) return null;
+              return (
+                <div
+                  key={field.id}
+                  className="absolute flex items-center"
+                  style={{
+                    left: `${field.positionX}%`,
+                    top: `${field.positionY}%`,
+                    width: `${field.width}%`,
+                    height: `${field.height}%`,
+                  }}
+                >
+                  {field.fieldType === 'checkbox' ? (
+                    <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${value === 'true' ? 'bg-blue-500 border-blue-500' : 'border-gray-400'}`}>
+                      {value === 'true' && <span className="text-white text-xs font-bold">✓</span>}
+                    </div>
+                  ) : (
+                    <span className={`text-gray-900 font-medium truncate ${isLightbox ? 'text-sm' : 'text-xs'}`}>
+                      {value}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+        </div>
       </div>
-    </Card>
-  );
+    );
+  };
+
+  // Fields without position (show as read-only list for PDF or non-positioned fields)
+  const nonPositionedFields = fields
+    .filter(f => f.fieldType !== 'signature' && !f.positionX && !f.positionY)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const positionedFieldsWithValues = fields
+    .filter(f => f.fieldType !== 'signature' && (f.positionX > 0 || f.positionY > 0) && fieldValues[f.id])
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+  // For PDFs, show all field values as a list
+  const fieldListToShow = isPdf
+    ? fields.filter(f => f.fieldType !== 'signature' && fieldValues[f.id]).sort((a, b) => a.sortOrder - b.sortOrder)
+    : nonPositionedFields.filter(f => fieldValues[f.id]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -178,17 +198,48 @@ export default function ContractViewPage() {
           <span className="text-gray-400">3. 완료</span>
         </div>
 
-        {/* Template file with overlay fields */}
-        {templateFileUrl && contract?.template?.fileType ? (
-          <ContractOverlay
-            fileUrl={templateFileUrl}
-            fileType={contract.template.fileType}
-            fields={fields}
-            fieldValues={fieldValues}
-            onFieldChange={handleFieldChange}
-          />
-        ) : (
-          renderFieldsForm()
+        {/* Contract Image (read-only) */}
+        {templateFileUrl && !imgError && (
+          <Card padding="lg">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-gray-900">계약서 확인</h3>
+              {!isPdf && (
+                <button
+                  onClick={() => setLightboxOpen(true)}
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700"
+                >
+                  <ZoomIn className="w-3.5 h-3.5" />
+                  크게 보기
+                </button>
+              )}
+            </div>
+            <div
+              className="rounded-xl border border-gray-200 overflow-hidden cursor-pointer"
+              onClick={() => !isPdf && setLightboxOpen(true)}
+            >
+              {renderContractImage(false)}
+            </div>
+          </Card>
+        )}
+
+        {/* Read-only field values list (for PDFs or non-positioned fields) */}
+        {fieldListToShow.length > 0 && (
+          <Card padding="lg">
+            <h3 className="font-bold text-gray-900 mb-4">계약 정보</h3>
+            <div className="space-y-3">
+              {fieldListToShow.map((field) => {
+                const value = fieldValues[field.id];
+                return (
+                  <div key={field.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                    <span className="text-sm text-gray-500">{field.label}</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {field.fieldType === 'checkbox' ? (value === 'true' ? '✓' : '-') : value}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
         )}
 
         {/* Agreement */}
@@ -202,7 +253,7 @@ export default function ContractViewPage() {
             />
             <div>
               <p className="text-sm font-semibold text-gray-900">
-                계약 내용에 동의합니다
+                계약 내용에 동의합니다 <span className="text-red-500">*</span>
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 위 계약 내용을 확인하였으며, 이에 동의합니다.
@@ -222,6 +273,27 @@ export default function ContractViewPage() {
           서명하기
         </Button>
       </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors z-10"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          <div
+            className="max-w-4xl max-h-[90vh] overflow-auto m-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {renderContractImage(true)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

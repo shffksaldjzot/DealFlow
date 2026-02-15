@@ -9,7 +9,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import Table from '@/components/ui/Table';
 import Input from '@/components/ui/Input';
 import Modal from '@/components/ui/Modal';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Download, Phone, Mail, MapPin, Building2 } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import type { Organization } from '@/types/organization';
 import type { PaginatedResult } from '@/types/api';
@@ -32,6 +32,7 @@ export default function AdminOrganizersPage() {
   const [loading, setLoading] = useState(true);
   const [rejectModal, setRejectModal] = useState<{ id: string; name: string } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [detailOrg, setDetailOrg] = useState<Organization | null>(null);
 
   const fetchOrgs = () => {
     setLoading(true);
@@ -70,6 +71,10 @@ export default function AdminOrganizersPage() {
     }
   };
 
+  const handleLicenseDownload = (fileId: string, orgName: string) => {
+    window.open(`/api/files/${fileId}/download`, '_blank');
+  };
+
   const getTypeBadge = (type: string) => {
     if (type === 'organizer') return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">주관사</span>;
     if (type === 'partner') return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">협력업체</span>;
@@ -81,6 +86,15 @@ export default function AdminOrganizersPage() {
     { key: 'type', header: '구분', render: (o: Organization) => getTypeBadge((o as any).type) },
     { key: 'businessNumber', header: '사업자번호' },
     { key: 'representativeName', header: '대표자', render: (o: Organization) => o.representativeName || '-' },
+    {
+      key: 'contact', header: '연락처', render: (o: Organization) => (
+        <div className="text-xs">
+          {o.contactPhone && <p>{o.contactPhone}</p>}
+          {o.contactEmail && <p className="text-gray-400">{o.contactEmail}</p>}
+          {!o.contactPhone && !o.contactEmail && <span className="text-gray-300">-</span>}
+        </div>
+      ),
+    },
     { key: 'status', header: '상태', render: (o: Organization) => <Badge status={o.status} /> },
     { key: 'createdAt', header: '등록일', render: (o: Organization) => formatDateTime(o.createdAt) },
     {
@@ -135,8 +149,13 @@ export default function AdminOrganizersPage() {
         />
       </div>
 
-      <Table columns={columns} data={orgs} />
+      <Table
+        columns={columns}
+        data={orgs}
+        onRowClick={(o) => setDetailOrg(o)}
+      />
 
+      {/* Reject Modal */}
       <Modal
         isOpen={!!rejectModal}
         onClose={() => setRejectModal(null)}
@@ -156,6 +175,102 @@ export default function AdminOrganizersPage() {
             거절 확인
           </Button>
         </div>
+      </Modal>
+
+      {/* Detail Modal */}
+      <Modal
+        isOpen={!!detailOrg}
+        onClose={() => setDetailOrg(null)}
+        title={detailOrg?.name || '업체 상세'}
+      >
+        {detailOrg && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              {getTypeBadge((detailOrg as any).type)}
+              <Badge status={detailOrg.status} />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400">사업자번호</p>
+                  <p className="text-sm font-medium">{detailOrg.businessNumber}</p>
+                </div>
+              </div>
+              {detailOrg.representativeName && (
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400">대표자</p>
+                    <p className="text-sm font-medium">{detailOrg.representativeName}</p>
+                  </div>
+                </div>
+              )}
+              {detailOrg.contactPhone && (
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-gray-400 shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400">연락처</p>
+                    <p className="text-sm font-medium">{detailOrg.contactPhone}</p>
+                  </div>
+                </div>
+              )}
+              {detailOrg.contactEmail && (
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-gray-400 shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400">이메일</p>
+                    <p className="text-sm font-medium">{detailOrg.contactEmail}</p>
+                  </div>
+                </div>
+              )}
+              {detailOrg.address && (
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400">주소</p>
+                    <p className="text-sm font-medium">{detailOrg.address}</p>
+                  </div>
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-gray-400">등록일</p>
+                <p className="text-sm">{formatDateTime(detailOrg.createdAt)}</p>
+              </div>
+            </div>
+
+            {/* Business License Download */}
+            {detailOrg.businessLicenseFileId && (
+              <Button
+                fullWidth
+                variant="outline"
+                onClick={() => handleLicenseDownload(detailOrg.businessLicenseFileId!, detailOrg.name)}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                사업자등록증 다운로드
+              </Button>
+            )}
+
+            {/* Actions for pending */}
+            {detailOrg.status === 'pending' && (
+              <div className="flex gap-2 pt-2 border-t border-gray-100">
+                <Button className="flex-1" onClick={() => { handleApprove(detailOrg.id); setDetailOrg(null); }}>
+                  <CheckCircle2 className="w-4 h-4 mr-1" />
+                  승인
+                </Button>
+                <Button
+                  variant="danger"
+                  className="flex-1"
+                  onClick={() => { setRejectModal({ id: detailOrg.id, name: detailOrg.name }); setDetailOrg(null); }}
+                >
+                  <XCircle className="w-4 h-4 mr-1" />
+                  거절
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </Modal>
     </div>
   );

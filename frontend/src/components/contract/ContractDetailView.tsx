@@ -176,7 +176,7 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
       )}
 
       {/* Download Buttons */}
-      {isSigned && (
+      {(contract.signedPdfFileId || (templateImageUrl && !imgError && contract.template?.fileType !== 'pdf')) && (
         <div className="space-y-2 mb-4">
           {contract.signedPdfFileId && (
             <Button fullWidth size="lg" onClick={handlePdfDownload}>

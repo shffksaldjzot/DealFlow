@@ -8,7 +8,7 @@ import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
 import FileUpload from '@/components/common/FileUpload';
 import { useToast } from '@/components/ui/Toast';
-import { Building2, FileCheck } from 'lucide-react';
+import { Building2, FileCheck, ZoomIn, X, Download } from 'lucide-react';
 import type { Organization } from '@/types/organization';
 
 export default function PartnerSettingsPage() {
@@ -23,6 +23,8 @@ export default function PartnerSettingsPage() {
     businessLicenseFileId: '',
   });
   const [licenseFileName, setLicenseFileName] = useState('');
+  const [licensePreviewUrl, setLicensePreviewUrl] = useState<string | null>(null);
+  const [licensePreviewOpen, setLicensePreviewOpen] = useState(false);
 
   useEffect(() => {
     api.get('/organizations/me')
@@ -35,6 +37,15 @@ export default function PartnerSettingsPage() {
           address: data.address || '',
           businessLicenseFileId: data.businessLicenseFileId || '',
         });
+        // Load business license preview
+        if (data.businessLicenseFileId) {
+          api.get(`/files/${data.businessLicenseFileId}/download`, { responseType: 'blob' })
+            .then((fileRes) => {
+              const blob = fileRes.data as Blob;
+              if (blob.size > 0) setLicensePreviewUrl(URL.createObjectURL(blob));
+            })
+            .catch(() => {});
+        }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -99,26 +110,56 @@ export default function PartnerSettingsPage() {
           <Input label="이메일" type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
           <Input label="주소" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
 
-          {/* Business License Upload */}
+          {/* Business License Upload + Preview */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               사업자등록증
             </label>
             {form.businessLicenseFileId ? (
-              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-                <FileCheck className="w-5 h-5 text-green-600" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-green-800">
-                    {licenseFileName || '사업자등록증 업로드 완료'}
-                  </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
+                  <FileCheck className="w-5 h-5 text-green-600" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-green-800">
+                      {licenseFileName || '사업자등록증 업로드 완료'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {licensePreviewUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setLicensePreviewOpen(true)}
+                        className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        미리보기
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm({ ...form, businessLicenseFileId: '' });
+                        setLicenseFileName('');
+                        setLicensePreviewUrl(null);
+                      }}
+                      className="text-xs text-red-500 hover:text-red-700"
+                    >
+                      삭제
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => { setForm({ ...form, businessLicenseFileId: '' }); setLicenseFileName(''); }}
-                  className="text-xs text-red-500 hover:text-red-700"
-                >
-                  삭제
-                </button>
+                {/* Inline preview thumbnail */}
+                {licensePreviewUrl && (
+                  <div
+                    className="rounded-xl border border-gray-200 overflow-hidden cursor-pointer"
+                    onClick={() => setLicensePreviewOpen(true)}
+                  >
+                    <img
+                      src={licensePreviewUrl}
+                      alt="사업자등록증"
+                      className="w-full max-h-48 object-contain bg-gray-50"
+                    />
+                  </div>
+                )}
               </div>
             ) : (
               <FileUpload
@@ -127,9 +168,16 @@ export default function PartnerSettingsPage() {
                 maxSizeMB={10}
                 helperText="사업자등록증 파일을 업로드하세요 (PDF, JPG, PNG)"
                 purpose="business_license"
-                onUploadComplete={(fId, fName, file) => {
+                onUploadComplete={(fId, fName) => {
                   setForm({ ...form, businessLicenseFileId: fId });
                   setLicenseFileName(fName);
+                  // Load preview for newly uploaded file
+                  api.get(`/files/${fId}/download`, { responseType: 'blob' })
+                    .then((fileRes) => {
+                      const blob = fileRes.data as Blob;
+                      if (blob.size > 0) setLicensePreviewUrl(URL.createObjectURL(blob));
+                    })
+                    .catch(() => {});
                 }}
               />
             )}
@@ -139,6 +187,27 @@ export default function PartnerSettingsPage() {
           <Button onClick={handleSave} loading={saving}>저장</Button>
         </div>
       </Card>
+
+      {/* License Preview Lightbox */}
+      {licensePreviewOpen && licensePreviewUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setLicensePreviewOpen(false)}
+        >
+          <button
+            onClick={() => setLicensePreviewOpen(false)}
+            className="absolute top-4 right-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors z-10"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          <div
+            className="max-w-4xl max-h-[90vh] overflow-auto m-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src={licensePreviewUrl} alt="사업자등록증" className="w-full" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
