@@ -28,7 +28,7 @@ import { SeedModule } from './shared/seed/seed.module';
             type: 'postgres',
             url: databaseUrl,
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: configService.get('NODE_ENV') !== 'production',
+            synchronize: configService.get('DB_SYNCHRONIZE') !== 'false',
             ssl: { rejectUnauthorized: false },
           };
         }
