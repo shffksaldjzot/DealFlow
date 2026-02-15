@@ -21,6 +21,8 @@ export default function ContractViewPage() {
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
+  const [templateImgError, setTemplateImgError] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -46,6 +48,24 @@ export default function ContractViewPage() {
     };
     init();
   }, [code, router, toast]);
+
+  const hasTemplateFile = contract?.template?.fileId;
+
+  useEffect(() => {
+    if (!hasTemplateFile || !code) return;
+    let revoked = false;
+    api.get(`/contract-flow/${code}/template-file`, { responseType: 'blob' })
+      .then((res) => {
+        if (revoked) return;
+        const blob = new Blob([res.data], { type: res.headers['content-type'] || 'application/octet-stream' });
+        setTemplateFileUrl(URL.createObjectURL(blob));
+        setTemplateImgError(false);
+      })
+      .catch(() => {});
+    return () => {
+      revoked = true;
+    };
+  }, [hasTemplateFile, code]);
 
   const handleFieldChange = (fieldId: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [fieldId]: value }));
@@ -92,26 +112,6 @@ export default function ContractViewPage() {
       </div>
     );
   }
-
-  const hasTemplateFile = contract?.template?.fileId;
-  const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
-  const [templateImgError, setTemplateImgError] = useState(false);
-
-  useEffect(() => {
-    if (!hasTemplateFile || !code) return;
-    let revoked = false;
-    api.get(`/contract-flow/${code}/template-file`, { responseType: 'blob' })
-      .then((res) => {
-        if (revoked) return;
-        const blob = new Blob([res.data], { type: res.headers['content-type'] || 'application/octet-stream' });
-        setTemplateFileUrl(URL.createObjectURL(blob));
-        setTemplateImgError(false);
-      })
-      .catch(() => {});
-    return () => {
-      revoked = true;
-    };
-  }, [hasTemplateFile, code]);
 
   const renderFieldsForm = () => (
     <Card padding="lg">

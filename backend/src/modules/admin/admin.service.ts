@@ -199,10 +199,7 @@ export class AdminService {
       .createQueryBuilder('org')
       .leftJoinAndSelect('org.members', 'members')
       .leftJoinAndSelect('members.user', 'user')
-      .orderBy(
-        `CASE WHEN org.status = 'pending' THEN 0 ELSE 1 END`,
-        'ASC',
-      )
+      .orderBy('org.status', 'ASC')
       .addOrderBy('org.createdAt', 'DESC')
       .skip(skip)
       .take(limit);
