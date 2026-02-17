@@ -19,7 +19,6 @@ export default function ContractViewPage() {
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [templateFileUrl, setTemplateFileUrl] = useState<string | null>(null);
   const [imgError, setImgError] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -66,28 +65,12 @@ export default function ContractViewPage() {
     };
   }, [hasTemplateFile, code]);
 
-  const handleSaveAndSign = async () => {
+  const handleSaveAndSign = () => {
     if (!agreed) {
       toast('계약 내용에 동의해주세요.', 'error');
       return;
     }
-
-    setSaving(true);
-    try {
-      // Save prefilled field values (from partner)
-      const fvArray = Object.entries(fieldValues)
-        .filter(([, v]) => v)
-        .map(([fieldId, value]) => ({ fieldId, value }));
-      if (fvArray.length > 0) {
-        await api.post(`/contract-flow/${code}/fill`, { fieldValues: fvArray });
-      }
-
-      router.push(`/contract/${code}/sign`);
-    } catch {
-      toast('저장에 실패했습니다.', 'error');
-    } finally {
-      setSaving(false);
-    }
+    router.push(`/contract/${code}/sign`);
   };
 
   if (loading) {
@@ -267,7 +250,6 @@ export default function ContractViewPage() {
           fullWidth
           size="xl"
           onClick={handleSaveAndSign}
-          loading={saving}
           disabled={!agreed}
         >
           서명하기

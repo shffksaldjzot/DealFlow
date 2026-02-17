@@ -33,7 +33,8 @@ export default function ContractSignPage() {
       toast('서명이 완료되었습니다!', 'success');
       router.push(`/contract/${code}/complete`);
     } catch (err: any) {
-      toast(err.response?.data?.message?.[0] || '서명에 실패했습니다.', 'error');
+      const msg = err.response?.data?.message;
+      toast(Array.isArray(msg) ? msg[0] : msg || '서명에 실패했습니다.', 'error');
     } finally {
       setSubmitting(false);
     }

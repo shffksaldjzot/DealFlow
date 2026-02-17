@@ -221,30 +221,6 @@ export class ContractFlowService {
       );
     }
 
-    // Validate required fields are filled (exclude signature fields - handled separately)
-    const allRequiredFields = await this.fieldRepository.find({
-      where: { templateId: contract.templateId, isRequired: true },
-    });
-    const requiredFields = allRequiredFields.filter(
-      (f) => f.fieldType !== FieldType.SIGNATURE,
-    );
-
-    const filledValues = await this.fieldValueRepository.find({
-      where: { contractId: contract.id },
-    });
-    const filledFieldIds = new Set(filledValues.map((v) => v.fieldId));
-
-    const missingFields = requiredFields.filter(
-      (f) => !filledFieldIds.has(f.id) || !filledValues.find((v) => v.fieldId === f.id)?.value,
-    );
-
-    if (missingFields.length > 0) {
-      const missingLabels = missingFields.map((f) => f.label).join(', ');
-      throw new BadRequestException(
-        `필수 항목이 작성되지 않았습니다: ${missingLabels}`,
-      );
-    }
-
     // Create signature record
     const signatureHash = crypto
       .createHash('sha256')
