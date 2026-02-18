@@ -726,6 +726,15 @@ export class AdminService {
       contract.cancelledAt = new Date();
       contract.cancelReason = dto.reason || '관리자에 의한 취소';
     }
+    if (dto.status === ContractStatus.PENDING) {
+      contract.signedAt = null;
+      contract.completedAt = null;
+      contract.cancelledAt = null;
+      contract.cancelReason = null;
+      contract.cancelledBy = null;
+      // Delete signatures for clean re-test
+      await this.signatureRepository.delete({ contractId: contract.id });
+    }
 
     const saved = await this.contractRepository.save(contract);
 
