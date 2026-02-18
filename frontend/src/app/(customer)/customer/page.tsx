@@ -282,6 +282,12 @@ export default function CustomerHome() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-gray-900 text-sm">{c.event?.name || '계약서'}</p>
+                    <p className="text-xs text-blue-600 mt-0.5">
+                      {c.partner?.name}
+                      {(c.partner as any)?.items && (
+                        <span className="text-gray-400 ml-1">· {(c.partner as any).items.split(',').map((s: string) => s.trim()).join(', ')}</span>
+                      )}
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge status={c.status} />
                       <span className="text-xs text-gray-400">{formatDateTime(c.createdAt)}</span>
@@ -374,6 +380,12 @@ export default function CustomerHome() {
                   <div>
                     <p className="text-xs text-gray-400 font-mono">{c.contractNumber}</p>
                     <p className="font-medium text-gray-900 text-sm mt-0.5">{c.event?.name || '계약서'}</p>
+                    <p className="text-xs text-blue-600 mt-0.5">
+                      {c.partner?.name}
+                      {(c.partner as any)?.items && (
+                        <span className="text-gray-400 ml-1">· {(c.partner as any).items.split(',').map((s: string) => s.trim()).join(', ')}</span>
+                      )}
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge status={c.status} />
                       <span className="text-xs text-gray-400">{formatDateTime(c.createdAt)}</span>

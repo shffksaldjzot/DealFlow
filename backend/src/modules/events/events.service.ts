@@ -356,15 +356,21 @@ export class EventsService {
     partners: Array<{
       partnerId: string;
       partnerName: string;
-      contractCount: number;
+      items: string | null;
+      contractCount: { total: number; pending: number; inProgress: number; signed: number; completed: number; cancelled: number };
       totalAmount: number;
+      settledAmount: number;
       commissionRate: number;
       commissionAmount: number;
+      payoutAmount: number;
+      contracts: Contract[];
     }>;
     totals: {
       contractCount: number;
       totalAmount: number;
+      settledAmount: number;
       totalCommission: number;
+      totalPayout: number;
     };
     eventCommissionRate: number;
   }> {
@@ -383,44 +389,83 @@ export class EventsService {
 
     const contracts = await this.contractRepository.find({
       where: { eventId },
+      relations: ['customer'],
+      order: { createdAt: 'DESC' },
     });
+
+    const statusCountInit = () => ({ total: 0, pending: 0, inProgress: 0, signed: 0, completed: 0, cancelled: 0 });
+    const statusKeyMap: Record<string, keyof ReturnType<typeof statusCountInit>> = {
+      pending: 'pending',
+      in_progress: 'inProgress',
+      signed: 'signed',
+      completed: 'completed',
+      cancelled: 'cancelled',
+    };
 
     const partnerMap = new Map<string, {
       partnerId: string;
       partnerName: string;
-      contractCount: number;
+      items: string | null;
+      contractCount: ReturnType<typeof statusCountInit>;
       totalAmount: number;
+      settledAmount: number;
       commissionRate: number;
+      contracts: Contract[];
     }>();
 
     for (const ep of eventPartners) {
       partnerMap.set(ep.partnerId, {
         partnerId: ep.partnerId,
         partnerName: ep.partner?.name || '업체',
-        contractCount: 0,
+        items: ep.items || ep.partner?.items || null,
+        contractCount: statusCountInit(),
         totalAmount: 0,
+        settledAmount: 0,
         commissionRate: ep.commissionRate != null ? Number(ep.commissionRate) : Number(event.commissionRate),
+        contracts: [],
       });
     }
 
     for (const contract of contracts) {
-      if (contract.status === 'cancelled') continue;
       const entry = partnerMap.get(contract.partnerId);
-      if (entry) {
-        entry.contractCount++;
-        entry.totalAmount += Number(contract.totalAmount || 0);
+      if (!entry) continue;
+
+      const key = statusKeyMap[contract.status];
+      if (key) entry.contractCount[key]++;
+      entry.contractCount.total++;
+      entry.contracts.push(contract);
+
+      if (contract.status === 'cancelled') continue;
+      const amount = Number(contract.totalAmount || 0);
+      entry.totalAmount += amount;
+
+      if (contract.status === 'signed' || contract.status === 'completed') {
+        entry.settledAmount += amount;
       }
     }
 
-    const partners = Array.from(partnerMap.values()).map((p) => ({
-      ...p,
-      commissionAmount: Math.round(p.totalAmount * p.commissionRate / 100),
-    }));
+    const partners = Array.from(partnerMap.values()).map((p) => {
+      const commissionAmount = Math.round(p.settledAmount * p.commissionRate / 100);
+      return {
+        partnerId: p.partnerId,
+        partnerName: p.partnerName,
+        items: p.items,
+        contractCount: p.contractCount,
+        totalAmount: p.totalAmount,
+        settledAmount: p.settledAmount,
+        commissionRate: p.commissionRate,
+        commissionAmount,
+        payoutAmount: p.settledAmount - commissionAmount,
+        contracts: p.contracts,
+      };
+    });
 
     const totals = {
-      contractCount: partners.reduce((sum, p) => sum + p.contractCount, 0),
+      contractCount: partners.reduce((sum, p) => sum + p.contractCount.total, 0),
       totalAmount: partners.reduce((sum, p) => sum + p.totalAmount, 0),
+      settledAmount: partners.reduce((sum, p) => sum + p.settledAmount, 0),
       totalCommission: partners.reduce((sum, p) => sum + p.commissionAmount, 0),
+      totalPayout: partners.reduce((sum, p) => sum + p.payoutAmount, 0),
     };
 
     return {

@@ -32,4 +32,8 @@ export class UpdateOrganizationDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @IsOptional()
+  @IsString()
+  items?: string;
 }

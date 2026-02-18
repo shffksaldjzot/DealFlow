@@ -35,6 +35,7 @@ export default function BusinessRegistration() {
     address: '',
     addressDetail: '',
     businessLicenseFileId: '',
+    items: '',
   });
 
   // Pre-fill email from signup
@@ -95,6 +96,7 @@ export default function BusinessRegistration() {
         contactEmail: form.contactEmail,
         address: fullAddress,
         businessLicenseFileId: form.businessLicenseFileId,
+        items: form.items || undefined,
         type: user?.role === 'organizer' ? 'organizer' : 'partner',
       });
       toast('업체 등록이 완료되었습니다. DealFlow 승인 후 이용 가능합니다.', 'success');
@@ -267,6 +269,23 @@ export default function BusinessRegistration() {
                 className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
+
+            {/* 취급 품목 (협력업체만) */}
+            {user?.role === 'partner' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  취급 품목
+                </label>
+                <input
+                  type="text"
+                  placeholder="예: 줄눈, 탄성코트, 가구, 가전, 도어락"
+                  value={form.items}
+                  onChange={(e) => setForm({ ...form, items: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-400 mt-1">쉼표(,)로 구분하여 입력하세요</p>
+              </div>
+            )}
 
             {/* 사업자등록증 업로드 + 미리보기 */}
             <FileUpload

@@ -9,7 +9,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import Table from '@/components/ui/Table';
 import Input from '@/components/ui/Input';
 import Modal from '@/components/ui/Modal';
-import { CheckCircle2, XCircle, Download, Phone, Mail, MapPin, Building2 } from 'lucide-react';
+import { CheckCircle2, XCircle, Download, Phone, Mail, MapPin, Building2, Tag } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import type { Organization } from '@/types/organization';
 import type { PaginatedResult } from '@/types/api';
@@ -86,6 +86,21 @@ export default function AdminOrganizersPage() {
     { key: 'type', header: '구분', render: (o: Organization) => getTypeBadge((o as any).type) },
     { key: 'businessNumber', header: '사업자번호' },
     { key: 'representativeName', header: '대표자', render: (o: Organization) => o.representativeName || '-' },
+    {
+      key: 'items', header: '품목', render: (o: Organization) =>
+        o.items ? (
+          <div className="flex flex-wrap gap-1 max-w-[200px]">
+            {o.items.split(',').slice(0, 3).map((item, idx) => (
+              <span key={idx} className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700">
+                {item.trim()}
+              </span>
+            ))}
+            {o.items.split(',').length > 3 && (
+              <span className="text-[10px] text-gray-400">+{o.items.split(',').length - 3}</span>
+            )}
+          </div>
+        ) : <span className="text-gray-300">-</span>,
+    },
     {
       key: 'contact', header: '연락처', render: (o: Organization) => (
         <div className="text-xs">
@@ -231,6 +246,21 @@ export default function AdminOrganizersPage() {
                   <div>
                     <p className="text-xs text-gray-400">주소</p>
                     <p className="text-sm font-medium">{detailOrg.address}</p>
+                  </div>
+                </div>
+              )}
+              {detailOrg.items && (
+                <div className="flex items-start gap-3">
+                  <Tag className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-gray-400">취급 품목</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {detailOrg.items.split(',').map((item, idx) => (
+                        <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                          {item.trim()}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

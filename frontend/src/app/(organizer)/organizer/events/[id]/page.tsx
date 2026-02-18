@@ -192,8 +192,8 @@ export default function EventDetailPage() {
               <FileText className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">계약 현황</p>
-              <p className="text-sm text-gray-500">행사별 계약 확인</p>
+              <p className="font-semibold text-gray-900">계약 / 정산</p>
+              <p className="text-sm text-gray-500">계약 현황 및 정산 관리</p>
             </div>
           </div>
         </Card>

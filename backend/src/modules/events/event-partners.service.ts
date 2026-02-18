@@ -54,6 +54,7 @@ export class EventPartnersService {
   async joinByInviteCode(
     userId: string,
     inviteCode: string,
+    items?: string,
   ): Promise<EventPartner> {
     const orgId = await this.getOrgIdForUser(userId, true);
 
@@ -78,10 +79,20 @@ export class EventPartnersService {
       throw new ConflictException('이미 참가한 이벤트입니다.');
     }
 
+    // Use provided items, or fall back to org default items
+    let partnerItems = items || null;
+    if (!partnerItems) {
+      const org = await this.orgRepository.findOne({ where: { id: orgId } });
+      if (org?.items) {
+        partnerItems = org.items;
+      }
+    }
+
     const eventPartner = this.eventPartnerRepository.create({
       eventId: event.id,
       partnerId: orgId,
       status: EventPartnerStatus.PENDING,
+      items: partnerItems,
     });
 
     const saved = await this.eventPartnerRepository.save(eventPartner);

@@ -27,6 +27,7 @@ export default function EventJoinPage() {
   const [event, setEvent] = useState<PublicEventInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
+  const [items, setItems] = useState('');
 
   useEffect(() => {
     fetch(`/api/events/public/${code}`)
@@ -49,7 +50,7 @@ export default function EventJoinPage() {
 
     setJoining(true);
     try {
-      await api.post('/event-partners/join', { inviteCode: code });
+      await api.post('/event-partners/join', { inviteCode: code, items: items.trim() || undefined });
       toast('참여 신청이 완료되었습니다.', 'success');
       router.push('/partner/events');
     } catch (err: any) {
@@ -119,9 +120,24 @@ export default function EventJoinPage() {
 
         {isAuthenticated && user ? (
           user.role === 'partner' ? (
-            <Button fullWidth size="xl" onClick={handleJoin} loading={joining}>
-              참여 신청하기
-            </Button>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  취급 품목
+                </label>
+                <input
+                  type="text"
+                  placeholder="예: 줄눈, 탄성코트, 가구, 가전, 도어락"
+                  value={items}
+                  onChange={(e) => setItems(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-400 mt-1">쉼표(,)로 구분하여 입력하세요</p>
+              </div>
+              <Button fullWidth size="xl" onClick={handleJoin} loading={joining}>
+                참여 신청하기
+              </Button>
+            </div>
           ) : (
             <div className="text-center">
               <p className="text-sm text-gray-500 mb-3">협력업체 계정으로만 참여할 수 있습니다.</p>

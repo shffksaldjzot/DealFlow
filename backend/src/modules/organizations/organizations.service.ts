@@ -42,6 +42,7 @@ export class OrganizationsService {
       contactPhone: dto.contactPhone,
       contactEmail: dto.contactEmail,
       address: dto.address,
+      items: dto.items || null,
       status: OrgStatus.PENDING,
     });
 
@@ -111,6 +112,7 @@ export class OrganizationsService {
     if (dto.contactPhone !== undefined) org.contactPhone = dto.contactPhone;
     if (dto.contactEmail !== undefined) org.contactEmail = dto.contactEmail;
     if (dto.address !== undefined) org.address = dto.address;
+    if (dto.items !== undefined) org.items = dto.items;
 
     return this.orgRepository.save(org);
   }

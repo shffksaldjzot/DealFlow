@@ -24,11 +24,12 @@ export interface EventPartner {
   partnerId: string;
   status: EventPartnerStatus;
   commissionRate?: number;
+  items?: string;
   approvedAt?: string;
   cancelledAt?: string;
   cancelledBy?: string;
   cancelReason?: string;
-  partner?: { id: string; name: string; contactPhone?: string; contactEmail?: string };
+  partner?: { id: string; name: string; contactPhone?: string; contactEmail?: string; items?: string };
   createdAt: string;
 }
 

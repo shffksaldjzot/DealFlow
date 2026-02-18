@@ -50,6 +50,9 @@ export class Organization {
   @Column({ type: 'text', nullable: true })
   address: string;
 
+  @Column({ type: 'text', nullable: true })
+  items: string;
+
   @Column({ type: 'varchar', length: 20, default: OrgStatus.PENDING })
   status: OrgStatus;
 

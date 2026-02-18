@@ -53,6 +53,9 @@ export class EventPartner {
   @Column({ name: 'cancel_reason', nullable: true })
   cancelReason: string;
 
+  @Column({ type: 'text', nullable: true })
+  items: string;
+
   @ManyToOne(() => Event, (event) => event.partners)
   @JoinColumn({ name: 'event_id' })
   event: Event;

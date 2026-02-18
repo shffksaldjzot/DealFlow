@@ -16,7 +16,7 @@ export class EventPartnersController {
     @CurrentUser('id') userId: string,
     @Body() dto: JoinEventDto,
   ) {
-    return this.eventPartnersService.joinByInviteCode(userId, dto.inviteCode);
+    return this.eventPartnersService.joinByInviteCode(userId, dto.inviteCode, dto.items);
   }
 
   @Get('my-events')

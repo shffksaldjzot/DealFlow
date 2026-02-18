@@ -1,0 +1,1577 @@
+{
+  "timestamp": "2026-02-15T10:57:39.971Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-02-15T10:49:24.475Z",
+    "activeFeatures": [
+      "frontend",
+      "business",
+      "view",
+      "[id]",
+      "backend",
+      "customer",
+      "pending-approval",
+      "activity-log",
+      "admin",
+      "events",
+      "contracts",
+      "organizations",
+      "logs",
+      "files",
+      "new",
+      "[templateId]",
+      "layout",
+      "settings",
+      "auth",
+      "filters",
+      "users",
+      "organizers",
+      "login",
+      "forgot-password",
+      "notifications",
+      "contract",
+      "partner",
+      "dto",
+      "seed"
+    ],
+    "primaryFeature": "frontend",
+    "features": {
+      "frontend": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-13T02:30:58.747Z",
+          "lastUpdated": "2026-02-15T09:06:31.793Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/lib/utils.ts"
+      },
+      "business": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-13T03:53:27.742Z",
+          "lastUpdated": "2026-02-14T05:58:55.395Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(auth)/signup/business/page.tsx"
+      },
+      "view": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-13T03:53:44.156Z",
+          "lastUpdated": "2026-02-15T06:27:57.580Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/contract/[code]/view/page.tsx"
+      },
+      "[id]": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-13T03:54:13.862Z",
+          "lastUpdated": "2026-02-15T10:33:44.222Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(admin)/admin/users/[id]/page.tsx"
+      },
+      "backend": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-13T03:54:45.351Z",
+          "lastUpdated": "2026-02-15T10:49:24.470Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/app.module.ts"
+      },
+      "customer": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-13T03:55:55.719Z",
+          "lastUpdated": "2026-02-13T03:55:55.719Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(customer)/customer/page.tsx"
+      },
+      "pending-approval": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-13T03:58:02.798Z",
+          "lastUpdated": "2026-02-13T03:58:02.798Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(auth)/pending-approval/page.tsx"
+      },
+      "activity-log": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:20:15.202Z",
+          "lastUpdated": "2026-02-14T05:20:29.140Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/shared/activity-log/activity-log.module.ts"
+      },
+      "admin": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:20:40.406Z",
+          "lastUpdated": "2026-02-15T10:34:13.277Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/modules/admin/admin.service.ts"
+      },
+      "events": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:20:58.224Z",
+          "lastUpdated": "2026-02-14T05:25:17.448Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/modules/events/event-partners.service.ts"
+      },
+      "contracts": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:21:53.044Z",
+          "lastUpdated": "2026-02-15T07:18:25.403Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/modules/contracts/entities/contract-history.entity.ts"
+      },
+      "organizations": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:22:45.405Z",
+          "lastUpdated": "2026-02-14T05:22:50.995Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/modules/organizations/organizations.service.ts"
+      },
+      "logs": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:23:08.464Z",
+          "lastUpdated": "2026-02-14T05:23:08.464Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(admin)/admin/logs/page.tsx"
+      },
+      "files": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:24:02.220Z",
+          "lastUpdated": "2026-02-14T05:24:02.220Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/modules/files/files.controller.ts"
+      },
+      "new": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:26:26.209Z",
+          "lastUpdated": "2026-02-15T06:26:52.555Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(partner)/partner/events/[id]/contracts/new/page.tsx"
+      },
+      "[templateId]": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:27:32.125Z",
+          "lastUpdated": "2026-02-14T06:00:08.364Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(partner)/partner/events/[id]/templates/[templateId]/page.tsx"
+      },
+      "layout": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:27:48.626Z",
+          "lastUpdated": "2026-02-14T17:32:11.924Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/components/layout/Sidebar.tsx"
+      },
+      "settings": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:28:01.306Z",
+          "lastUpdated": "2026-02-14T05:59:08.275Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(organizer)/organizer/settings/page.tsx"
+      },
+      "auth": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T05:59:19.230Z",
+          "lastUpdated": "2026-02-15T10:32:57.067Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/modules/auth/auth.service.ts"
+      },
+      "filters": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T08:59:32.409Z",
+          "lastUpdated": "2026-02-14T17:30:45.686Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/common/filters/http-exception.filter.ts"
+      },
+      "users": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T17:30:56.162Z",
+          "lastUpdated": "2026-02-15T10:33:32.705Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(admin)/admin/users/page.tsx"
+      },
+      "organizers": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T17:33:12.473Z",
+          "lastUpdated": "2026-02-14T17:33:12.473Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(admin)/admin/organizers/page.tsx"
+      },
+      "login": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T17:35:30.893Z",
+          "lastUpdated": "2026-02-15T09:06:23.480Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(auth)/login/page.tsx"
+      },
+      "forgot-password": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T17:35:56.385Z",
+          "lastUpdated": "2026-02-14T17:35:56.385Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(auth)/forgot-password/page.tsx"
+      },
+      "notifications": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-14T17:59:35.993Z",
+          "lastUpdated": "2026-02-15T07:18:15.715Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/modules/notifications/entities/notification.entity.ts"
+      },
+      "contract": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-15T06:27:01.698Z",
+          "lastUpdated": "2026-02-15T06:27:19.138Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/components/contract/ContractOverlay.tsx"
+      },
+      "partner": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-15T06:28:14.773Z",
+          "lastUpdated": "2026-02-15T06:28:14.773Z"
+        },
+        "lastFile": "/home/user/claud-deal/frontend/src/app/(partner)/partner/page.tsx"
+      },
+      "dto": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-15T09:06:09.185Z",
+          "lastUpdated": "2026-02-15T09:06:09.185Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/common/dto/pagination.dto.ts"
+      },
+      "seed": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-15T10:49:06.866Z",
+          "lastUpdated": "2026-02-15T10:49:11.956Z"
+        },
+        "lastFile": "/home/user/claud-deal/backend/src/shared/seed/seed.module.ts"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-02-13T01:38:43.725Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-02-15T10:49:24.475Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-02-13T02:30:58.747Z",
+        "feature": "frontend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-13T02:31:16.564Z",
+        "feature": "frontend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-13T02:31:29.561Z",
+        "feature": "frontend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-13T03:53:27.742Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-13T03:53:44.157Z",
+        "feature": "view",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-13T03:54:13.862Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-13T03:54:45.351Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-13T03:55:55.719Z",
+        "feature": "customer",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-13T03:58:02.798Z",
+        "feature": "pending-approval",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:20:15.202Z",
+        "feature": "activity-log",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:20:29.140Z",
+        "feature": "activity-log",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:20:34.420Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:20:40.406Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:20:46.446Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:20:51.491Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:20:58.224Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:05.390Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:11.324Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:18.630Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:24.289Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:31.487Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:38.138Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:44.093Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:53.045Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:21:59.697Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:22:06.403Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:22:14.313Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:22:20.927Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:22:27.498Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:22:33.272Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:22:38.484Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:22:45.405Z",
+        "feature": "organizations",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:22:50.995Z",
+        "feature": "organizations",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:23:08.464Z",
+        "feature": "logs",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:23:32.075Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:23:45.264Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:24:02.220Z",
+        "feature": "files",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:24:07.319Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:24:13.034Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:24:30.522Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:24:40.064Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:24:45.765Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:24:50.700Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:24:55.871Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:25:02.032Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:25:11.047Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:25:17.448Z",
+        "feature": "events",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:25:24.098Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:25:31.753Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:25:37.191Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:25:43.740Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:25:48.861Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:26:14.798Z",
+        "feature": "frontend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:26:26.210Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:26:47.389Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:26:53.843Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:27:20.722Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:27:26.956Z",
+        "feature": "view",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:27:32.125Z",
+        "feature": "[templateId]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:27:48.626Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:28:01.306Z",
+        "feature": "settings",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:28:18.470Z",
+        "feature": "settings",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:57:53.058Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:58:07.751Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:58:18.823Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:58:31.691Z",
+        "feature": "frontend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:58:37.096Z",
+        "feature": "frontend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:58:45.084Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:58:55.395Z",
+        "feature": "business",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:59:02.038Z",
+        "feature": "settings",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:59:08.275Z",
+        "feature": "settings",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:59:19.230Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:59:25.146Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:59:29.343Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:59:37.069Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T05:59:57.190Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T06:00:08.364Z",
+        "feature": "[templateId]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T06:00:26.539Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T06:00:31.979Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T06:01:17.220Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T06:01:31.344Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T08:59:32.409Z",
+        "feature": "filters",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T09:00:43.996Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T09:01:02.313Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T09:01:12.216Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T09:02:25.055Z",
+        "feature": "filters",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:30:45.686Z",
+        "feature": "filters",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:30:56.162Z",
+        "feature": "users",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:00.129Z",
+        "feature": "users",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:05.135Z",
+        "feature": "users",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:11.405Z",
+        "feature": "users",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:17.690Z",
+        "feature": "users",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:29.443Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:36.809Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:41.867Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:46.080Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:31:57.530Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:32:11.924Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:32:16.434Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:32:26.293Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:32:35.075Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:32:49.128Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:33:12.473Z",
+        "feature": "organizers",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:33:30.608Z",
+        "feature": "view",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:33:44.636Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:33:50.364Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:33:56.702Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:34:01.280Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:34:12.124Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:34:16.926Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:34:21.557Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:34:54.802Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:34:59.615Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:35:04.294Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:35:11.749Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:35:23.248Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:35:30.893Z",
+        "feature": "login",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:35:56.385Z",
+        "feature": "forgot-password",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:36:03.291Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:36:08.958Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:36:25.101Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:36:30.884Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:37:03.563Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:59:23.189Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:59:32.414Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:59:35.993Z",
+        "feature": "notifications",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:59:39.684Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:59:43.123Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T17:59:57.727Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T18:00:02.293Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T18:00:07.889Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T18:00:14.289Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T18:00:19.386Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T18:00:25.267Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T18:00:30.884Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T18:01:33.915Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-14T18:01:39.928Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:26:10.101Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:26:38.522Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:26:43.836Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:26:48.122Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:26:52.555Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:27:01.698Z",
+        "feature": "contract",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:27:06.176Z",
+        "feature": "contract",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:27:13.970Z",
+        "feature": "contract",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:27:19.138Z",
+        "feature": "contract",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:27:48.886Z",
+        "feature": "view",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:27:57.580Z",
+        "feature": "view",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:28:14.773Z",
+        "feature": "partner",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:45:38.455Z",
+        "feature": "notifications",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:45:48.512Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:45:50.550Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T06:45:51.639Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:03.331Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:14.021Z",
+        "feature": "notifications",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:15.715Z",
+        "feature": "notifications",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:17.706Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:21.372Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:23.639Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:24.206Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:24.675Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:18:25.403Z",
+        "feature": "contracts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:43:16.873Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T07:43:35.921Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T08:31:58.683Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:05:21.045Z",
+        "feature": "users",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:05:31.597Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:05:36.931Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:05:46.125Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:05:50.685Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:06:09.185Z",
+        "feature": "dto",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:06:13.849Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:06:23.480Z",
+        "feature": "login",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:06:31.793Z",
+        "feature": "frontend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T09:06:40.885Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:10:34.760Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:10:49.844Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:10:55.637Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:11:02.645Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:11:10.644Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:11:17.394Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:32:46.115Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:32:57.067Z",
+        "feature": "auth",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:33:17.984Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:33:32.705Z",
+        "feature": "users",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:33:44.222Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:34:13.277Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:49:06.866Z",
+        "feature": "seed",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:49:11.956Z",
+        "feature": "seed",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:49:18.123Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-15T10:49:24.470Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

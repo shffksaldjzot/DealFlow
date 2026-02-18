@@ -41,4 +41,8 @@ export class CreateOrganizationDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @IsOptional()
+  @IsString()
+  items?: string;
 }

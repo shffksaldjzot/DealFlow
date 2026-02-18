@@ -11,6 +11,7 @@ export interface Organization {
   contactPhone?: string;
   contactEmail?: string;
   address?: string;
+  items?: string;
   status: OrgStatus;
   approvedAt?: string;
   createdAt: string;

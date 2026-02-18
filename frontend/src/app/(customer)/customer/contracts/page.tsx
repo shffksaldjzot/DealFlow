@@ -45,11 +45,19 @@ export default function CustomerContractsPage() {
               onClick={() => router.push(`/customer/contracts/${c.id}`)}
             >
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-400 font-mono">{c.contractNumber}</p>
                   <p className="font-semibold text-gray-900 mt-0.5">
                     {c.event?.name || '계약서'}
                   </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-blue-600 font-medium">{c.partner?.name}</span>
+                    {(c.partner as any)?.items && (
+                      <span className="text-[11px] text-gray-400">
+                        ({(c.partner as any).items.split(',').map((s: string) => s.trim()).join(', ')})
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge status={c.status} />
                     <span className="text-xs text-gray-400">
@@ -57,7 +65,7 @@ export default function CustomerContractsPage() {
                     </span>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
               </div>
             </Card>
           ))}
