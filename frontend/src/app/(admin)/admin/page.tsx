@@ -186,22 +186,33 @@ export default function AdminDashboard() {
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 가입 사용자</h3>
                 <Card>
                   <div className="divide-y divide-gray-50">
-                    {stats.recentUsers.map((u: any) => (
-                      <div
-                        key={u.id}
-                        className="flex items-center justify-between py-2.5 cursor-pointer hover:bg-gray-50 -mx-4 px-4 rounded-lg transition-colors"
-                        onClick={() => router.push(`/admin/users/${u.id}`)}
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{u.name}</p>
-                          <p className="text-xs text-gray-400">{u.email}</p>
+                    {stats.recentUsers.map((u: any) => {
+                      const roleMap: Record<string, { label: string; color: string }> = {
+                        admin: { label: '관리자', color: 'bg-purple-100 text-purple-800' },
+                        organizer: { label: '주관사', color: 'bg-blue-100 text-blue-800' },
+                        partner: { label: '협력업체', color: 'bg-green-100 text-green-800' },
+                        customer: { label: '고객', color: 'bg-gray-100 text-gray-600' },
+                      };
+                      const role = roleMap[u.role] || { label: u.role, color: 'bg-gray-100 text-gray-600' };
+                      return (
+                        <div
+                          key={u.id}
+                          className="flex items-center justify-between py-2.5 cursor-pointer hover:bg-gray-50 -mx-4 px-4 rounded-lg transition-colors"
+                          onClick={() => router.push(`/admin/users/${u.id}`)}
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{u.name}</p>
+                            <p className="text-xs text-gray-400">{u.email}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${role.color}`}>
+                              {role.label}
+                            </span>
+                            <p className="text-xs text-gray-400 mt-0.5">{formatDateTime(u.createdAt)}</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <Badge status={u.role === 'admin' ? 'completed' : u.role === 'organizer' ? 'active' : u.role === 'partner' ? 'approved' : 'pending'} />
-                          <p className="text-xs text-gray-400 mt-0.5">{formatDateTime(u.createdAt)}</p>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </Card>
               </div>
