@@ -41,6 +41,13 @@ export class NotificationsService {
     return this.notificationRepository.save(notification);
   }
 
+  async markAllAsRead(userId: string): Promise<void> {
+    await this.notificationRepository.update(
+      { userId, status: NotificationStatus.PENDING },
+      { status: NotificationStatus.SENT, sentAt: new Date() },
+    );
+  }
+
   async createNotification(data: {
     userId: string;
     type: string;

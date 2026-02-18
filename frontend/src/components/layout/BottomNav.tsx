@@ -1,15 +1,25 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, FileText, User } from 'lucide-react';
+import api, { extractData } from '@/lib/api';
+import { Home, FileText, User, Bell } from 'lucide-react';
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  const items = [
+  useEffect(() => {
+    api.get('/notifications/unread-count')
+      .then((res) => setUnreadCount(extractData<{ count: number }>(res).count))
+      .catch(() => {});
+  }, []);
+
+  const items: Array<{ label: string; href: string; icon: typeof Home; badge?: number }> = [
     { label: '홈', href: '/customer', icon: Home },
     { label: '내 계약', href: '/customer/contracts', icon: FileText },
+    { label: '알림', href: '/customer/notifications', icon: Bell, badge: unreadCount },
     { label: '프로필', href: '/customer/profile', icon: User },
   ];
 
@@ -25,11 +35,18 @@ export default function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center gap-0.5 px-4 py-1',
+                'flex flex-col items-center gap-0.5 px-4 py-1 relative',
                 isActive ? 'text-blue-600' : 'text-gray-400',
               )}
             >
-              <Icon className="w-5 h-5" />
+              <div className="relative">
+                <Icon className="w-5 h-5" />
+                {(item.badge ?? 0) > 0 && (
+                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                    {(item.badge ?? 0) > 9 ? '9+' : item.badge}
+                  </span>
+                )}
+              </div>
               <span className="text-[11px] font-medium">{item.label}</span>
             </Link>
           );

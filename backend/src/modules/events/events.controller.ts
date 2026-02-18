@@ -98,6 +98,26 @@ export class EventsController {
     return this.eventsService.updatePartnerStatus(id, partnerId, userId, dto);
   }
 
+  @Get(':id/settlement')
+  @Roles('organizer')
+  getSettlement(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.eventsService.getSettlement(id, userId);
+  }
+
+  @Patch(':id/partners/:partnerId/commission')
+  @Roles('organizer')
+  updatePartnerCommission(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('partnerId', ParseUUIDPipe) partnerId: string,
+    @CurrentUser('id') userId: string,
+    @Body() body: { commissionRate: number },
+  ) {
+    return this.eventsService.updatePartnerCommission(id, partnerId, userId, body.commissionRate);
+  }
+
   @Get(':id/contracts')
   getContractsSummary(
     @Param('id', ParseUUIDPipe) id: string,

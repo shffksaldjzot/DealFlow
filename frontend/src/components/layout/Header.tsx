@@ -70,6 +70,36 @@ export default function Header() {
     } catch {}
   };
 
+  const getNotificationLink = (n: Notification): string | null => {
+    const role = user?.role;
+    const basePath = role ? rolePaths[role] : '';
+    if (n.relatedType === 'contract' && n.relatedId) {
+      if (role === 'customer') return `${basePath}/contracts/${n.relatedId}`;
+      return null; // partner/organizer contracts need eventId which we don't have here
+    }
+    if (n.relatedType === 'event' && n.relatedId) {
+      return `${basePath}/events/${n.relatedId}`;
+    }
+    return null;
+  };
+
+  const handleNotificationClick = async (n: Notification) => {
+    if (!n.isRead) await handleMarkRead(n.id);
+    const link = getNotificationLink(n);
+    if (link) {
+      setShowDropdown(false);
+      router.push(link);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await api.patch('/notifications/read-all');
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch {}
+  };
+
   const handleLogout = () => {
     logout();
     router.push('/login');
@@ -112,7 +142,12 @@ export default function Header() {
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                 <h3 className="text-sm font-bold text-gray-900">알림</h3>
                 {unreadCount > 0 && (
-                  <span className="text-xs text-blue-600 font-medium">{unreadCount}개 읽지 않음</span>
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-xs text-blue-600 font-medium hover:underline"
+                  >
+                    모두 읽음
+                  </button>
                 )}
               </div>
               <div className="max-h-80 overflow-y-auto">
@@ -128,7 +163,7 @@ export default function Header() {
                       className={`px-4 py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 cursor-pointer ${
                         !n.isRead ? 'bg-blue-50/30' : ''
                       }`}
-                      onClick={() => !n.isRead && handleMarkRead(n.id)}
+                      onClick={() => handleNotificationClick(n)}
                     >
                       <div className="flex items-start gap-2">
                         {!n.isRead && (

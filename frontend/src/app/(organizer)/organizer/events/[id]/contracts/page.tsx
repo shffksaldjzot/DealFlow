@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
@@ -22,6 +22,7 @@ export default function EventContractsPage() {
   const router = useRouter();
   const [summary, setSummary] = useState<ContractsSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [partnerFilter, setPartnerFilter] = useState('all');
 
   useEffect(() => {
     api.get(`/events/${id}/contracts`)
@@ -31,6 +32,20 @@ export default function EventContractsPage() {
   }, [id]);
 
   const contracts = summary?.contracts || [];
+
+  // Get unique partner names for filter
+  const partnerNames = useMemo(() => {
+    const names = new Set<string>();
+    contracts.forEach((c) => {
+      const name = (c as any).partner?.name;
+      if (name) names.add(name);
+    });
+    return Array.from(names).sort();
+  }, [contracts]);
+
+  const filteredContracts = partnerFilter === 'all'
+    ? contracts
+    : contracts.filter((c) => (c as any).partner?.name === partnerFilter);
 
   const columns = [
     { key: 'partner', header: '업체명', render: (c: Contract) => (c as any).partner?.name || '-' },
@@ -82,14 +97,30 @@ export default function EventContractsPage() {
         </Card>
       )}
 
+      {/* Partner Filter */}
+      {!loading && partnerNames.length > 1 && (
+        <div className="mb-4">
+          <select
+            value={partnerFilter}
+            onChange={(e) => setPartnerFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">전체 업체</option>
+            {partnerNames.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {loading ? (
         <div className="h-48 bg-white rounded-2xl animate-pulse" />
-      ) : contracts.length === 0 ? (
+      ) : filteredContracts.length === 0 ? (
         <EmptyState title="계약이 없습니다" />
       ) : (
         <Table
           columns={columns}
-          data={contracts}
+          data={filteredContracts}
           onRowClick={(c) => router.push(`/organizer/events/${id}/contracts/${c.id}`)}
         />
       )}

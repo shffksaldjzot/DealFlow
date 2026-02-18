@@ -8,7 +8,7 @@ import Badge from '@/components/ui/Badge';
 import Table from '@/components/ui/Table';
 import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
-import { Calendar, MapPin, Percent, FileText, Plus, QrCode } from 'lucide-react';
+import { Calendar, MapPin, Percent, FileText, Plus, QrCode, XCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import type { Event } from '@/types/event';
@@ -26,6 +26,9 @@ export default function PartnerEventDetailPage() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
+  const [cancelContractId, setCancelContractId] = useState<string | null>(null);
+  const [contractCancelReason, setContractCancelReason] = useState('');
+  const [contractCancelling, setContractCancelling] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -36,6 +39,26 @@ export default function PartnerEventDetailPage() {
       .catch(() => toast('데이터를 불러올 수 없습니다.', 'error'))
       .finally(() => setLoading(false));
   }, [id, toast]);
+
+  const handleCancelContract = async () => {
+    if (!cancelContractId || !contractCancelReason.trim()) {
+      toast('취소 사유를 입력해주세요.', 'error');
+      return;
+    }
+    setContractCancelling(true);
+    try {
+      await api.post(`/contracts/${cancelContractId}/cancel`, { reason: contractCancelReason });
+      toast('계약이 파기되었습니다.', 'success');
+      setCancelContractId(null);
+      setContractCancelReason('');
+      // Refresh contracts
+      api.get('/contracts', { params: { eventId: id } }).then((res) => setContracts(extractData(res))).catch(() => {});
+    } catch {
+      toast('파기에 실패했습니다.', 'error');
+    } finally {
+      setContractCancelling(false);
+    }
+  };
 
   const handleCancelParticipation = async () => {
     setCancelling(true);
@@ -141,6 +164,20 @@ export default function PartnerEventDetailPage() {
       render: (item: Contract) => (
         <span className="text-gray-500">{formatDate(item.createdAt)}</span>
       ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      render: (item: Contract) =>
+        item.status !== 'completed' && item.status !== 'cancelled' ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); setCancelContractId(item.id); }}
+            className="p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+            title="파기"
+          >
+            <XCircle className="w-4 h-4" />
+          </button>
+        ) : null,
     },
   ];
 
@@ -302,6 +339,34 @@ export default function PartnerEventDetailPage() {
           참여 취소
         </button>
       </div>
+
+      {/* Contract Cancel Dialog */}
+      {cancelContractId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-lg font-bold text-gray-900">계약 파기</h3>
+            <p className="text-sm text-gray-500">이 계약을 파기하시겠습니까?</p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">파기 사유</label>
+              <textarea
+                value={contractCancelReason}
+                onChange={(e) => setContractCancelReason(e.target.value)}
+                placeholder="파기 사유를 입력하세요"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={3}
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button variant="secondary" onClick={() => { setCancelContractId(null); setContractCancelReason(''); }}>
+                닫기
+              </Button>
+              <Button variant="danger" onClick={handleCancelContract} loading={contractCancelling} disabled={!contractCancelReason.trim()}>
+                파기하기
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cancel Confirmation Dialog */}
       {showCancelDialog && (

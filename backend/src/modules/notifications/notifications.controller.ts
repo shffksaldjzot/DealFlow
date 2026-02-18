@@ -19,6 +19,11 @@ export class NotificationsController {
     return { count };
   }
 
+  @Patch('read-all')
+  markAllAsRead(@CurrentUser('id') userId: string) {
+    return this.notificationsService.markAllAsRead(userId);
+  }
+
   @Patch(':id/read')
   markAsRead(
     @Param('id', ParseUUIDPipe) id: string,

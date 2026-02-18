@@ -349,6 +349,113 @@ export class EventsService {
     };
   }
 
+  async getSettlement(
+    eventId: string,
+    userId: string,
+  ): Promise<{
+    partners: Array<{
+      partnerId: string;
+      partnerName: string;
+      contractCount: number;
+      totalAmount: number;
+      commissionRate: number;
+      commissionAmount: number;
+    }>;
+    totals: {
+      contractCount: number;
+      totalAmount: number;
+      totalCommission: number;
+    };
+    eventCommissionRate: number;
+  }> {
+    const orgId = await this.getOrgIdForUser(userId);
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId, organizerId: orgId },
+    });
+    if (!event) {
+      throw new NotFoundException('이벤트를 찾을 수 없거나 접근 권한이 없습니다.');
+    }
+
+    const eventPartners = await this.eventPartnerRepository.find({
+      where: { eventId },
+      relations: ['partner'],
+    });
+
+    const contracts = await this.contractRepository.find({
+      where: { eventId },
+    });
+
+    const partnerMap = new Map<string, {
+      partnerId: string;
+      partnerName: string;
+      contractCount: number;
+      totalAmount: number;
+      commissionRate: number;
+    }>();
+
+    for (const ep of eventPartners) {
+      partnerMap.set(ep.partnerId, {
+        partnerId: ep.partnerId,
+        partnerName: ep.partner?.name || '업체',
+        contractCount: 0,
+        totalAmount: 0,
+        commissionRate: ep.commissionRate != null ? Number(ep.commissionRate) : Number(event.commissionRate),
+      });
+    }
+
+    for (const contract of contracts) {
+      if (contract.status === 'cancelled') continue;
+      const entry = partnerMap.get(contract.partnerId);
+      if (entry) {
+        entry.contractCount++;
+        entry.totalAmount += Number(contract.totalAmount || 0);
+      }
+    }
+
+    const partners = Array.from(partnerMap.values()).map((p) => ({
+      ...p,
+      commissionAmount: Math.round(p.totalAmount * p.commissionRate / 100),
+    }));
+
+    const totals = {
+      contractCount: partners.reduce((sum, p) => sum + p.contractCount, 0),
+      totalAmount: partners.reduce((sum, p) => sum + p.totalAmount, 0),
+      totalCommission: partners.reduce((sum, p) => sum + p.commissionAmount, 0),
+    };
+
+    return {
+      partners,
+      totals,
+      eventCommissionRate: Number(event.commissionRate),
+    };
+  }
+
+  async updatePartnerCommission(
+    eventId: string,
+    partnerId: string,
+    userId: string,
+    commissionRate: number,
+  ): Promise<EventPartner> {
+    const orgId = await this.getOrgIdForUser(userId);
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId, organizerId: orgId },
+    });
+    if (!event) {
+      throw new NotFoundException('이벤트를 찾을 수 없거나 권한이 없습니다.');
+    }
+
+    const eventPartner = await this.eventPartnerRepository.findOne({
+      where: { eventId, partnerId },
+      relations: ['partner'],
+    });
+    if (!eventPartner) {
+      throw new NotFoundException('해당 파트너를 찾을 수 없습니다.');
+    }
+
+    eventPartner.commissionRate = commissionRate;
+    return this.eventPartnerRepository.save(eventPartner);
+  }
+
   async getEventContractDetail(
     eventId: string,
     contractId: string,

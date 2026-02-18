@@ -6,14 +6,16 @@ import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { FileText, ChevronRight, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera, X } from 'lucide-react';
+import { FileText, ChevronRight, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera, X, XCircle } from 'lucide-react';
 import { formatDateTime, formatDate } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
+import { useToast } from '@/components/ui/Toast';
 import type { EventVisit } from '@/types/event';
 
 export default function CustomerHome() {
   const { user } = useAuthStore();
   const router = useRouter();
+  const { toast } = useToast();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [visits, setVisits] = useState<EventVisit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,12 +24,28 @@ export default function CustomerHome() {
   const [showScanner, setShowScanner] = useState(false);
   const scannerRef = useRef<any>(null);
 
+  const fetchContracts = () => {
+    api.get('/customer/contracts').then((res) => setContracts(extractData(res))).catch(() => {});
+  };
+
   useEffect(() => {
     Promise.all([
       api.get('/customer/contracts').then((res) => setContracts(extractData(res))).catch(() => {}),
       api.get('/event-visits/my').then((res) => setVisits(extractData(res))).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, []);
+
+  const handleCancelContract = async (contractId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('이 계약을 취소하시겠습니까?')) return;
+    try {
+      await api.post(`/customer/contracts/${contractId}/cancel`);
+      toast('계약이 취소되었습니다.', 'success');
+      fetchContracts();
+    } catch {
+      toast('취소에 실패했습니다.', 'error');
+    }
+  };
 
   const pendingContracts = contracts.filter(
     (c) => c.status === 'pending' || c.status === 'in_progress',
@@ -269,9 +287,18 @@ export default function CustomerHome() {
                       <span className="text-xs text-gray-400">{formatDateTime(c.createdAt)}</span>
                     </div>
                   </div>
-                  <Button size="sm" onClick={(e) => { e.stopPropagation(); router.push(`/customer/contracts/${c.id}`); }}>
-                    서명하기
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => handleCancelContract(c.id, e)}
+                      className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                      title="취소"
+                    >
+                      <XCircle className="w-4 h-4" />
+                    </button>
+                    <Button size="sm" onClick={(e) => { e.stopPropagation(); router.push(`/customer/contracts/${c.id}`); }}>
+                      서명하기
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))}

@@ -16,6 +16,7 @@ import {
   X,
   ClipboardList,
   UserCheck,
+  Bell,
 } from 'lucide-react';
 
 interface NavItem {
@@ -33,12 +34,14 @@ const navItems: Record<string, NavItem[]> = {
   organizer: [
     { label: '대시보드', href: '/organizer', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '행사 관리', href: '/organizer/events', icon: <Calendar className="w-5 h-5" /> },
+    { label: '알림', href: '/organizer/notifications', icon: <Bell className="w-5 h-5" />, badgeKey: 'unreadNotifications' },
     { label: '마이페이지', href: '/organizer/settings', icon: <Building2 className="w-5 h-5" /> },
   ],
   partner: [
     { label: '대시보드', href: '/partner', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '참여 행사', href: '/partner/events', icon: <Calendar className="w-5 h-5" /> },
     { label: '행사 참여', href: '/partner/events/join', icon: <QrCode className="w-5 h-5" /> },
+    { label: '알림', href: '/partner/notifications', icon: <Bell className="w-5 h-5" />, badgeKey: 'unreadNotifications' },
     { label: '마이페이지', href: '/partner/settings', icon: <Building2 className="w-5 h-5" /> },
   ],
   admin: [
@@ -47,11 +50,13 @@ const navItems: Record<string, NavItem[]> = {
     { label: '사용자 관리', href: '/admin/users', icon: <Users className="w-5 h-5" /> },
     { label: '행사 관리', href: '/admin/events', icon: <Calendar className="w-5 h-5" /> },
     { label: '계약 관리', href: '/admin/contracts', icon: <FileText className="w-5 h-5" /> },
+    { label: '알림', href: '/admin/notifications', icon: <Bell className="w-5 h-5" />, badgeKey: 'unreadNotifications' },
     { label: '활동 로그', href: '/admin/logs', icon: <ClipboardList className="w-5 h-5" /> },
   ],
   customer: [
     { label: '홈', href: '/customer', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '내 계약', href: '/customer/contracts', icon: <FileText className="w-5 h-5" /> },
+    { label: '알림', href: '/customer/notifications', icon: <Bell className="w-5 h-5" />, badgeKey: 'unreadNotifications' },
     { label: '프로필', href: '/customer/profile', icon: <Settings className="w-5 h-5" /> },
   ],
 };
@@ -101,12 +106,20 @@ export default function Sidebar({ role }: SidebarProps) {
   const items = navItems[role] || [];
 
   useEffect(() => {
+    // Fetch unread notification count for all roles
+    api.get('/notifications/unread-count')
+      .then((res) => {
+        const data = extractData<{ count: number }>(res);
+        setBadges((prev) => ({ ...prev, unreadNotifications: data.count }));
+      })
+      .catch(() => {});
+
     if (role === 'admin') {
       api.get('/admin/dashboard')
         .then((res) => {
           const data = extractData<any>(res);
           const pending = (data.pendingOrganizations || 0) + (data.pendingPartners || 0);
-          setBadges({ pendingApprovals: pending });
+          setBadges((prev) => ({ ...prev, pendingApprovals: pending }));
         })
         .catch(() => {});
     }

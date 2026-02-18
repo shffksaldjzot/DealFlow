@@ -2,8 +2,9 @@
 import { useEffect, useState } from 'react';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
-import { Bell, Check } from 'lucide-react';
+import { Bell, Check, CheckCheck } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import type { Notification } from '@/types/notification';
 
@@ -25,11 +26,28 @@ export default function AdminNotifications() {
     } catch {}
   };
 
+  const handleMarkAllRead = async () => {
+    try {
+      await api.patch('/notifications/read-all');
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    } catch {}
+  };
+
   const unread = notifications.filter((n) => !n.isRead).length;
 
   return (
     <div>
-      <PageHeader title="알림" subtitle={unread > 0 ? `읽지 않은 알림 ${unread}개` : '모든 알림을 확인했습니다'} />
+      <PageHeader
+        title="알림"
+        subtitle={unread > 0 ? `읽지 않은 알림 ${unread}개` : '모든 알림을 확인했습니다'}
+        actions={
+          unread > 0 ? (
+            <Button variant="outline" size="sm" onClick={handleMarkAllRead}>
+              <CheckCheck className="w-4 h-4 mr-1" /> 모두 읽음
+            </Button>
+          ) : undefined
+        }
+      />
 
       {loading ? (
         <div className="space-y-3">

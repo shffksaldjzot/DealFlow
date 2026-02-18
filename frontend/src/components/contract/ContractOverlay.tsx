@@ -88,10 +88,22 @@ export default function ContractOverlay({
                   </label>
                 ) : (
                   <input
-                    type={field.fieldType === 'date' ? 'date' : field.fieldType === 'number' || field.fieldType === 'amount' ? 'number' : 'text'}
+                    type={field.fieldType === 'date' ? 'date' : 'text'}
+                    inputMode={field.fieldType === 'number' || field.fieldType === 'amount' ? 'numeric' : undefined}
                     placeholder={field.placeholder || field.label}
-                    value={fieldValues[field.id] || ''}
-                    onChange={(e) => onFieldChange(field.id, e.target.value)}
+                    value={
+                      (field.fieldType === 'number' || field.fieldType === 'amount') && fieldValues[field.id]
+                        ? Number(fieldValues[field.id]).toLocaleString('ko-KR')
+                        : fieldValues[field.id] || ''
+                    }
+                    onChange={(e) => {
+                      if (field.fieldType === 'number' || field.fieldType === 'amount') {
+                        const raw = e.target.value.replace(/[^0-9]/g, '');
+                        onFieldChange(field.id, raw);
+                      } else {
+                        onFieldChange(field.id, e.target.value);
+                      }
+                    }}
                     className="w-full px-2 py-1 text-sm border border-blue-300 rounded bg-white/90 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 )}
@@ -129,16 +141,22 @@ export default function ContractOverlay({
                     {field.isRequired && <span className="text-red-500 ml-1">*</span>}
                   </label>
                   <input
-                    type={
-                      field.fieldType === 'amount' || field.fieldType === 'number'
-                        ? 'number'
-                        : field.fieldType === 'date'
-                          ? 'date'
-                          : 'text'
-                    }
+                    type={field.fieldType === 'date' ? 'date' : 'text'}
+                    inputMode={field.fieldType === 'number' || field.fieldType === 'amount' ? 'numeric' : undefined}
                     placeholder={field.placeholder || ''}
-                    value={fieldValues[field.id] || ''}
-                    onChange={(e) => onFieldChange(field.id, e.target.value)}
+                    value={
+                      (field.fieldType === 'number' || field.fieldType === 'amount') && fieldValues[field.id]
+                        ? Number(fieldValues[field.id]).toLocaleString('ko-KR')
+                        : fieldValues[field.id] || ''
+                    }
+                    onChange={(e) => {
+                      if (field.fieldType === 'number' || field.fieldType === 'amount') {
+                        const raw = e.target.value.replace(/[^0-9]/g, '');
+                        onFieldChange(field.id, raw);
+                      } else {
+                        onFieldChange(field.id, e.target.value);
+                      }
+                    }}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
