@@ -47,6 +47,9 @@ export class Organization {
   @Column({ name: 'contact_email', length: 255, nullable: true })
   contactEmail: string;
 
+  @Column({ name: 'emergency_email', type: 'varchar', length: 255, nullable: true })
+  emergencyEmail: string;
+
   @Column({ type: 'text', nullable: true })
   address: string;
 

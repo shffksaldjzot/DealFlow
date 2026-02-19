@@ -20,6 +20,7 @@ export default function PartnerSettingsPage() {
     contactPhone: '',
     contactEmail: '',
     address: '',
+    items: '',
     businessLicenseFileId: '',
   });
   const [licenseFileName, setLicenseFileName] = useState('');
@@ -35,6 +36,7 @@ export default function PartnerSettingsPage() {
           contactPhone: data.contactPhone || '',
           contactEmail: data.contactEmail || '',
           address: data.address || '',
+          items: data.items || '',
           businessLicenseFileId: data.businessLicenseFileId || '',
         });
         // Load business license preview
@@ -109,6 +111,17 @@ export default function PartnerSettingsPage() {
           <Input label="연락처" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} />
           <Input label="이메일" type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
           <Input label="주소" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+
+          {/* 기본 품목 */}
+          <div>
+            <Input
+              label="기본 취급 품목"
+              value={form.items}
+              onChange={(e) => setForm({ ...form, items: e.target.value })}
+              placeholder="예: 줄눈, 탄성코트, 가구, 가전, 도어락"
+            />
+            <p className="text-xs text-gray-400 mt-1">쉼표(,)로 구분하여 입력하세요. 행사 참가 시 기본 품목으로 자동 설정됩니다.</p>
+          </div>
 
           {/* Business License Upload + Preview */}
           <div>

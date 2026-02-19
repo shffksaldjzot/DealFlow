@@ -6,7 +6,7 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
-import { Calendar, FileText, Users, Plus, ChevronRight, Settings, ClipboardList } from 'lucide-react';
+import { Calendar, FileText, Users, Plus, ChevronRight, Settings, ClipboardList, Clock } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { Event } from '@/types/event';
 
@@ -29,6 +29,18 @@ export default function OrganizerDashboard() {
     (acc, e) => acc + (e.partners?.filter((p: any) => p.status === 'approved')?.length || 0),
     0,
   );
+
+  // Extract pending partner requests across all events
+  const pendingPartnerRequests = events.flatMap((event) =>
+    (event.partners || [])
+      .filter((p: any) => p.status === 'pending')
+      .map((p: any) => ({
+        eventId: event.id,
+        eventName: event.name,
+        partnerName: p.organization?.name || '업체명 미확인',
+        appliedAt: p.createdAt,
+      }))
+  ).sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
 
   const stats = [
     { label: '진행 중', value: String(activeEvents.length), icon: Calendar, color: 'text-green-600 bg-green-50' },
@@ -96,6 +108,41 @@ export default function OrganizerDashboard() {
           </div>
         </Card>
       </div>
+
+      {/* Pending Partner Requests */}
+      {!loading && pendingPartnerRequests.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 mb-3">
+            <h3 className="text-sm font-semibold text-gray-700">참가 대기 요청</h3>
+            <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
+              {pendingPartnerRequests.length}
+            </span>
+          </div>
+          <div className="space-y-2 mb-8">
+            {pendingPartnerRequests.map((req, i) => (
+              <Card
+                key={i}
+                hoverable
+                onClick={() => router.push(`/organizer/events/${req.eventId}/partners`)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock className="w-4 h-4 text-orange-500 shrink-0" />
+                      <p className="text-sm font-semibold text-gray-900 truncate">{req.partnerName}</p>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-gray-400 ml-6">
+                      <span>{req.eventName}</span>
+                      <span>{formatDate(req.appliedAt)}</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Recent Events with more detail */}
       <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 행사</h3>

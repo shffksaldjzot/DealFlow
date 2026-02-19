@@ -26,6 +26,7 @@ export default function EventPartnersPage() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const [partners, setPartners] = useState<EventPartner[]>([]);
+  const [eventName, setEventName] = useState('');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<PartnerTabKey>('all');
   const [cancelTarget, setCancelTarget] = useState<EventPartner | null>(null);
@@ -38,7 +39,16 @@ export default function EventPartnersPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchPartners(); }, [id]);
+  useEffect(() => {
+    fetchPartners();
+    // Fetch event name
+    api.get(`/events/${id}`)
+      .then((res) => {
+        const event = extractData<any>(res);
+        setEventName(event.name || '');
+      })
+      .catch(() => {});
+  }, [id]);
 
   const handleAction = async (partnerId: string, status: 'approved' | 'rejected') => {
     try {
@@ -79,7 +89,7 @@ export default function EventPartnersPage() {
     <div>
       <PageHeader
         title="협력업체 관리"
-        subtitle="참여 신청한 협력업체를 승인/거절하세요"
+        subtitle={eventName ? `${eventName} - 참여 신청한 협력업체를 승인/거절하세요` : '참여 신청한 협력업체를 승인/거절하세요'}
         backHref={`/organizer/events/${id}`}
       />
 
@@ -126,7 +136,14 @@ export default function EventPartnersPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-bold text-gray-900">{ep.partner?.name || '업체'}</h3>
-                    <Badge status={ep.status} />
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Badge status={ep.status} />
+                      {eventName && (
+                        <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                          {eventName}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {ep.status === 'pending' && (
                     <div className="flex gap-2">

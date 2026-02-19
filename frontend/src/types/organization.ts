@@ -10,6 +10,7 @@ export interface Organization {
   representativeName?: string;
   contactPhone?: string;
   contactEmail?: string;
+  emergencyEmail?: string;
   address?: string;
   items?: string;
   status: OrgStatus;

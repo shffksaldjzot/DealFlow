@@ -111,6 +111,7 @@ export class OrganizationsService {
       org.representativeName = dto.representativeName;
     if (dto.contactPhone !== undefined) org.contactPhone = dto.contactPhone;
     if (dto.contactEmail !== undefined) org.contactEmail = dto.contactEmail;
+    if (dto.emergencyEmail !== undefined) org.emergencyEmail = dto.emergencyEmail;
     if (dto.address !== undefined) org.address = dto.address;
     if (dto.items !== undefined) org.items = dto.items;
 

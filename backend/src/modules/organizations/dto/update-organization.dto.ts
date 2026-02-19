@@ -30,6 +30,10 @@ export class UpdateOrganizationDto {
   contactEmail?: string;
 
   @IsOptional()
+  @IsEmail()
+  emergencyEmail?: string;
+
+  @IsOptional()
   @IsString()
   address?: string;
 
