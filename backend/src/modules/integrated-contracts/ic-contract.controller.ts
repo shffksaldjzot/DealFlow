@@ -9,6 +9,7 @@ import {
 import { IcContractService } from './ic-contract.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 import { CreateIcContractDto } from './dto/create-ic-contract.dto';
 
 @Controller('ic')
@@ -17,11 +18,13 @@ export class IcContractController {
 
   // --- 고객 계약 플로우 ---
 
+  @Public()
   @Get('contract-flow/:eventId')
   getContractFlow(@Param('eventId', ParseUUIDPipe) eventId: string) {
     return this.icContractService.getContractFlow(eventId);
   }
 
+  @Public()
   @Get('contract-flow/:eventId/type/:typeId')
   getContractFlowByType(
     @Param('eventId', ParseUUIDPipe) eventId: string,
@@ -30,11 +33,13 @@ export class IcContractController {
     return this.icContractService.getContractFlowByType(eventId, typeId);
   }
 
+  @Public()
   @Get('contract-flow-by-code/:inviteCode')
   getContractFlowByInviteCode(@Param('inviteCode') inviteCode: string) {
     return this.icContractService.getContractFlowByInviteCode(inviteCode);
   }
 
+  @Public()
   @Get('contract-flow-by-code/:inviteCode/type/:typeId')
   getContractFlowByCodeAndType(
     @Param('inviteCode') inviteCode: string,
@@ -58,6 +63,7 @@ export class IcContractController {
     return this.icContractService.findMyContracts(userId);
   }
 
+  @Public()
   @Get('contracts/short/:shortCode')
   findByShortCode(@Param('shortCode') shortCode: string) {
     return this.icContractService.findByShortCode(shortCode);
