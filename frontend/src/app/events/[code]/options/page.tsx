@@ -10,7 +10,7 @@ import { ArrowRight, Home } from 'lucide-react';
 import type { IcContractFlow, IcApartmentType } from '@/types/integrated-contract';
 
 export default function OptionsTypePage() {
-  const { id: eventId } = useParams<{ id: string }>();
+  const { code } = useParams<{ code: string }>();
   const router = useRouter();
 
   const [flow, setFlow] = useState<IcContractFlow | null>(null);
@@ -18,7 +18,7 @@ export default function OptionsTypePage() {
   const [selectedType, setSelectedType] = useState<IcApartmentType | null>(null);
 
   useEffect(() => {
-    api.get(`/ic/contract-flow/${eventId}`)
+    api.get(`/ic/contract-flow-by-code/${code}`)
       .then((res) => {
         const data = extractData<IcContractFlow>(res);
         setFlow(data);
@@ -28,7 +28,7 @@ export default function OptionsTypePage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [eventId]);
+  }, [code]);
 
   if (loading) {
     return (
@@ -86,7 +86,7 @@ export default function OptionsTypePage() {
           fullWidth
           size="lg"
           disabled={!selectedType}
-          onClick={() => selectedType && router.push(`/events/${eventId}/options/${selectedType.id}`)}
+          onClick={() => selectedType && router.push(`/events/${code}/options/${selectedType.id}`)}
         >
           옵션 선택하기
           <ArrowRight className="w-5 h-5 ml-2" />

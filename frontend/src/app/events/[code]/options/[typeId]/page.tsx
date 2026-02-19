@@ -12,7 +12,7 @@ import { ArrowLeft, PenTool, CheckCircle } from 'lucide-react';
 import type { IcContractFlow, IcSelectedItem } from '@/types/integrated-contract';
 
 export default function OptionsSelectPage() {
-  const { id: eventId, typeId } = useParams<{ id: string; typeId: string }>();
+  const { code, typeId } = useParams<{ code: string; typeId: string }>();
   const router = useRouter();
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuthStore();
@@ -32,11 +32,11 @@ export default function OptionsSelectPage() {
   const [hasSignature, setHasSignature] = useState(false);
 
   useEffect(() => {
-    api.get(`/ic/contract-flow/${eventId}/type/${typeId}`)
+    api.get(`/ic/contract-flow-by-code/${code}/type/${typeId}`)
       .then((res) => setFlow(extractData<IcContractFlow>(res)))
       .catch(() => toast('데이터를 불러올 수 없습니다.', 'error'))
       .finally(() => setLoading(false));
-  }, [eventId, typeId, toast]);
+  }, [code, typeId, toast]);
 
   useEffect(() => {
     if (user) {
@@ -108,7 +108,7 @@ export default function OptionsSelectPage() {
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {
-      router.push(`/login?redirect=/events/${eventId}/options/${typeId}`);
+      router.push(`/login?redirect=/events/${code}/options/${typeId}`);
       return;
     }
 

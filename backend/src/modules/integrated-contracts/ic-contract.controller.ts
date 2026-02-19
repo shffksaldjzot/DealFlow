@@ -30,6 +30,19 @@ export class IcContractController {
     return this.icContractService.getContractFlowByType(eventId, typeId);
   }
 
+  @Get('contract-flow-by-code/:inviteCode')
+  getContractFlowByInviteCode(@Param('inviteCode') inviteCode: string) {
+    return this.icContractService.getContractFlowByInviteCode(inviteCode);
+  }
+
+  @Get('contract-flow-by-code/:inviteCode/type/:typeId')
+  getContractFlowByCodeAndType(
+    @Param('inviteCode') inviteCode: string,
+    @Param('typeId', ParseUUIDPipe) typeId: string,
+  ) {
+    return this.icContractService.getContractFlowByInviteCodeAndType(inviteCode, typeId);
+  }
+
   @Post('contracts')
   @Roles('customer')
   createContract(

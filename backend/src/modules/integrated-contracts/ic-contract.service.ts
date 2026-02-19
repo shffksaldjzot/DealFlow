@@ -394,4 +394,24 @@ export class IcContractService {
       order: { createdAt: 'DESC' },
     });
   }
+
+  private async resolveEventIdByInviteCode(inviteCode: string): Promise<string> {
+    const event = await this.eventRepository.findOne({
+      where: { inviteCode },
+    });
+    if (!event) {
+      throw new NotFoundException('해당 초대코드의 행사를 찾을 수 없습니다.');
+    }
+    return event.id;
+  }
+
+  async getContractFlowByInviteCode(inviteCode: string) {
+    const eventId = await this.resolveEventIdByInviteCode(inviteCode);
+    return this.getContractFlow(eventId);
+  }
+
+  async getContractFlowByInviteCodeAndType(inviteCode: string, typeId: string) {
+    const eventId = await this.resolveEventIdByInviteCode(inviteCode);
+    return this.getContractFlowByType(eventId, typeId);
+  }
 }
