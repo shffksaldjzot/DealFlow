@@ -20,6 +20,8 @@ import { UpdateEventStatusDto } from './dto/update-event-status.dto';
 import { UpdatePartnerStatusDto } from './dto/update-partner-status.dto';
 import { generateInviteCode } from '../../common/utils/code-generator';
 import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { MemberRole } from '../organizations/entities/organization-member.entity';
 
 @Injectable()
 export class EventsService {
@@ -35,6 +37,7 @@ export class EventsService {
     @InjectRepository(Organization)
     private readonly orgRepository: Repository<Organization>,
     private readonly activityLogService: ActivityLogService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private async getOrgIdForUser(userId: string, requireApproved = false): Promise<string> {
@@ -293,6 +296,42 @@ export class EventsService {
       'event_partner',
       eventPartner.id,
     );
+
+    // Notify partner organization owner about status change
+    try {
+      const partnerOwner = await this.memberRepository.findOne({
+        where: { organizationId: partnerId, role: MemberRole.OWNER },
+      });
+      if (partnerOwner) {
+        const notifMap: Record<string, { title: string; message: string }> = {
+          [EventPartnerStatus.APPROVED]: {
+            title: `행사 참가가 승인되었습니다`,
+            message: `"${organizerName}" 주관사가 행사 "${event.name}"의 참가 신청을 승인했습니다. 이제 해당 행사에서 계약서를 작성할 수 있습니다.`,
+          },
+          [EventPartnerStatus.REJECTED]: {
+            title: `행사 참가가 거절되었습니다`,
+            message: `"${organizerName}" 주관사가 행사 "${event.name}"의 참가 신청을 거절했습니다. 자세한 사항은 주관사에 문의해주세요.`,
+          },
+          [EventPartnerStatus.CANCELLED]: {
+            title: `행사 참가 승인이 취소되었습니다`,
+            message: `"${organizerName}" 주관사가 행사 "${event.name}"의 참가 승인을 취소했습니다.${dto.cancelReason ? ` 사유: ${dto.cancelReason}` : ' 자세한 사항은 주관사에 문의해주세요.'}`,
+          },
+        };
+        const notif = notifMap[dto.status];
+        if (notif) {
+          await this.notificationsService.createNotification({
+            userId: partnerOwner.userId,
+            type: `partner_${dto.status}`,
+            title: notif.title,
+            message: notif.message,
+            relatedId: event.id,
+            relatedType: 'event',
+          });
+        }
+      }
+    } catch {
+      // Do not fail the status update flow if notification fails
+    }
 
     return saved;
   }

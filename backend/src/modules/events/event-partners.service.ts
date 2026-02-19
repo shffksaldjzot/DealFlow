@@ -107,11 +107,12 @@ export class EventPartnersService {
         where: { organizationId: event.organizerId, role: MemberRole.OWNER },
       });
       if (organizerOwner) {
+        const itemsInfo = partnerItems ? ` (품목: ${partnerItems})` : '';
         await this.notificationsService.createNotification({
           userId: organizerOwner.userId,
           type: 'partner_joined',
-          title: '새로운 파트너가 행사 참여를 요청했습니다',
-          message: `행사 "${event.name}"에 "${partnerName}"이(가) 참여를 요청했습니다.`,
+          title: `[${event.name}] 새로운 협력업체 참가 요청`,
+          message: `"${partnerName}"이(가) 행사 "${event.name}"에 참가를 요청했습니다.${itemsInfo} 협력업체 관리에서 승인 또는 거절해주세요.`,
           relatedId: event.id,
           relatedType: 'event',
         });

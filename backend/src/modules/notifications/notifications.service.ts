@@ -79,18 +79,18 @@ export class NotificationsService {
   ): Promise<Notification> {
     const titleMap: Record<string, string> = {
       contract_created: '새 계약서가 생성되었습니다',
-      contract_signed: '계약서가 서명되었습니다',
-      contract_completed: '계약이 완료되었습니다',
+      contract_signed: '계약서 서명이 완료되었습니다',
+      contract_completed: '계약이 최종 완료되었습니다',
       contract_cancelled: '계약이 취소되었습니다',
-      contract_in_progress: '계약서 작성이 시작되었습니다',
+      contract_in_progress: '고객이 계약서 작성을 시작했습니다',
     };
 
     const contentMap: Record<string, string> = {
-      contract_created: '새로운 계약서가 생성되어 고객의 서명을 기다리고 있습니다.',
-      contract_signed: '고객이 계약서에 서명을 완료했습니다. 확인해 주세요.',
-      contract_completed: '계약이 성공적으로 완료되었습니다.',
-      contract_cancelled: '계약이 취소되었습니다. 상세 내용을 확인해 주세요.',
-      contract_in_progress: '고객이 계약서 작성을 시작했습니다.',
+      contract_created: '새로운 계약서가 생성되어 고객의 서명을 기다리고 있습니다. QR코드를 고객에게 전달해주세요.',
+      contract_signed: '고객이 계약서에 서명을 완료했습니다. 계약 내용과 서명을 확인해주세요.',
+      contract_completed: '계약이 성공적으로 완료되었습니다. 정산 내역에서 확인할 수 있습니다.',
+      contract_cancelled: '계약이 취소되었습니다. 취소 사유와 상세 내용을 확인해주세요.',
+      contract_in_progress: '고객이 계약서 필드를 작성하기 시작했습니다. 서명 완료 시 별도로 알림을 보내드립니다.',
     };
 
     const notification = this.notificationRepository.create({

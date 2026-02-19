@@ -274,6 +274,9 @@ export class ContractFlowService {
 
     // Send notifications after successful signature
     try {
+      const eventName = contract.event?.name || '행사';
+      const partnerName = contract.partner?.name || '협력업체';
+
       // Notify the partner org owner
       const partnerOwner = await this.memberRepository.findOne({
         where: { organizationId: contract.partnerId, role: MemberRole.OWNER },
@@ -282,8 +285,8 @@ export class ContractFlowService {
         await this.notificationsService.createNotification({
           userId: partnerOwner.userId,
           type: 'contract_signed',
-          title: '새로운 계약 서명이 완료되었습니다',
-          message: `계약번호 ${contract.contractNumber}의 서명이 완료되었습니다.`,
+          title: `[${eventName}] 새로운 계약 서명 완료`,
+          message: `행사 "${eventName}"에서 계약번호 ${contract.contractNumber}의 고객 서명이 완료되었습니다. 계약 내용을 확인해주세요.`,
           relatedId: contract.id,
           relatedType: 'contract',
         });
@@ -295,8 +298,8 @@ export class ContractFlowService {
         await this.notificationsService.createNotification({
           userId: customerUserId,
           type: 'contract_signed',
-          title: '계약 서명이 완료되었습니다',
-          message: `계약번호 ${contract.contractNumber}의 서명이 완료되었습니다.`,
+          title: `[${partnerName}] 계약 서명 완료`,
+          message: `"${partnerName}"과의 계약(${contract.contractNumber}) 서명이 완료되었습니다. 행사: ${eventName}`,
           relatedId: contract.id,
           relatedType: 'contract',
         });
