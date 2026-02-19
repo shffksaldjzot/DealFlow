@@ -56,6 +56,7 @@ const navItems: Record<string, NavItem[]> = {
   customer: [
     { label: '홈', href: '/customer', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '내 계약', href: '/customer/contracts', icon: <FileText className="w-5 h-5" /> },
+    { label: '통합 계약', href: '/customer/integrated-contracts', icon: <ClipboardList className="w-5 h-5" /> },
     { label: '알림', href: '/customer/notifications', icon: <Bell className="w-5 h-5" />, badgeKey: 'unreadNotifications' },
     { label: '프로필', href: '/customer/profile', icon: <Settings className="w-5 h-5" /> },
   ],

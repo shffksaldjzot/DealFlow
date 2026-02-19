@@ -8,7 +8,7 @@ import Badge from '@/components/ui/Badge';
 import Table from '@/components/ui/Table';
 import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
-import { Calendar, MapPin, Percent, FileText, Plus, QrCode, XCircle } from 'lucide-react';
+import { Calendar, MapPin, Percent, FileText, Plus, QrCode, XCircle, FileSpreadsheet } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import type { Event } from '@/types/event';
@@ -229,6 +229,22 @@ export default function PartnerEventDetailPage() {
 
       <div className="mb-2">
         <Badge status={event.status} />
+      </div>
+
+      {/* Integrated Contract Sheet */}
+      <div className="mt-6">
+        <Card hoverable onClick={() => router.push(`/partner/events/${id}/sheet`)}>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-indigo-50 rounded-xl">
+              <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-gray-900">통합 계약 시트</p>
+              <p className="text-sm text-gray-500">품목별 옵션 + 가격 시트를 편집합니다</p>
+            </div>
+            <span className="text-gray-400">→</span>
+          </div>
+        </Card>
       </div>
 
       {/* Contract Templates Section */}

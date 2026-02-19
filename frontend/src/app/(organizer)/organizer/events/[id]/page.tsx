@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
-import { Calendar, MapPin, Copy, Check, Users, FileText, Link2, QrCode, Trash2 } from 'lucide-react';
+import { Calendar, MapPin, Copy, Check, Users, FileText, Link2, QrCode, Trash2, Settings, ClipboardList } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/utils';
@@ -194,6 +194,34 @@ export default function EventDetailPage() {
             <div>
               <p className="font-semibold text-gray-900">계약 / 정산</p>
               <p className="text-sm text-gray-500">계약 현황 및 정산 관리</p>
+            </div>
+          </div>
+        </Card>
+        <Card
+          hoverable
+          onClick={() => router.push(`/organizer/events/${id}/ic-config`)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+              <Settings className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900">통합 계약 설정</p>
+              <p className="text-sm text-gray-500">타입·결제단계·약관</p>
+            </div>
+          </div>
+        </Card>
+        <Card
+          hoverable
+          onClick={() => router.push(`/organizer/events/${id}/ic-contracts`)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+              <ClipboardList className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900">통합 계약 현황</p>
+              <p className="text-sm text-gray-500">고객 통합 계약 조회</p>
             </div>
           </div>
         </Card>
