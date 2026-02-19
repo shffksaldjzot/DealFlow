@@ -4,6 +4,7 @@ import {
   IsString,
   IsNumber,
   IsUUID,
+  IsIn,
   ValidateNested,
   Min,
 } from 'class-validator';
@@ -21,6 +22,10 @@ export class SheetColumnItemDto {
   @IsOptional()
   @IsString()
   customName?: string;
+
+  @IsOptional()
+  @IsIn(['text', 'amount'])
+  columnType?: 'text' | 'amount';
 
   @IsOptional()
   @IsNumber()

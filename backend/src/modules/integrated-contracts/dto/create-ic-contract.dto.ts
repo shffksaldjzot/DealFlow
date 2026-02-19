@@ -43,4 +43,8 @@ export class CreateIcContractDto {
   @IsString()
   @Length(1, 20)
   customerPhone?: string;
+
+  @IsOptional()
+  @IsString()
+  specialNotes?: string;
 }

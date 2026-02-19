@@ -23,6 +23,9 @@ export class IcSheetColumn {
   @Column({ name: 'custom_name', length: 100, nullable: true })
   customName: string;
 
+  @Column({ name: 'column_type', type: 'varchar', length: 10, default: 'amount' })
+  columnType: 'text' | 'amount';
+
   @Column({ name: 'sort_order', type: 'int', default: 0 })
   sortOrder: number;
 

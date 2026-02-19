@@ -57,13 +57,14 @@ export class IcContractService {
       categories: {
         sheetId: string;
         categoryName: string;
-        columns: { id: string; apartmentTypeId: string; customName: string; sortOrder: number }[];
+        columns: { id: string; apartmentTypeId: string; customName: string; columnType: string; sortOrder: number }[];
         options: {
           rowId: string;
           optionName: string;
           popupContent: string;
           sortOrder: number;
           prices: Record<string, number>;
+          cellValues: Record<string, string>;
         }[];
       }[];
     }[];
@@ -105,6 +106,7 @@ export class IcContractService {
           id: col.id,
           apartmentTypeId: col.apartmentTypeId,
           customName: col.customName,
+          columnType: col.columnType || 'amount',
           sortOrder: col.sortOrder,
         }));
 
@@ -116,6 +118,7 @@ export class IcContractService {
           popupContent: row.popupContent,
           sortOrder: row.sortOrder,
           prices: row.prices || {},
+          cellValues: row.cellValues || {},
         }));
 
       partnerMap.get(partnerId).categories.push({
@@ -197,7 +200,9 @@ export class IcContractService {
         throw new NotFoundException(`옵션 "${item.rowId}"을 찾을 수 없습니다.`);
       }
 
-      const unitPrice = row.prices?.[item.columnId] ?? 0;
+      // cellValues takes priority; fall back to prices
+      const cellVal = row.cellValues?.[item.columnId];
+      const unitPrice = cellVal !== undefined ? (Number(cellVal) || 0) : (row.prices?.[item.columnId] ?? 0);
 
       selectedItems.push({
         sheetId: item.sheetId,
@@ -242,6 +247,7 @@ export class IcContractService {
       paymentSchedule,
       legalAgreed: true,
       signatureData: dto.signatureData,
+      specialNotes: dto.specialNotes || null,
       status: IcContractStatus.SIGNED,
       signedAt: new Date(),
     });

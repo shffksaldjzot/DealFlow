@@ -1,39 +1,224 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/authStore';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import ApartmentTypeSelector from '@/components/integrated-contract/ApartmentTypeSelector';
-import FloorPlanViewer from '@/components/integrated-contract/FloorPlanViewer';
-import { ArrowRight, Home } from 'lucide-react';
-import type { IcContractFlow, IcApartmentType } from '@/types/integrated-contract';
+import CustomerSheetView from '@/components/integrated-contract/CustomerSheetView';
+import SelectionSummary from '@/components/integrated-contract/SelectionSummary';
+import { useToast } from '@/components/ui/Toast';
+import { ArrowLeft, PenTool, CheckCircle, Home } from 'lucide-react';
+import type { IcContractFlow, IcSelectedItem, IcApartmentType } from '@/types/integrated-contract';
 
-export default function OptionsTypePage() {
+interface SelectedRow {
+  sheetId: string;
+  rowId: string;
+  optionName: string;
+  categoryName: string;
+  partnerName: string;
+}
+
+export default function OptionsPage() {
   const { code } = useParams<{ code: string }>();
   const router = useRouter();
+  const { toast } = useToast();
+  const { user, isAuthenticated } = useAuthStore();
 
   const [flow, setFlow] = useState<IcContractFlow | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedType, setSelectedType] = useState<IcApartmentType | null>(null);
+  const [selectedRows, setSelectedRows] = useState<SelectedRow[]>([]);
+  const [step, setStep] = useState<'select' | 'sign'>('select');
+  const [signing, setSigning] = useState(false);
+  const [legalAgreed, setLegalAgreed] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [specialNotes, setSpecialNotes] = useState('');
+
+  // Apartment type selection (in signature step)
+  const [selectedTypeId, setSelectedTypeId] = useState<string>('');
+
+  // Signature canvas
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [hasSignature, setHasSignature] = useState(false);
 
   useEffect(() => {
     api.get(`/ic/contract-flow-by-code/${code}`)
       .then((res) => {
         const data = extractData<IcContractFlow>(res);
         setFlow(data);
+        // Auto-select if only one type
         if (data.apartmentTypes.length === 1) {
-          setSelectedType(data.apartmentTypes[0]);
+          setSelectedTypeId(data.apartmentTypes[0].id);
         }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [code]);
 
+  useEffect(() => {
+    if (user) {
+      setCustomerName(user.name || '');
+      setCustomerPhone(user.phone || '');
+    }
+  }, [user]);
+
+  const handleToggleRow = (
+    sheetId: string,
+    rowId: string,
+    optionName: string,
+    categoryName: string,
+    partnerName: string,
+  ) => {
+    setSelectedRows((prev) => {
+      const exists = prev.find((s) => s.sheetId === sheetId && s.rowId === rowId);
+      if (exists) {
+        return prev.filter((s) => !(s.sheetId === sheetId && s.rowId === rowId));
+      }
+      return [...prev, { sheetId, rowId, optionName, categoryName, partnerName }];
+    });
+  };
+
+  // Resolve selected items with price for a specific apartment type column
+  const resolveSelectedItems = (typeId: string): IcSelectedItem[] => {
+    if (!flow) return [];
+    return selectedRows.map((sel) => {
+      // Find the matching category / option
+      for (const partner of flow.partners) {
+        for (const cat of partner.categories) {
+          if (cat.sheetId !== sel.sheetId) continue;
+          const opt = cat.options.find((o) => o.rowId === sel.rowId);
+          if (!opt) continue;
+          // Find column matching the selected type
+          const col = cat.columns.find((c) => c.apartmentTypeId === typeId);
+          const columnId = col?.id || '';
+          const cellVal = opt.cellValues?.[columnId];
+          const unitPrice = cellVal !== undefined
+            ? (Number(cellVal) || 0)
+            : (opt.prices?.[columnId] ?? 0);
+          return {
+            sheetId: sel.sheetId,
+            rowId: sel.rowId,
+            columnId,
+            optionName: sel.optionName,
+            categoryName: sel.categoryName,
+            partnerName: sel.partnerName,
+            unitPrice,
+          };
+        }
+      }
+      return {
+        sheetId: sel.sheetId,
+        rowId: sel.rowId,
+        columnId: '',
+        optionName: sel.optionName,
+        categoryName: sel.categoryName,
+        partnerName: sel.partnerName,
+        unitPrice: 0,
+      };
+    });
+  };
+
+  // Canvas drawing
+  const getPos = (e: React.MouseEvent | React.TouchEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    if ('touches' in e) {
+      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    }
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  };
+
+  const startDraw = (e: React.MouseEvent | React.TouchEvent) => {
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    setIsDrawing(true);
+    const pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  };
+
+  const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawing) return;
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    const pos = getPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    setHasSignature(true);
+  };
+
+  const endDraw = () => setIsDrawing(false);
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasSignature(false);
+  };
+
+  const handleSubmit = async () => {
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=/events/${code}/options`);
+      return;
+    }
+
+    if (!flow || selectedRows.length === 0) {
+      toast('품목을 선택해주세요.', 'error');
+      return;
+    }
+    if (!selectedTypeId) {
+      toast('아파트 타입을 선택해주세요.', 'error');
+      return;
+    }
+    if (!legalAgreed && flow.config.legalTerms) {
+      toast('약관에 동의해주세요.', 'error');
+      return;
+    }
+    if (!hasSignature) {
+      toast('서명을 해주세요.', 'error');
+      return;
+    }
+
+    setSigning(true);
+    try {
+      const items = resolveSelectedItems(selectedTypeId);
+      const signatureData = canvasRef.current?.toDataURL('image/png') || '';
+      const res = await api.post('/ic/contracts', {
+        configId: flow.config.id,
+        apartmentTypeId: selectedTypeId,
+        selectedItems: items.map((item) => ({
+          sheetId: item.sheetId,
+          rowId: item.rowId,
+          columnId: item.columnId,
+        })),
+        legalAgreed: true,
+        signatureData,
+        customerName: customerName || undefined,
+        customerPhone: customerPhone || undefined,
+        specialNotes: specialNotes || undefined,
+      });
+      const contract = extractData<{ id: string; shortCode: string }>(res);
+      toast('계약이 완료되었습니다!', 'success');
+      router.push(`/customer/integrated-contracts/${contract.id}`);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      toast(Array.isArray(msg) ? msg[0] : msg || '계약 생성에 실패했습니다.', 'error');
+    } finally {
+      setSigning(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-full max-w-lg mx-auto p-4 space-y-4">
+        <div className="w-full max-w-2xl mx-auto p-4 space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
           ))}
@@ -54,43 +239,200 @@ export default function OptionsTypePage() {
     );
   }
 
+  const resolvedItems = selectedTypeId ? resolveSelectedItems(selectedTypeId) : [];
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-lg mx-auto p-4 space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">타입 선택</h1>
-          <p className="text-sm text-gray-500 mt-1">원하시는 타입을 선택해주세요</p>
-        </div>
+      <div className="max-w-2xl mx-auto p-4 space-y-4">
+        {/* Back */}
+        <button
+          onClick={() => step === 'sign' ? setStep('select') : router.back()}
+          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {step === 'sign' ? '옵션 선택으로' : '뒤로'}
+        </button>
 
-        {/* Type Selection */}
-        <ApartmentTypeSelector
-          types={flow.apartmentTypes}
-          selectedId={selectedType?.id}
-          onSelect={setSelectedType}
-        />
+        {step === 'select' && (
+          <>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">옵션 선택</h1>
+              <p className="text-sm text-gray-500 mt-1">전체 가격표에서 원하시는 품목을 선택해주세요</p>
+            </div>
 
-        {/* Floor Plan Preview */}
-        {selectedType && (
-          <Card>
-            <h3 className="font-bold text-gray-900 mb-3">{selectedType.name} 평면도</h3>
-            <FloorPlanViewer
-              fileId={selectedType.floorPlanFileId}
-              typeName={selectedType.name}
+            {/* Full price table view */}
+            <CustomerSheetView
+              partners={flow.partners}
+              selectedRows={selectedRows.map((s) => ({ sheetId: s.sheetId, rowId: s.rowId }))}
+              onToggleRow={handleToggleRow}
             />
-          </Card>
+
+            {/* Selection count */}
+            {selectedRows.length > 0 && (
+              <div className="text-sm text-gray-500 text-center">
+                {selectedRows.length}개 품목 선택됨
+              </div>
+            )}
+
+            {/* Next */}
+            <Button
+              fullWidth
+              size="lg"
+              disabled={selectedRows.length === 0}
+              onClick={() => setStep('sign')}
+            >
+              <PenTool className="w-5 h-5 mr-2" />
+              서명하기 ({selectedRows.length}개 선택)
+            </Button>
+          </>
         )}
 
-        {/* Next Button */}
-        <Button
-          fullWidth
-          size="lg"
-          disabled={!selectedType}
-          onClick={() => selectedType && router.push(`/events/${code}/options/${selectedType.id}`)}
-        >
-          옵션 선택하기
-          <ArrowRight className="w-5 h-5 ml-2" />
-        </Button>
+        {step === 'sign' && (
+          <>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">계약 서명</h1>
+              <p className="text-sm text-gray-500 mt-1">타입을 선택하고, 내용을 확인한 후 서명해주세요</p>
+            </div>
+
+            {/* Apartment Type Selection */}
+            {flow.apartmentTypes.length > 0 && (
+              <Card>
+                <h3 className="font-bold text-gray-900 mb-3">타입 선택</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {flow.apartmentTypes.map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => setSelectedTypeId(type.id)}
+                      className={`p-3 rounded-xl border-2 text-left transition-colors ${
+                        selectedTypeId === type.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <p className={`text-sm font-medium ${selectedTypeId === type.id ? 'text-blue-700' : 'text-gray-700'}`}>
+                        {type.name}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Summary (with type-specific prices) */}
+            {selectedTypeId && resolvedItems.length > 0 && (
+              <Card>
+                <SelectionSummary
+                  items={resolvedItems}
+                  paymentStages={flow.config.paymentStages || []}
+                />
+              </Card>
+            )}
+
+            {!selectedTypeId && flow.apartmentTypes.length > 1 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-center">
+                <p className="text-sm text-yellow-700">타입을 선택하면 가격이 표시됩니다.</p>
+              </div>
+            )}
+
+            {/* Customer Info */}
+            <Card>
+              <h3 className="font-bold text-gray-900 mb-3">계약자 정보</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">연락처</label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </Card>
+
+            {/* Legal Terms */}
+            {flow.config.legalTerms && (
+              <Card>
+                <h3 className="font-bold text-gray-900 mb-2">약관</h3>
+                <div className="max-h-32 overflow-y-auto text-xs text-gray-500 bg-gray-50 rounded-lg p-3 mb-3 whitespace-pre-wrap">
+                  {flow.config.legalTerms}
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={legalAgreed}
+                    onChange={(e) => setLegalAgreed(e.target.checked)}
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">약관에 동의합니다</span>
+                </label>
+              </Card>
+            )}
+
+            {/* Special Notes */}
+            <Card>
+              <h3 className="font-bold text-gray-900 mb-2">특이사항</h3>
+              <textarea
+                value={specialNotes}
+                onChange={(e) => setSpecialNotes(e.target.value)}
+                placeholder="특이사항이 있으면 입력해주세요 (선택)"
+                rows={3}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+            </Card>
+
+            {/* Signature */}
+            <Card>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-gray-900">서명</h3>
+                {hasSignature && (
+                  <button onClick={clearSignature} className="text-xs text-red-500 hover:text-red-700">
+                    지우기
+                  </button>
+                )}
+              </div>
+              <canvas
+                ref={canvasRef}
+                width={350}
+                height={150}
+                className="w-full border-2 border-dashed border-gray-300 rounded-xl bg-white cursor-crosshair touch-none"
+                onMouseDown={startDraw}
+                onMouseMove={draw}
+                onMouseUp={endDraw}
+                onMouseLeave={endDraw}
+                onTouchStart={startDraw}
+                onTouchMove={draw}
+                onTouchEnd={endDraw}
+              />
+              {!hasSignature && (
+                <p className="text-xs text-gray-400 text-center mt-2">
+                  위 영역에 서명해주세요
+                </p>
+              )}
+            </Card>
+
+            {/* Submit */}
+            <Button
+              fullWidth
+              size="lg"
+              onClick={handleSubmit}
+              loading={signing}
+              disabled={(!legalAgreed && !!flow.config.legalTerms) || !selectedTypeId}
+            >
+              <CheckCircle className="w-5 h-5 mr-2" />
+              계약 완료
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

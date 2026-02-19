@@ -30,6 +30,9 @@ export class IcSheetRow {
   @Column({ type: JSON_COLUMN_TYPE, nullable: true })
   prices: Record<string, number>;
 
+  @Column({ name: 'cell_values', type: JSON_COLUMN_TYPE, nullable: true })
+  cellValues: Record<string, string>;
+
   @ManyToOne(() => IcPartnerSheet, (s) => s.rows)
   @JoinColumn({ name: 'sheet_id' })
   sheet: IcPartnerSheet;

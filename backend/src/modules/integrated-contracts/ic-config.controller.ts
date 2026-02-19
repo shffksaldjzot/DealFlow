@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Patch,
   Delete,
   Body,
@@ -9,15 +10,22 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { IcConfigService } from './ic-config.service';
+import { IcSheetService } from './ic-sheet.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CreateIcConfigDto } from './dto/create-ic-config.dto';
 import { UpdateIcConfigDto } from './dto/update-ic-config.dto';
 import { CreateApartmentTypeDto } from './dto/create-apartment-type.dto';
+import { SaveSheetColumnsDto } from './dto/save-sheet-columns.dto';
+import { SaveSheetRowsDto } from './dto/save-sheet-rows.dto';
+import { UpdateIcSheetDto } from './dto/update-ic-sheet.dto';
 
 @Controller('ic/configs')
 export class IcConfigController {
-  constructor(private readonly icConfigService: IcConfigService) {}
+  constructor(
+    private readonly icConfigService: IcConfigService,
+    private readonly icSheetService: IcSheetService,
+  ) {}
 
   @Post()
   @Roles('organizer')
@@ -72,5 +80,49 @@ export class IcConfigController {
     @CurrentUser('id') userId: string,
   ) {
     return this.icConfigService.deleteApartmentType(id, tid, userId);
+  }
+
+  // === Organizer sheet management ===
+
+  @Get(':id/sheets')
+  @Roles('organizer')
+  findSheets(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.icSheetService.findSheetsByConfigAsOrganizer(id, userId);
+  }
+
+  @Put(':id/sheets/:sheetId/columns')
+  @Roles('organizer')
+  saveSheetColumns(
+    @Param('id', ParseUUIDPipe) _id: string,
+    @Param('sheetId', ParseUUIDPipe) sheetId: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: SaveSheetColumnsDto,
+  ) {
+    return this.icSheetService.saveColumnsAsOrganizer(sheetId, userId, dto);
+  }
+
+  @Put(':id/sheets/:sheetId/rows')
+  @Roles('organizer')
+  saveSheetRows(
+    @Param('id', ParseUUIDPipe) _id: string,
+    @Param('sheetId', ParseUUIDPipe) sheetId: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: SaveSheetRowsDto,
+  ) {
+    return this.icSheetService.saveRowsAsOrganizer(sheetId, userId, dto);
+  }
+
+  @Patch(':id/sheets/:sheetId')
+  @Roles('organizer')
+  updateSheet(
+    @Param('id', ParseUUIDPipe) _id: string,
+    @Param('sheetId', ParseUUIDPipe) sheetId: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateIcSheetDto,
+  ) {
+    return this.icSheetService.updateSheetAsOrganizer(sheetId, userId, dto);
   }
 }

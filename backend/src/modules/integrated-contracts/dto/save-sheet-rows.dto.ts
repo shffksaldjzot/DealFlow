@@ -32,6 +32,10 @@ export class SheetRowItemDto {
   @IsOptional()
   @IsObject()
   prices?: Record<string, number>;
+
+  @IsOptional()
+  @IsObject()
+  cellValues?: Record<string, string>;
 }
 
 export class SaveSheetRowsDto {

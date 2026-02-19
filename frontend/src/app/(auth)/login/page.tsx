@@ -27,6 +27,7 @@ function LoginForm() {
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [capsLockOn, setCapsLockOn] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const { login, signup } = useAuthStore();
   const { toast } = useToast();
   const router = useRouter();
@@ -49,6 +50,7 @@ function LoginForm() {
   const handleLogin = async () => {
     if (!email || !password) return;
     setLoading(true);
+    setLoginError(null);
     try {
       await login(email, password);
       const { user } = useAuthStore.getState();
@@ -57,7 +59,7 @@ function LoginForm() {
     } catch (err: any) {
       const msg = err?.response?.data?.message;
       const errorMessage = Array.isArray(msg) ? msg[0] : (msg || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
-      toast(errorMessage, 'error');
+      setLoginError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -130,6 +132,11 @@ function LoginForm() {
                     <p className="text-xs text-orange-500 mt-1">Caps Lock이 켜져 있습니다</p>
                   )}
                 </div>
+                {loginError && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600 text-center">
+                    {loginError}
+                  </div>
+                )}
               </div>
               <div className="space-y-3">
                 <Button fullWidth size="lg" onClick={handleLogin} loading={loading}>

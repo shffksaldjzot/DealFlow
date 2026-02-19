@@ -71,6 +71,9 @@ export class IcContract {
   @Column({ name: 'signature_data', type: 'text', nullable: true })
   signatureData: string;
 
+  @Column({ name: 'special_notes', type: 'text', nullable: true })
+  specialNotes: string;
+
   @Column({ type: 'varchar', length: 20, default: IcContractStatus.SIGNED })
   status: IcContractStatus;
 

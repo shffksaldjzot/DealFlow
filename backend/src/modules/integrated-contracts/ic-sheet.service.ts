@@ -9,6 +9,7 @@ import { IcPartnerSheet, IcSheetStatus } from './entities/ic-partner-sheet.entit
 import { IcSheetColumn } from './entities/ic-sheet-column.entity';
 import { IcSheetRow } from './entities/ic-sheet-row.entity';
 import { IcConfig } from './entities/ic-config.entity';
+import { Event } from '../events/entities/event.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
 import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
 import { CreateIcSheetDto } from './dto/create-ic-sheet.dto';
@@ -28,6 +29,8 @@ export class IcSheetService {
     private readonly rowRepository: Repository<IcSheetRow>,
     @InjectRepository(IcConfig)
     private readonly configRepository: Repository<IcConfig>,
+    @InjectRepository(Event)
+    private readonly eventRepository: Repository<Event>,
     @InjectRepository(OrganizationMember)
     private readonly memberRepository: Repository<OrganizationMember>,
     @InjectRepository(Organization)
@@ -145,6 +148,7 @@ export class IcSheetService {
         sheetId,
         apartmentTypeId: col.apartmentTypeId || null,
         customName: col.customName || null,
+        columnType: col.columnType || 'amount',
         sortOrder: col.sortOrder ?? index,
       }),
     );
@@ -169,6 +173,7 @@ export class IcSheetService {
         popupContent: row.popupContent || null,
         sortOrder: row.sortOrder ?? index,
         prices: row.prices || {},
+        cellValues: row.cellValues || null,
       }),
     );
 
@@ -178,7 +183,7 @@ export class IcSheetService {
   async addRow(
     sheetId: string,
     userId: string,
-    row: { optionName: string; popupContent?: string; sortOrder?: number; prices?: Record<string, number> },
+    row: { optionName: string; popupContent?: string; sortOrder?: number; prices?: Record<string, number>; cellValues?: Record<string, string> },
   ): Promise<IcSheetRow> {
     await this.verifySheetOwner(sheetId, userId);
 
@@ -188,6 +193,7 @@ export class IcSheetService {
       popupContent: row.popupContent || null,
       sortOrder: row.sortOrder ?? 0,
       prices: row.prices || {},
+      cellValues: row.cellValues || null,
     });
 
     return this.rowRepository.save(newRow);
@@ -197,7 +203,7 @@ export class IcSheetService {
     sheetId: string,
     rowId: string,
     userId: string,
-    data: { optionName?: string; popupContent?: string; sortOrder?: number; prices?: Record<string, number> },
+    data: { optionName?: string; popupContent?: string; sortOrder?: number; prices?: Record<string, number>; cellValues?: Record<string, string> },
   ): Promise<IcSheetRow> {
     await this.verifySheetOwner(sheetId, userId);
 
@@ -212,6 +218,7 @@ export class IcSheetService {
     if (data.popupContent !== undefined) row.popupContent = data.popupContent;
     if (data.sortOrder !== undefined) row.sortOrder = data.sortOrder;
     if (data.prices !== undefined) row.prices = data.prices;
+    if (data.cellValues !== undefined) row.cellValues = data.cellValues;
 
     return this.rowRepository.save(row);
   }
@@ -227,5 +234,118 @@ export class IcSheetService {
     }
 
     await this.rowRepository.remove(row);
+  }
+
+  // === Organizer sheet management ===
+
+  private async verifyOrganizerAccessToSheet(
+    sheetId: string,
+    userId: string,
+  ): Promise<IcPartnerSheet> {
+    const orgId = await this.getOrgIdForUser(userId, true);
+    const sheet = await this.sheetRepository.findOne({
+      where: { id: sheetId },
+      relations: ['columns', 'columns.apartmentType', 'rows'],
+    });
+    if (!sheet) {
+      throw new NotFoundException('시트를 찾을 수 없습니다.');
+    }
+    const config = await this.configRepository.findOne({
+      where: { id: sheet.configId },
+    });
+    if (!config) {
+      throw new NotFoundException('설정을 찾을 수 없습니다.');
+    }
+    const event = await this.eventRepository.findOne({
+      where: { id: config.eventId },
+    });
+    if (!event || event.organizerId !== orgId) {
+      throw new ForbiddenException('해당 시트에 대한 주관사 권한이 없습니다.');
+    }
+    return sheet;
+  }
+
+  async findSheetsByConfigAsOrganizer(
+    configId: string,
+    userId: string,
+  ): Promise<IcPartnerSheet[]> {
+    const orgId = await this.getOrgIdForUser(userId, true);
+    const config = await this.configRepository.findOne({
+      where: { id: configId },
+    });
+    if (!config) {
+      throw new NotFoundException('설정을 찾을 수 없습니다.');
+    }
+    const event = await this.eventRepository.findOne({
+      where: { id: config.eventId },
+    });
+    if (!event || event.organizerId !== orgId) {
+      throw new ForbiddenException('해당 행사의 주관사만 조회할 수 있습니다.');
+    }
+    return this.sheetRepository.find({
+      where: { configId },
+      relations: ['columns', 'columns.apartmentType', 'rows', 'partner'],
+      order: { createdAt: 'ASC' },
+    });
+  }
+
+  async saveColumnsAsOrganizer(
+    sheetId: string,
+    userId: string,
+    dto: SaveSheetColumnsDto,
+  ): Promise<IcSheetColumn[]> {
+    await this.verifyOrganizerAccessToSheet(sheetId, userId);
+
+    await this.columnRepository.delete({ sheetId });
+
+    const columns = dto.columns.map((col, index) =>
+      this.columnRepository.create({
+        sheetId,
+        apartmentTypeId: col.apartmentTypeId || null,
+        customName: col.customName || null,
+        columnType: col.columnType || 'amount',
+        sortOrder: col.sortOrder ?? index,
+      }),
+    );
+
+    return this.columnRepository.save(columns);
+  }
+
+  async saveRowsAsOrganizer(
+    sheetId: string,
+    userId: string,
+    dto: SaveSheetRowsDto,
+  ): Promise<IcSheetRow[]> {
+    await this.verifyOrganizerAccessToSheet(sheetId, userId);
+
+    await this.rowRepository.delete({ sheetId });
+
+    const rows = dto.rows.map((row, index) =>
+      this.rowRepository.create({
+        sheetId,
+        optionName: row.optionName,
+        popupContent: row.popupContent || null,
+        sortOrder: row.sortOrder ?? index,
+        prices: row.prices || {},
+        cellValues: row.cellValues || null,
+      }),
+    );
+
+    return this.rowRepository.save(rows);
+  }
+
+  async updateSheetAsOrganizer(
+    sheetId: string,
+    userId: string,
+    dto: UpdateIcSheetDto,
+  ): Promise<IcPartnerSheet> {
+    const sheet = await this.verifyOrganizerAccessToSheet(sheetId, userId);
+
+    if (dto.categoryName !== undefined) sheet.categoryName = dto.categoryName;
+    if (dto.memo !== undefined) sheet.memo = dto.memo;
+    if (dto.status !== undefined) sheet.status = dto.status;
+
+    await this.sheetRepository.save(sheet);
+    return this.findOneById(sheetId);
   }
 }

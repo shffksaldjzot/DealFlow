@@ -51,6 +51,7 @@ export interface IcSheetColumn {
   sheetId: string;
   apartmentTypeId?: string;
   customName?: string;
+  columnType: 'text' | 'amount';
   sortOrder: number;
   apartmentType?: IcApartmentType;
   createdAt: string;
@@ -63,6 +64,7 @@ export interface IcSheetRow {
   popupContent?: string;
   sortOrder: number;
   prices: Record<string, number>;
+  cellValues?: Record<string, string>;
   createdAt: string;
   updatedAt: string;
 }
@@ -97,6 +99,7 @@ export interface IcContract {
   paymentSchedule: IcPaymentScheduleItem[];
   legalAgreed: boolean;
   signatureData?: string;
+  specialNotes?: string;
   status: IcContractStatus;
   signedAt?: string;
   config?: IcConfig;
@@ -113,6 +116,7 @@ export interface IcFlowOption {
   popupContent?: string;
   sortOrder: number;
   prices: Record<string, number>;
+  cellValues?: Record<string, string>;
   unitPrice?: number | null;
   columnId?: string | null;
 }
@@ -124,6 +128,7 @@ export interface IcFlowCategory {
     id: string;
     apartmentTypeId: string;
     customName: string;
+    columnType: 'text' | 'amount';
     sortOrder: number;
   }[];
   options: IcFlowOption[];
