@@ -47,10 +47,10 @@ export class IcPartnerSheet {
   @JoinColumn({ name: 'partner_id' })
   partner: Organization;
 
-  @OneToMany(() => IcSheetColumn, (col) => col.sheet)
+  @OneToMany(() => IcSheetColumn, (col) => col.sheet, { eager: false })
   columns: IcSheetColumn[];
 
-  @OneToMany(() => IcSheetRow, (row) => row.sheet)
+  @OneToMany(() => IcSheetRow, (row) => row.sheet, { eager: false })
   rows: IcSheetRow[];
 
   @CreateDateColumn({ name: 'created_at' })

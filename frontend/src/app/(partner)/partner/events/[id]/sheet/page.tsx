@@ -65,12 +65,12 @@ export default function PartnerSheetPage() {
     }
   };
 
-  const handleSaveColumns = async (columns: any[]) => {
-    if (!activeSheetId) return;
+  const handleSaveColumns = async (columns: any[]): Promise<any[]> => {
+    if (!activeSheetId) return [];
     try {
-      await api.put(`/ic/sheets/${activeSheetId}/columns`, { columns });
+      const res = await api.put(`/ic/sheets/${activeSheetId}/columns`, { columns });
       toast('열이 저장되었습니다.', 'success');
-      await loadData();
+      return res.data?.data || [];
     } catch {
       toast('열 저장에 실패했습니다.', 'error');
       throw new Error();

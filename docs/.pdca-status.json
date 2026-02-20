@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-19T02:33:35.473Z",
+  "lastUpdated": "2026-02-20T16:02:05.371Z",
   "activeFeatures": [
     "frontend",
     "business",
@@ -39,7 +39,18 @@
     "sign",
     "partners",
     "join",
-    "organizer"
+    "organizer",
+    "integrated-contracts",
+    "integrated-contract",
+    "sheet",
+    "preview",
+    "options",
+    "[typeId]",
+    "ic-config",
+    "ic-contracts",
+    "claud-deal",
+    "ui",
+    "stores"
   ],
   "primaryFeature": "frontend",
   "features": {
@@ -52,9 +63,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-13T02:30:58.747Z",
-        "lastUpdated": "2026-02-19T01:11:26.589Z"
+        "lastUpdated": "2026-02-19T10:01:59.268Z"
       },
-      "lastFile": "/home/user/claud-deal/frontend/src/types/organization.ts"
+      "lastFile": "/home/user/claud-deal/frontend/src/types/integrated-contract.ts"
     },
     "business": {
       "phase": "do",
@@ -91,7 +102,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-13T03:54:13.862Z",
-        "lastUpdated": "2026-02-18T11:28:02.635Z"
+        "lastUpdated": "2026-02-19T07:18:23.680Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/(organizer)/organizer/events/[id]/page.tsx"
     },
@@ -104,7 +115,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-13T03:54:45.351Z",
-        "lastUpdated": "2026-02-15T12:30:44.272Z"
+        "lastUpdated": "2026-02-19T06:55:44.008Z"
       },
       "lastFile": "/home/user/claud-deal/backend/src/app.module.ts"
     },
@@ -169,9 +180,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-14T05:20:58.224Z",
-        "lastUpdated": "2026-02-19T02:33:35.472Z"
+        "lastUpdated": "2026-02-20T15:55:46.575Z"
       },
-      "lastFile": "/home/user/claud-deal/backend/src/modules/events/event-partners.service.ts"
+      "lastFile": "/home/user/claud-deal/backend/src/modules/events/events.service.ts"
     },
     "contracts": {
       "phase": "do",
@@ -260,7 +271,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-14T05:27:48.626Z",
-        "lastUpdated": "2026-02-18T11:05:53.428Z"
+        "lastUpdated": "2026-02-20T15:57:24.013Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/components/layout/BottomNav.tsx"
     },
@@ -338,7 +349,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-14T17:35:30.893Z",
-        "lastUpdated": "2026-02-15T13:11:37.728Z"
+        "lastUpdated": "2026-02-19T09:58:57.585Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/(auth)/login/page.tsx"
     },
@@ -364,9 +375,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-14T17:59:35.993Z",
-        "lastUpdated": "2026-02-19T02:33:27.254Z"
+        "lastUpdated": "2026-02-20T15:55:41.099Z"
       },
-      "lastFile": "/home/user/claud-deal/backend/src/modules/notifications/notifications.service.ts"
+      "lastFile": "/home/user/claud-deal/backend/src/modules/notifications/notifications.controller.ts"
     },
     "contract": {
       "phase": "do",
@@ -481,9 +492,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-15T15:15:23.900Z",
-        "lastUpdated": "2026-02-15T15:16:22.908Z"
+        "lastUpdated": "2026-02-19T10:34:02.365Z"
       },
-      "lastFile": "/tmp/parse_detail.js"
+      "lastFile": "/tmp/quick-test.js"
     },
     "sign": {
       "phase": "do",
@@ -533,9 +544,152 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-19T01:12:56.084Z",
-        "lastUpdated": "2026-02-19T01:12:56.084Z"
+        "lastUpdated": "2026-02-20T15:55:51.629Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/(organizer)/organizer/page.tsx"
+    },
+    "integrated-contracts": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T06:52:12.308Z",
+        "lastUpdated": "2026-02-20T16:01:34.698Z"
+      },
+      "lastFile": "/home/user/claud-deal/backend/src/modules/integrated-contracts/entities/ic-partner-sheet.entity.ts"
+    },
+    "integrated-contract": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T07:00:13.073Z",
+        "lastUpdated": "2026-02-20T15:59:42.921Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/components/integrated-contract/SheetEditor.tsx"
+    },
+    "sheet": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T07:01:54.693Z",
+        "lastUpdated": "2026-02-20T16:02:05.371Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/app/(partner)/partner/events/[id]/sheet/page.tsx"
+    },
+    "preview": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T07:02:08.172Z",
+        "lastUpdated": "2026-02-19T07:02:08.172Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/app/(partner)/partner/events/[id]/sheet/preview/page.tsx"
+    },
+    "options": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T07:08:49.487Z",
+        "lastUpdated": "2026-02-19T10:06:03.433Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/app/events/[code]/options/page.tsx"
+    },
+    "[typeId]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T07:09:25.380Z",
+        "lastUpdated": "2026-02-19T10:06:11.489Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/app/events/[code]/options/[typeId]/page.tsx"
+    },
+    "ic-config": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T07:17:32.183Z",
+        "lastUpdated": "2026-02-20T16:01:14.227Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/app/(organizer)/organizer/events/[id]/ic-config/page.tsx"
+    },
+    "ic-contracts": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T07:17:56.438Z",
+        "lastUpdated": "2026-02-19T07:17:56.438Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/app/(organizer)/organizer/events/[id]/ic-contracts/page.tsx"
+    },
+    "claud-deal": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T08:54:59.821Z",
+        "lastUpdated": "2026-02-19T12:15:49.287Z"
+      },
+      "lastFile": "/home/user/claud-deal/diag-test.js"
+    },
+    "ui": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-20T15:55:57.708Z",
+        "lastUpdated": "2026-02-20T15:56:04.096Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/components/ui/Toast.tsx"
+    },
+    "stores": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-20T15:56:18.059Z",
+        "lastUpdated": "2026-02-20T15:56:18.059Z"
+      },
+      "lastFile": "/home/user/claud-deal/frontend/src/stores/notificationStore.ts"
     }
   },
   "pipeline": {
@@ -546,7 +700,7 @@
   "session": {
     "startedAt": "2026-02-13T01:38:43.725Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-19T02:33:35.473Z"
+    "lastActivity": "2026-02-20T16:02:05.371Z"
   },
   "history": [
     {
@@ -2862,6 +3016,918 @@
     {
       "timestamp": "2026-02-19T02:33:35.472Z",
       "feature": "events",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:12.308Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:42.076Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:42.780Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:43.396Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:43.928Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:44.227Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:54.192Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:56.578Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:58.211Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:53:00.052Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:53:01.472Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:53:04.242Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:53:06.414Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:53:09.211Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:53:48.096Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:53:54.115Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:54:23.344Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:54:29.785Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:55:13.307Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:55:18.957Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:55:35.103Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:55:39.014Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:55:44.008Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T06:59:53.773Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:00:13.073Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:00:21.767Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:01:20.292Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:01:54.693Z",
+      "feature": "sheet",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:02:08.172Z",
+      "feature": "preview",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:02:14.586Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:02:21.620Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:03:31.514Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:03:36.141Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:03:40.876Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:07:41.214Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:07:48.383Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:07:53.847Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:08:04.692Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:08:16.133Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:08:28.015Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:08:49.487Z",
+      "feature": "options",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:09:25.380Z",
+      "feature": "[typeId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:09:39.392Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:09:47.686Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:10:01.911Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:16:25.631Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:16:30.848Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:16:43.791Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:17:32.183Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:17:56.438Z",
+      "feature": "ic-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:18:11.126Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T07:18:23.680Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:46:51.153Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:47:02.177Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:47:08.037Z",
+      "feature": "options",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:47:11.096Z",
+      "feature": "options",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:47:12.504Z",
+      "feature": "options",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:47:17.203Z",
+      "feature": "[typeId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:47:19.769Z",
+      "feature": "[typeId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:47:21.315Z",
+      "feature": "[typeId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:53:51.112Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:54:59.821Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T08:59:08.679Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:03:00.615Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:03:05.384Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:03:09.998Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:03:14.122Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:03:18.097Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:03:23.822Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:09:10.135Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:09:55.603Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:58:44.051Z",
+      "feature": "login",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:58:51.422Z",
+      "feature": "login",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:58:57.585Z",
+      "feature": "login",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:59:09.515Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:59:14.620Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:59:20.225Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:59:27.415Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:59:31.319Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:59:36.872Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T09:59:48.810Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:00:01.333Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:00:09.774Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:00:15.546Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:00:31.907Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:00:48.717Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:00:57.862Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:05.141Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:12.240Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:17.789Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:25.227Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:38.088Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:43.111Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:49.278Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:54.868Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:01:59.268Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:03:06.638Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:04:26.592Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:05:05.522Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:06:03.433Z",
+      "feature": "options",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:06:11.489Z",
+      "feature": "[typeId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:31:26.425Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:34:02.365Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:35:12.421Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:35:35.066Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:39:57.049Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:45:30.068Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:45:38.028Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:46:26.392Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:46:32.866Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:48:37.099Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:49:25.648Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:49:30.817Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:49:35.038Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:53:13.810Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:54:29.333Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T10:56:20.091Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:03:43.439Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:05:51.161Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:11:30.530Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:13:37.121Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:16:20.061Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:18:29.943Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:21:35.313Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:25:56.156Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:28:16.369Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:28:56.210Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:35:42.614Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:38:08.018Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:43:41.537Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T11:55:01.213Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T12:01:07.648Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T12:08:16.232Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T12:13:37.866Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T12:15:49.287Z",
+      "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T12:16:18.849Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T12:18:33.270Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:11:35.556Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:13:02.495Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:55:41.099Z",
+      "feature": "notifications",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:55:46.575Z",
+      "feature": "events",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:55:51.629Z",
+      "feature": "organizer",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:55:57.708Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:56:04.096Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:56:18.059Z",
+      "feature": "stores",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:56:44.764Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:57:11.128Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:57:24.013Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T15:59:42.921Z",
+      "feature": "integrated-contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T16:01:14.227Z",
+      "feature": "ic-config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T16:01:34.698Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T16:02:05.371Z",
+      "feature": "sheet",
       "phase": "do",
       "action": "updated"
     }

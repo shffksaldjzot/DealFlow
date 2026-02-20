@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import api, { extractData } from '@/lib/api';
+import { useNotificationStore } from '@/stores/notificationStore';
 import {
   LayoutDashboard,
   Calendar,
@@ -103,24 +104,20 @@ function NavList({ items, role, badges, onNavigate }: { items: NavItem[]; role: 
 
 export default function Sidebar({ role }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [badges, setBadges] = useState<Record<string, number>>({});
+  const [localBadges, setLocalBadges] = useState<Record<string, number>>({});
+  const { unreadCount } = useNotificationStore();
   const items = navItems[role] || [];
 
-  useEffect(() => {
-    // Fetch unread notification count for all roles
-    api.get('/notifications/unread-count')
-      .then((res) => {
-        const data = extractData<{ count: number }>(res);
-        setBadges((prev) => ({ ...prev, unreadNotifications: data.count }));
-      })
-      .catch(() => {});
+  // Merge notification store count into badges
+  const badges = { ...localBadges, unreadNotifications: unreadCount };
 
+  useEffect(() => {
     if (role === 'admin') {
       api.get('/admin/dashboard')
         .then((res) => {
           const data = extractData<any>(res);
           const pending = (data.pendingOrganizations || 0) + (data.pendingPartners || 0);
-          setBadges((prev) => ({ ...prev, pendingApprovals: pending }));
+          setLocalBadges((prev) => ({ ...prev, pendingApprovals: pending }));
         })
         .catch(() => {});
     }

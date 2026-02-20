@@ -112,7 +112,7 @@ export class EventsService {
 
     return this.eventRepository.find({
       where: { organizerId: orgId },
-      relations: ['organizer', 'partners'],
+      relations: ['organizer', 'partners', 'partners.partner'],
       order: { createdAt: 'DESC' },
     });
   }

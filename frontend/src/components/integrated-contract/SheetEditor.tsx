@@ -1,6 +1,6 @@
 'use client';
 import { useState, useId } from 'react';
-import { Plus, Trash2, GripVertical, Save, Type, DollarSign } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Save, Type, DollarSign, Loader2 } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -29,7 +29,7 @@ export interface ColumnDraft {
   customName?: string;
   columnType: 'text' | 'amount';
   sortOrder: number;
-  _key: string; // stable key for dnd
+  _key: string;
 }
 
 export interface RowDraft {
@@ -39,14 +39,14 @@ export interface RowDraft {
   sortOrder: number;
   prices: Record<string, number>;
   cellValues: Record<string, string>;
-  _key: string; // stable key for dnd
+  _key: string;
 }
 
 interface SheetEditorProps {
   apartmentTypes: IcApartmentType[];
   initialColumns?: IcSheetColumn[];
   initialRows?: IcSheetRow[];
-  onSaveColumns: (columns: Omit<ColumnDraft, '_key'>[]) => Promise<void>;
+  onSaveColumns: (columns: Omit<ColumnDraft, '_key'>[]) => Promise<any[] | void>;
   onSaveRows: (rows: Omit<RowDraft, '_key'>[]) => Promise<void>;
   disabled?: boolean;
 }
@@ -54,6 +54,21 @@ interface SheetEditorProps {
 let _keyCounter = 0;
 function nextKey() {
   return `k_${++_keyCounter}_${Date.now()}`;
+}
+
+// Format number with commas
+function formatAmount(val: string | number): string {
+  const num = typeof val === 'string' ? val.replace(/,/g, '') : String(val);
+  if (!num || num === '0') return '';
+  const parsed = parseInt(num, 10);
+  if (isNaN(parsed)) return '';
+  return parsed.toLocaleString('ko-KR');
+}
+
+// Parse comma-formatted string to number
+function parseAmount(val: string): number {
+  const cleaned = val.replace(/[^0-9-]/g, '');
+  return cleaned === '' ? 0 : parseInt(cleaned, 10) || 0;
 }
 
 // Sortable row wrapper
@@ -110,9 +125,13 @@ export default function SheetEditor({
   onSaveRows,
   disabled,
 }: SheetEditorProps) {
+  // Sort initial data by sortOrder
+  const sortedInitialCols = [...initialColumns].sort((a, b) => a.sortOrder - b.sortOrder);
+  const sortedInitialRows = [...initialRows].sort((a, b) => a.sortOrder - b.sortOrder);
+
   const [columns, setColumns] = useState<ColumnDraft[]>(
-    initialColumns.length > 0
-      ? initialColumns.map((c) => ({
+    sortedInitialCols.length > 0
+      ? sortedInitialCols.map((c) => ({
           id: c.id,
           apartmentTypeId: c.apartmentTypeId,
           customName: c.customName,
@@ -130,7 +149,7 @@ export default function SheetEditor({
   );
 
   const [rows, setRows] = useState<RowDraft[]>(
-    initialRows.map((r) => ({
+    sortedInitialRows.map((r) => ({
       id: r.id,
       optionName: r.optionName,
       popupContent: r.popupContent,
@@ -148,8 +167,7 @@ export default function SheetEditor({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  const rowDndId = useId();
-  const colDndId = useId();
+  const dndId = useId();
 
   // Column operations
   const addColumn = (type: 'amount' | 'text') => {
@@ -200,14 +218,18 @@ export default function SheetEditor({
     const updated = [...rows];
     if (colType === 'amount') {
       const prices = { ...updated[rowIndex].prices };
-      const numVal = value === '' ? 0 : Number(value);
-      prices[columnKey] = isNaN(numVal) ? 0 : numVal;
+      const numVal = parseAmount(value);
+      prices[columnKey] = numVal;
       updated[rowIndex] = { ...updated[rowIndex], prices };
+      // Also sync cellValues with the raw numeric value
+      const cellValues = { ...updated[rowIndex].cellValues };
+      cellValues[columnKey] = String(numVal);
+      updated[rowIndex] = { ...updated[rowIndex], cellValues };
+    } else {
+      const cellValues = { ...updated[rowIndex].cellValues };
+      cellValues[columnKey] = value;
+      updated[rowIndex] = { ...updated[rowIndex], cellValues };
     }
-    // Always store in cellValues for text columns; also for amount to keep sync
-    const cellValues = { ...updated[rowIndex].cellValues };
-    cellValues[columnKey] = value;
-    updated[rowIndex] = { ...updated[rowIndex], cellValues };
     setRows(updated);
   };
 
@@ -228,37 +250,90 @@ export default function SheetEditor({
 
   // Get cell display value
   const getCellValue = (row: RowDraft, colKey: string, colType: 'text' | 'amount'): string => {
+    if (colType === 'amount') {
+      // Check prices first (canonical for amounts), then cellValues
+      if (row.prices?.[colKey] !== undefined && row.prices[colKey] !== 0) {
+        return String(row.prices[colKey]);
+      }
+      if (row.cellValues?.[colKey] !== undefined && row.cellValues[colKey] !== '' && row.cellValues[colKey] !== '0') {
+        return row.cellValues[colKey];
+      }
+      return '';
+    }
     if (row.cellValues?.[colKey] !== undefined) return row.cellValues[colKey];
-    if (colType === 'amount' && row.prices?.[colKey]) return String(row.prices[colKey]);
     return '';
   };
 
-  // Drag handlers
-  const handleRowDragEnd = (event: DragEndEvent) => {
+  // Unified drag handler
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    const oldIndex = rows.findIndex((r) => r._key === active.id);
-    const newIndex = rows.findIndex((r) => r._key === over.id);
-    if (oldIndex === -1 || newIndex === -1) return;
-    setRows(arrayMove(rows, oldIndex, newIndex).map((r, i) => ({ ...r, sortOrder: i })));
+
+    const colOldIndex = columns.findIndex((c) => c._key === active.id);
+    if (colOldIndex !== -1) {
+      const colNewIndex = columns.findIndex((c) => c._key === over.id);
+      if (colNewIndex !== -1) {
+        setColumns(arrayMove(columns, colOldIndex, colNewIndex).map((c, i) => ({ ...c, sortOrder: i })));
+      }
+      return;
+    }
+
+    const rowOldIndex = rows.findIndex((r) => r._key === active.id);
+    if (rowOldIndex !== -1) {
+      const rowNewIndex = rows.findIndex((r) => r._key === over.id);
+      if (rowNewIndex !== -1) {
+        setRows(arrayMove(rows, rowOldIndex, rowNewIndex).map((r, i) => ({ ...r, sortOrder: i })));
+      }
+    }
   };
 
-  const handleColumnDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = columns.findIndex((c) => c._key === active.id);
-    const newIndex = columns.findIndex((c) => c._key === over.id);
-    if (oldIndex === -1 || newIndex === -1) return;
-    setColumns(arrayMove(columns, oldIndex, newIndex).map((c, i) => ({ ...c, sortOrder: i })));
-  };
-
-  // Save
+  // Save with column ID remapping
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Remember old column keys by index
+      const oldKeyByIndex = columns.map((col) => getColumnKey(col));
+
       const colsToSave = columns.map(({ _key, ...rest }, i) => ({ ...rest, sortOrder: i }));
-      const rowsToSave = rows.map(({ _key, ...rest }, i) => ({ ...rest, sortOrder: i }));
-      await onSaveColumns(colsToSave);
+      const savedCols = await onSaveColumns(colsToSave);
+
+      // Build key remapping if new column IDs were returned
+      const keyRemap = new Map<string, string>();
+      if (Array.isArray(savedCols) && savedCols.length === columns.length) {
+        // Sort saved columns by sortOrder to match index order
+        const sorted = [...savedCols].sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+        sorted.forEach((newCol: any, i: number) => {
+          const oldKey = oldKeyByIndex[i];
+          if (oldKey && newCol.id && oldKey !== newCol.id) {
+            keyRemap.set(oldKey, newCol.id);
+          }
+        });
+      }
+
+      // Remap row prices/cellValues keys to use new column IDs
+      const rowsToSave = rows.map(({ _key, ...rest }, i) => {
+        if (keyRemap.size === 0) {
+          return { ...rest, sortOrder: i };
+        }
+
+        const remappedPrices: Record<string, number> = {};
+        const remappedCellValues: Record<string, string> = {};
+
+        for (const [key, val] of Object.entries(rest.prices || {})) {
+          remappedPrices[keyRemap.get(key) || key] = val;
+        }
+        for (const [key, val] of Object.entries(rest.cellValues || {})) {
+          remappedCellValues[keyRemap.get(key) || key] = val;
+        }
+
+        return {
+          ...rest,
+          sortOrder: i,
+          prices: remappedPrices,
+          cellValues: remappedCellValues,
+        };
+      });
+
       await onSaveRows(rowsToSave);
     } finally {
       setSaving(false);
@@ -266,7 +341,17 @@ export default function SheetEditor({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="relative space-y-4">
+      {/* Full-screen saving overlay */}
+      {saving && (
+        <div className="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center">
+          <div className="bg-white rounded-2xl px-8 py-6 shadow-2xl flex items-center gap-4">
+            <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+            <span className="text-base font-medium text-gray-800">저장 중...</span>
+          </div>
+        </div>
+      )}
+
       {/* Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
         {!disabled && (
@@ -293,15 +378,15 @@ export default function SheetEditor({
       </div>
 
       {/* Spreadsheet Table */}
-      <div className="border border-gray-200 rounded-xl overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <DndContext
-              id={colDndId}
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleColumnDragEnd}
-            >
+      <DndContext
+        id={dndId}
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="border border-gray-200 rounded-xl overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 {!disabled && <th className="px-1 py-2 w-8" />}
                 <th className="px-3 py-2 text-left font-medium text-gray-600 min-w-[200px] sticky left-0 bg-gray-50 z-10">
@@ -352,7 +437,6 @@ export default function SheetEditor({
                               </>
                             )}
                           </div>
-                          {/* Column type badge */}
                           <div className="mt-1 flex items-center gap-1">
                             <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
                               col.columnType === 'text'
@@ -378,14 +462,7 @@ export default function SheetEditor({
                 </SortableContext>
                 {!disabled && <th className="px-2 py-2 w-8" />}
               </tr>
-            </DndContext>
-          </thead>
-          <DndContext
-            id={rowDndId}
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleRowDragEnd}
-          >
+            </thead>
             <tbody>
               {rows.length === 0 ? (
                 <tr>
@@ -403,7 +480,6 @@ export default function SheetEditor({
                     <SortableRow key={row._key} id={row._key} disabled={disabled}>
                       {({ listeners, attributes }) => (
                         <>
-                          {/* Drag handle */}
                           {!disabled && (
                             <td className="px-1 py-1.5 text-center">
                               <button {...listeners} {...attributes} className="cursor-grab p-1 text-gray-300 hover:text-gray-500">
@@ -411,7 +487,6 @@ export default function SheetEditor({
                               </button>
                             </td>
                           )}
-                          {/* Option Name */}
                           <td className="px-3 py-1.5 sticky left-0 bg-white z-10">
                             {disabled ? (
                               <span className="text-gray-900">{row.optionName}</span>
@@ -425,7 +500,6 @@ export default function SheetEditor({
                               />
                             )}
                           </td>
-                          {/* Popup */}
                           <td className="px-2 py-1.5 text-center">
                             <PopupContentEditor
                               content={row.popupContent || ''}
@@ -433,7 +507,6 @@ export default function SheetEditor({
                               disabled={disabled}
                             />
                           </td>
-                          {/* Cell values */}
                           {columns.map((col) => {
                             const colKey = getColumnKey(col);
                             const cellVal = getCellValue(row, colKey, col.columnType);
@@ -448,11 +521,15 @@ export default function SheetEditor({
                                   </span>
                                 ) : isAmount ? (
                                   <input
-                                    type="number"
-                                    value={cellVal || ''}
-                                    onChange={(e) => updateCellValue(ri, colKey, e.target.value, 'amount')}
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={cellVal ? formatAmount(cellVal) : ''}
+                                    onChange={(e) => {
+                                      const raw = e.target.value.replace(/[^0-9]/g, '');
+                                      updateCellValue(ri, colKey, raw, 'amount');
+                                    }}
                                     placeholder="0"
-                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500 [appearance:textfield]"
                                   />
                                 ) : (
                                   <input
@@ -466,7 +543,6 @@ export default function SheetEditor({
                               </td>
                             );
                           })}
-                          {/* Delete */}
                           {!disabled && (
                             <td className="px-2 py-1.5">
                               <button
@@ -484,11 +560,10 @@ export default function SheetEditor({
                 </SortableContext>
               )}
             </tbody>
-          </DndContext>
-        </table>
-      </div>
+          </table>
+        </div>
+      </DndContext>
 
-      {/* Summary */}
       {rows.length > 0 && columns.length > 0 && (
         <div className="text-xs text-gray-500">
           {columns.length}열 × {rows.length}행

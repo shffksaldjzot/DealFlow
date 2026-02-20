@@ -37,7 +37,7 @@ export default function OrganizerDashboard() {
       .map((p: any) => ({
         eventId: event.id,
         eventName: event.name,
-        partnerName: p.organization?.name || '업체명 미확인',
+        partnerName: p.partner?.name || p.organization?.name || '업체명 미확인',
         appliedAt: p.createdAt,
       }))
   ).sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());

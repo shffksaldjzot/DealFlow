@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { useRouter } from 'next/navigation';
 import { LogOut, User, Bell, Check, ChevronRight } from 'lucide-react';
 import api, { extractData } from '@/lib/api';
@@ -9,8 +10,8 @@ import type { Notification } from '@/types/notification';
 
 export default function Header() {
   const { user, logout, isAuthenticated } = useAuthStore();
+  const { unreadCount, fetchUnreadCount, decrement, clearCount } = useNotificationStore();
   const router = useRouter();
-  const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,18 +30,13 @@ export default function Header() {
     admin: '/admin',
   };
 
-  // Fetch unread count
+  // Fetch unread count via shared store
   useEffect(() => {
     if (!isAuthenticated) return;
-    const fetchCount = () => {
-      api.get('/notifications/unread-count')
-        .then((res) => setUnreadCount(extractData<{ count: number }>(res).count))
-        .catch(() => {});
-    };
-    fetchCount();
-    const interval = setInterval(fetchCount, 30000);
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchUnreadCount]);
 
   // Fetch notifications when dropdown opens
   useEffect(() => {
@@ -66,21 +62,22 @@ export default function Header() {
     try {
       await api.patch(`/notifications/${notifId}/read`);
       setNotifications((prev) => prev.map((n) => n.id === notifId ? { ...n, isRead: true } : n));
-      setUnreadCount((c) => Math.max(0, c - 1));
+      decrement();
     } catch {}
   };
 
   const getNotificationLink = (n: Notification): string | null => {
     const role = user?.role;
     const basePath = role ? rolePaths[role] : '';
-    if (n.relatedType === 'contract' && n.relatedId) {
-      if (role === 'customer') return `${basePath}/contracts/${n.relatedId}`;
-      return null; // partner/organizer contracts need eventId which we don't have here
-    }
     if (n.relatedType === 'event' && n.relatedId) {
       return `${basePath}/events/${n.relatedId}`;
     }
-    return null;
+    if (n.relatedType === 'contract' && n.relatedId) {
+      if (role === 'customer') return `${basePath}/contracts/${n.relatedId}`;
+      if (role === 'partner') return `${basePath}/events`;
+      if (role === 'organizer') return `${basePath}/events`;
+    }
+    return basePath ? `${basePath}/notifications` : null;
   };
 
   const handleNotificationClick = async (n: Notification) => {
@@ -96,7 +93,7 @@ export default function Header() {
     try {
       await api.patch('/notifications/read-all');
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-      setUnreadCount(0);
+      clearCount();
     } catch {}
   };
 

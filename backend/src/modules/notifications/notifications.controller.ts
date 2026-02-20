@@ -1,6 +1,23 @@
 import { Controller, Get, Patch, Param, ParseUUIDPipe } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Notification, NotificationStatus } from './entities/notification.entity';
+
+function toDto(n: Notification) {
+  return {
+    id: n.id,
+    userId: n.userId,
+    type: n.type,
+    title: n.title,
+    message: n.content || '',
+    isRead: n.status !== NotificationStatus.PENDING,
+    relatedId: n.metadata?.relatedId ?? n.contractId ?? null,
+    relatedType: n.metadata?.relatedType ?? (n.contractId ? 'contract' : null),
+    sentAt: n.sentAt,
+    readAt: n.sentAt,
+    createdAt: n.createdAt,
+  };
+}
 
 @Controller('notifications')
 export class NotificationsController {
@@ -9,8 +26,9 @@ export class NotificationsController {
   ) {}
 
   @Get()
-  listMyNotifications(@CurrentUser('id') userId: string) {
-    return this.notificationsService.listMyNotifications(userId);
+  async listMyNotifications(@CurrentUser('id') userId: string) {
+    const list = await this.notificationsService.listMyNotifications(userId);
+    return list.map(toDto);
   }
 
   @Get('unread-count')
@@ -25,10 +43,11 @@ export class NotificationsController {
   }
 
   @Patch(':id/read')
-  markAsRead(
+  async markAsRead(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.notificationsService.markAsRead(id, userId);
+    const n = await this.notificationsService.markAsRead(id, userId);
+    return toDto(n);
   }
 }

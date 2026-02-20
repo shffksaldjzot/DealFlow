@@ -1,20 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import api, { extractData } from '@/lib/api';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { Home, FileText, User, Bell } from 'lucide-react';
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    api.get('/notifications/unread-count')
-      .then((res) => setUnreadCount(extractData<{ count: number }>(res).count))
-      .catch(() => {});
-  }, []);
+  const { unreadCount } = useNotificationStore();
 
   const items: Array<{ label: string; href: string; icon: typeof Home; badge?: number }> = [
     { label: '홈', href: '/customer', icon: Home },
