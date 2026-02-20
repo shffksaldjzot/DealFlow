@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Button from '@/components/ui/Button';
@@ -9,7 +9,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
 import SheetEditor from '@/components/integrated-contract/SheetEditor';
 import { useToast } from '@/components/ui/Toast';
-import { Plus, Eye, FileSpreadsheet, Trash2 } from 'lucide-react';
+import { Eye, FileSpreadsheet } from 'lucide-react';
 import type { IcConfig, IcPartnerSheet } from '@/types/integrated-contract';
 
 export default function PartnerSheetPage() {
@@ -18,25 +18,34 @@ export default function PartnerSheetPage() {
   const { toast } = useToast();
 
   const [config, setConfig] = useState<IcConfig | null>(null);
-  const [sheets, setSheets] = useState<IcPartnerSheet[]>([]);
+  const [sheet, setSheet] = useState<IcPartnerSheet | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeSheetId, setActiveSheetId] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
+  const autoCreated = useRef(false);
 
   const loadData = async () => {
     try {
       const configData = await api.get(`/ic/configs/event/${eventId}`).then((res) => extractData<IcConfig>(res));
       setConfig(configData);
       const sheetsData = await api.get('/ic/sheets/my', { params: { configId: configData.id } }).then((res) => extractData<IcPartnerSheet[]>(res));
-      setSheets(sheetsData);
-      if (sheetsData.length > 0 && !activeSheetId) {
-        setActiveSheetId(sheetsData[0].id);
+
+      if (sheetsData.length > 0) {
+        setSheet(sheetsData[0]);
+      } else if (!autoCreated.current) {
+        // Auto-create sheet (server sets name automatically)
+        autoCreated.current = true;
+        try {
+          const created = await api.post('/ic/sheets', {
+            configId: configData.id,
+            categoryName: '품목',
+          }).then((res) => extractData<IcPartnerSheet>(res));
+          setSheet(created);
+        } catch {
+          toast('시트 자동 생성에 실패했습니다.', 'error');
+        }
       }
     } catch {
-      // Config might not exist yet
       setConfig(null);
-      setSheets([]);
+      setSheet(null);
     } finally {
       setLoading(false);
     }
@@ -46,29 +55,10 @@ export default function PartnerSheetPage() {
     loadData();
   }, [eventId]);
 
-  const handleCreateSheet = async () => {
-    if (!config || !newCategoryName.trim()) return;
-    setCreating(true);
-    try {
-      const created = await api.post('/ic/sheets', {
-        configId: config.id,
-        categoryName: newCategoryName.trim(),
-      }).then((res) => extractData<IcPartnerSheet>(res));
-      setSheets([...sheets, created]);
-      setActiveSheetId(created.id);
-      setNewCategoryName('');
-      toast('시트가 생성되었습니다.', 'success');
-    } catch {
-      toast('시트 생성에 실패했습니다.', 'error');
-    } finally {
-      setCreating(false);
-    }
-  };
-
   const handleSaveColumns = async (columns: any[]): Promise<any[]> => {
-    if (!activeSheetId) return [];
+    if (!sheet) return [];
     try {
-      const res = await api.put(`/ic/sheets/${activeSheetId}/columns`, { columns });
+      const res = await api.put(`/ic/sheets/${sheet.id}/columns`, { columns });
       toast('열이 저장되었습니다.', 'success');
       return res.data?.data || [];
     } catch {
@@ -78,9 +68,9 @@ export default function PartnerSheetPage() {
   };
 
   const handleSaveRows = async (rows: any[]): Promise<any[]> => {
-    if (!activeSheetId) return [];
+    if (!sheet) return [];
     try {
-      const res = await api.put(`/ic/sheets/${activeSheetId}/rows`, { rows });
+      const res = await api.put(`/ic/sheets/${sheet.id}/rows`, { rows });
       toast('행이 저장되었습니다.', 'success');
       return res.data?.data || [];
     } catch {
@@ -89,9 +79,10 @@ export default function PartnerSheetPage() {
     }
   };
 
-  const handleUpdateSheetStatus = async (sheetId: string, status: string) => {
+  const handleUpdateSheetStatus = async (status: string) => {
+    if (!sheet) return;
     try {
-      await api.patch(`/ic/sheets/${sheetId}`, { status });
+      await api.patch(`/ic/sheets/${sheet.id}`, { status });
       toast(status === 'active' ? '시트가 활성화되었습니다.' : '시트 상태가 변경되었습니다.', 'success');
       await loadData();
     } catch {
@@ -123,13 +114,11 @@ export default function PartnerSheetPage() {
     );
   }
 
-  const activeSheet = sheets.find((s) => s.id === activeSheetId);
-
   return (
     <div>
       <PageHeader
         title="통합 계약 시트"
-        subtitle={`품목 시트를 편집하세요`}
+        subtitle={sheet ? sheet.categoryName : '품목 시트를 편집하세요'}
         backHref={`/partner/events/${eventId}`}
         actions={
           <Button
@@ -143,73 +132,28 @@ export default function PartnerSheetPage() {
         }
       />
 
-      {/* Sheet Tabs */}
-      <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
-        {sheets.map((sheet) => (
-          <button
-            key={sheet.id}
-            onClick={() => setActiveSheetId(sheet.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
-              activeSheetId === sheet.id
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-            }`}
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            {sheet.categoryName}
-            <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-              activeSheetId === sheet.id ? 'bg-blue-500' : 'bg-gray-100'
-            }`}>
-              {sheet.rows?.length || 0}
-            </span>
-          </button>
-        ))}
-
-        {/* New Sheet Input */}
-        <div className="flex items-center gap-1">
-          <input
-            type="text"
-            value={newCategoryName}
-            onChange={(e) => setNewCategoryName(e.target.value)}
-            placeholder="새 시트명..."
-            className="px-3 py-2 border border-dashed border-gray-300 rounded-xl text-sm w-32 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-            onKeyDown={(e) => e.key === 'Enter' && handleCreateSheet()}
-          />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCreateSheet}
-            loading={creating}
-            disabled={!newCategoryName.trim()}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Active Sheet Editor */}
-      {activeSheet ? (
+      {sheet ? (
         <Card>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <h3 className="font-bold text-gray-900">{activeSheet.categoryName}</h3>
-              <Badge status={activeSheet.status} />
+              <h3 className="font-bold text-gray-900">{sheet.categoryName}</h3>
+              <Badge status={sheet.status} />
             </div>
             <div className="flex items-center gap-2">
-              {activeSheet.status === 'draft' && (
+              {sheet.status === 'draft' && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleUpdateSheetStatus(activeSheet.id, 'active')}
+                  onClick={() => handleUpdateSheetStatus('active')}
                 >
                   활성화
                 </Button>
               )}
-              {activeSheet.status === 'active' && (
+              {sheet.status === 'active' && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleUpdateSheetStatus(activeSheet.id, 'inactive')}
+                  onClick={() => handleUpdateSheetStatus('inactive')}
                 >
                   비활성화
                 </Button>
@@ -219,8 +163,8 @@ export default function PartnerSheetPage() {
 
           <SheetEditor
             apartmentTypes={config.apartmentTypes || []}
-            initialColumns={activeSheet.columns || []}
-            initialRows={activeSheet.rows || []}
+            initialColumns={sheet.columns || []}
+            initialRows={sheet.rows || []}
             onSaveColumns={handleSaveColumns}
             onSaveRows={handleSaveRows}
             onError={(msg) => toast(msg, 'error')}
@@ -229,8 +173,8 @@ export default function PartnerSheetPage() {
       ) : (
         <Card>
           <EmptyState
-            title="시트를 생성하세요"
-            description="카테고리명을 입력하고 시트를 추가하세요"
+            title="시트를 불러오는 중..."
+            description="잠시만 기다려 주세요"
             icon={<FileSpreadsheet className="w-12 h-12 text-gray-300" />}
           />
         </Card>

@@ -11,6 +11,7 @@ import { IcApartmentType } from './entities/ic-apartment-type.entity';
 import { Event } from '../events/entities/event.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
 import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { CreateIcConfigDto } from './dto/create-ic-config.dto';
 import { UpdateIcConfigDto } from './dto/update-ic-config.dto';
 import { CreateApartmentTypeDto } from './dto/create-apartment-type.dto';
@@ -29,6 +30,8 @@ export class IcConfigService {
     private readonly memberRepository: Repository<OrganizationMember>,
     @InjectRepository(Organization)
     private readonly orgRepository: Repository<Organization>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly activityLogService: ActivityLogService,
   ) {}
 
@@ -51,6 +54,16 @@ export class IcConfigService {
   }
 
   private async verifyOrganizerAccess(eventId: string, userId: string): Promise<Event> {
+    // Admin bypass: skip org check
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user?.role === UserRole.ADMIN) {
+      const event = await this.eventRepository.findOne({ where: { id: eventId } });
+      if (!event) {
+        throw new NotFoundException('행사를 찾을 수 없습니다.');
+      }
+      return event;
+    }
+
     const orgId = await this.getOrgIdForUser(userId, true);
     const event = await this.eventRepository.findOne({ where: { id: eventId } });
     if (!event) {

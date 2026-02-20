@@ -12,6 +12,7 @@ import { IcConfig } from './entities/ic-config.entity';
 import { Event } from '../events/entities/event.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
 import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { CreateIcSheetDto } from './dto/create-ic-sheet.dto';
 import { UpdateIcSheetDto } from './dto/update-ic-sheet.dto';
 import { SaveSheetColumnsDto } from './dto/save-sheet-columns.dto';
@@ -35,6 +36,8 @@ export class IcSheetService {
     private readonly memberRepository: Repository<OrganizationMember>,
     @InjectRepository(Organization)
     private readonly orgRepository: Repository<Organization>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly activityLogService: ActivityLogService,
   ) {}
 
@@ -81,10 +84,22 @@ export class IcSheetService {
       throw new NotFoundException('통합 계약 설정을 찾을 수 없습니다.');
     }
 
+    // Idempotent: return existing sheet if one exists for this config+partner
+    const existing = await this.sheetRepository.findOne({
+      where: { configId: dto.configId, partnerId: orgId },
+    });
+    if (existing) {
+      return this.findOneById(existing.id);
+    }
+
+    // Auto-name: "품목(orgName)"
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    const categoryName = dto.categoryName || `품목(${org?.name || '업체'})`;
+
     const sheet = this.sheetRepository.create({
       configId: dto.configId,
       partnerId: orgId,
-      categoryName: dto.categoryName,
+      categoryName,
       memo: dto.memo || null,
     });
 
@@ -92,7 +107,7 @@ export class IcSheetService {
 
     await this.activityLogService.log(
       'create_ic_sheet',
-      `통합 계약 시트 "${dto.categoryName}" 생성`,
+      `통합 계약 시트 "${categoryName}" 생성`,
       userId,
       'ic_partner_sheet',
       saved.id,
@@ -242,7 +257,6 @@ export class IcSheetService {
     sheetId: string,
     userId: string,
   ): Promise<IcPartnerSheet> {
-    const orgId = await this.getOrgIdForUser(userId, true);
     const sheet = await this.sheetRepository.findOne({
       where: { id: sheetId },
       relations: ['columns', 'columns.apartmentType', 'rows'],
@@ -250,6 +264,14 @@ export class IcSheetService {
     if (!sheet) {
       throw new NotFoundException('시트를 찾을 수 없습니다.');
     }
+
+    // Admin bypass
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user?.role === UserRole.ADMIN) {
+      return sheet;
+    }
+
+    const orgId = await this.getOrgIdForUser(userId, true);
     const config = await this.configRepository.findOne({
       where: { id: sheet.configId },
     });
@@ -269,19 +291,25 @@ export class IcSheetService {
     configId: string,
     userId: string,
   ): Promise<IcPartnerSheet[]> {
-    const orgId = await this.getOrgIdForUser(userId, true);
     const config = await this.configRepository.findOne({
       where: { id: configId },
     });
     if (!config) {
       throw new NotFoundException('설정을 찾을 수 없습니다.');
     }
-    const event = await this.eventRepository.findOne({
-      where: { id: config.eventId },
-    });
-    if (!event || event.organizerId !== orgId) {
-      throw new ForbiddenException('해당 행사의 주관사만 조회할 수 있습니다.');
+
+    // Admin bypass
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user?.role !== UserRole.ADMIN) {
+      const orgId = await this.getOrgIdForUser(userId, true);
+      const event = await this.eventRepository.findOne({
+        where: { id: config.eventId },
+      });
+      if (!event || event.organizerId !== orgId) {
+        throw new ForbiddenException('해당 행사의 주관사만 조회할 수 있습니다.');
+      }
     }
+
     return this.sheetRepository.find({
       where: { configId },
       relations: ['columns', 'columns.apartmentType', 'rows', 'partner'],

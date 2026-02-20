@@ -70,9 +70,15 @@ export class IcContractController {
   }
 
   @Get('contracts/event/:eventId')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   findByEventId(@Param('eventId', ParseUUIDPipe) eventId: string) {
     return this.icContractService.findByEventId(eventId);
+  }
+
+  @Get('contracts/partner/my')
+  @Roles('partner')
+  findPartnerContracts(@CurrentUser('id') userId: string) {
+    return this.icContractService.findPartnerContracts(userId);
   }
 
   @Get('contracts/:id')

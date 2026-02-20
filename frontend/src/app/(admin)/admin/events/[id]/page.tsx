@@ -134,6 +134,19 @@ export default function AdminEventDetailPage() {
         </div>
       </Card>
 
+      {/* IC Config Link */}
+      <Card className="mb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700">통합 계약 설정</h3>
+            <p className="text-xs text-gray-400 mt-0.5">행사의 통합 계약(IC) 설정을 관리합니다</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => router.push(`/admin/events/${id}/ic-config`)}>
+            설정 관리
+          </Button>
+        </div>
+      </Card>
+
       {/* Partners */}
       {event.partners && event.partners.length > 0 && (
         <Card className="mb-4">

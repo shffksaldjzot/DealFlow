@@ -19,7 +19,7 @@ import { SaveSheetColumnsDto } from './dto/save-sheet-columns.dto';
 import { SaveSheetRowsDto } from './dto/save-sheet-rows.dto';
 
 @Controller('ic/sheets')
-@Roles('partner')
+@Roles('partner', 'admin')
 export class IcSheetController {
   constructor(private readonly icSheetService: IcSheetService) {}
 

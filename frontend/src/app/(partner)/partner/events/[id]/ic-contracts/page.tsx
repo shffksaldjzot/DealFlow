@@ -8,11 +8,11 @@ import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
 import Table from '@/components/ui/Table';
 import { useToast } from '@/components/ui/Toast';
-import { FileText, TrendingUp } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import type { IcContract } from '@/types/integrated-contract';
 
-export default function OrganizerIcContractsPage() {
+export default function PartnerIcContractsPage() {
   const { id: eventId } = useParams<{ id: string }>();
   const router = useRouter();
   const { toast } = useToast();
@@ -21,8 +21,13 @@ export default function OrganizerIcContractsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(`/ic/contracts/event/${eventId}`)
-      .then((res) => setContracts(extractData(res)))
+    api.get('/ic/contracts/partner/my')
+      .then((res) => {
+        const all = extractData<IcContract[]>(res);
+        // Filter by event
+        const filtered = all.filter((c) => c.config?.event?.id === eventId || c.config?.eventId === eventId);
+        setContracts(filtered);
+      })
       .catch(() => toast('데이터를 불러올 수 없습니다.', 'error'))
       .finally(() => setLoading(false));
   }, [eventId, toast]);
@@ -36,9 +41,6 @@ export default function OrganizerIcContractsPage() {
       </div>
     );
   }
-
-  const totalAmount = contracts.reduce((sum, c) => sum + Number(c.totalAmount || 0), 0);
-  const signedCount = contracts.filter((c) => c.status === 'signed' || c.status === 'completed').length;
 
   const columns = [
     {
@@ -61,22 +63,17 @@ export default function OrganizerIcContractsPage() {
       ),
     },
     {
-      key: 'type',
-      header: '타입',
-      render: (item: IcContract) => (
-        <span className="text-gray-600">{item.apartmentType?.name || '-'}</span>
-      ),
-    },
-    {
       key: 'items',
-      header: '품목수',
-      render: (item: IcContract) => (
-        <span className="text-gray-600">{item.selectedItems?.length || 0}개</span>
-      ),
+      header: '내 품목수',
+      render: (item: IcContract) => {
+        // Count only this partner's items (we'll filter on detail page)
+        const myItems = item.selectedItems?.length || 0;
+        return <span className="text-gray-600">{myItems}개</span>;
+      },
     },
     {
       key: 'totalAmount',
-      header: '금액',
+      header: '총액',
       render: (item: IcContract) => (
         <span className="font-medium text-gray-900">{formatCurrency(item.totalAmount)}</span>
       ),
@@ -95,31 +92,15 @@ export default function OrganizerIcContractsPage() {
     <div>
       <PageHeader
         title="통합 계약 현황"
-        backHref={`/organizer/events/${eventId}`}
+        subtitle="내 품목이 포함된 계약 목록"
+        backHref={`/partner/events/${eventId}`}
       />
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <Card>
-          <p className="text-xs text-gray-500">총 계약</p>
-          <p className="text-xl font-bold text-gray-900">{contracts.length}건</p>
-        </Card>
-        <Card>
-          <p className="text-xs text-gray-500">체결 완료</p>
-          <p className="text-xl font-bold text-green-600">{signedCount}건</p>
-        </Card>
-        <Card>
-          <p className="text-xs text-gray-500">총 금액</p>
-          <p className="text-xl font-bold text-blue-600">{formatCurrency(totalAmount)}</p>
-        </Card>
-      </div>
-
-      {/* Table */}
       {contracts.length === 0 ? (
         <Card>
           <EmptyState
             icon={<FileText className="w-12 h-12 text-gray-300" />}
-            title="통합 계약이 없습니다"
+            title="관련 통합 계약이 없습니다"
             description="고객이 옵션을 선택하여 계약하면 여기에 표시됩니다"
           />
         </Card>
@@ -130,7 +111,7 @@ export default function OrganizerIcContractsPage() {
               columns={columns}
               data={contracts}
               emptyMessage="계약이 없습니다."
-              onRowClick={(item: IcContract) => router.push(`/organizer/events/${eventId}/ic-contracts/${item.id}`)}
+              onRowClick={(item: IcContract) => router.push(`/partner/events/${eventId}/ic-contracts/${item.id}`)}
             />
           </div>
         </Card>

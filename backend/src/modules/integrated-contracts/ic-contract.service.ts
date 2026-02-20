@@ -401,6 +401,32 @@ export class IcContractService {
     });
   }
 
+  async findPartnerContracts(userId: string): Promise<IcContract[]> {
+    // Find partner's org
+    const membership = await this.memberRepository.findOne({ where: { userId } });
+    if (!membership) return [];
+
+    // Find sheets belonging to this partner
+    const sheets = await this.sheetRepository.find({
+      where: { partnerId: membership.organizationId },
+    });
+    if (sheets.length === 0) return [];
+
+    const sheetIds = sheets.map((s) => s.id);
+
+    // Find all contracts and filter those containing items from partner's sheets
+    const configIds = [...new Set(sheets.map((s) => s.configId))];
+    const contracts = await this.contractRepository.find({
+      where: configIds.map((cid) => ({ configId: cid })),
+      relations: ['config', 'config.event', 'apartmentType', 'customer'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return contracts.filter((c) =>
+      c.selectedItems?.some((item) => sheetIds.includes(item.sheetId)),
+    );
+  }
+
   private async resolveEventIdByInviteCode(inviteCode: string): Promise<string> {
     const event = await this.eventRepository.findOne({
       where: { inviteCode },

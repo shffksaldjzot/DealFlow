@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
+import IcContractPrintView from '@/components/integrated-contract/IcContractPrintView';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
 import type { IcContract } from '@/types/integrated-contract';
 
@@ -45,13 +46,29 @@ export default function AdminIcContractDetailPage() {
   if (!contract) return null;
 
   return (
-    <div>
+    <>
+    <div className="print-hidden">
       <PageHeader
         title={`통합 계약 ${contract.shortCode}`}
         subtitle={contract.customerName || '고객 미입력'}
         backHref="/admin/ic-contracts"
         actions={
           <div className="flex gap-2">
+            <button
+              onClick={() => window.print()}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+            >
+              인쇄
+            </button>
+            <button
+              onClick={() => {
+                const eventId = contract.config?.eventId || contract.config?.event?.id;
+                if (eventId) router.push(`/admin/events/${eventId}/ic-config`);
+              }}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+            >
+              설정 보기
+            </button>
             {contract.status === 'signed' && (
               <button
                 disabled={updating}
@@ -193,5 +210,13 @@ export default function AdminIcContractDetailPage() {
         </div>
       )}
     </div>
+
+    {/* Print View (hidden on screen, shown on print) */}
+    <div className="hidden" style={{ display: 'none' }}>
+      <div className="ic-print-container">
+        <IcContractPrintView contract={contract} />
+      </div>
+    </div>
+    </>
   );
 }

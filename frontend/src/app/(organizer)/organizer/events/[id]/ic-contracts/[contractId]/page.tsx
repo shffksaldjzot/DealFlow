@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -9,17 +9,18 @@ import ContractPreview from '@/components/integrated-contract/ContractPreview';
 import IcContractPrintView from '@/components/integrated-contract/IcContractPrintView';
 import type { IcContract } from '@/types/integrated-contract';
 
-export default function CustomerIntegratedContractDetailPage() {
-  const { id } = useParams<{ id: string }>();
+export default function OrganizerIcContractDetailPage() {
+  const { id: eventId, contractId } = useParams<{ id: string; contractId: string }>();
+  const router = useRouter();
   const [contract, setContract] = useState<IcContract | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(`/ic/contracts/${id}`)
+    api.get(`/ic/contracts/${contractId}`)
       .then((res) => setContract(extractData(res)))
-      .catch(() => {})
+      .catch(() => router.push(`/organizer/events/${eventId}/ic-contracts`))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [contractId, eventId, router]);
 
   if (loading) {
     return (
@@ -31,23 +32,15 @@ export default function CustomerIntegratedContractDetailPage() {
     );
   }
 
-  if (!contract) {
-    return (
-      <div>
-        <PageHeader title="계약 상세" backHref="/customer/integrated-contracts" />
-        <Card>
-          <p className="text-center text-gray-500">계약을 찾을 수 없습니다.</p>
-        </Card>
-      </div>
-    );
-  }
+  if (!contract) return null;
 
   return (
     <>
       <div className="print-hidden">
         <PageHeader
-          title="계약 상세"
-          backHref="/customer/integrated-contracts"
+          title={`통합 계약 ${contract.shortCode}`}
+          subtitle={contract.customerName || '고객 미입력'}
+          backHref={`/organizer/events/${eventId}/ic-contracts`}
           actions={
             <div className="flex items-center gap-2">
               <button

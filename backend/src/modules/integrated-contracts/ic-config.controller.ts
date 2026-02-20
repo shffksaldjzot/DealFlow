@@ -28,7 +28,7 @@ export class IcConfigController {
   ) {}
 
   @Post()
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   create(
     @CurrentUser('id') userId: string,
     @Body() dto: CreateIcConfigDto,
@@ -42,7 +42,7 @@ export class IcConfigController {
   }
 
   @Patch(':id')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser('id') userId: string,
@@ -52,7 +52,7 @@ export class IcConfigController {
   }
 
   @Post(':id/apartment-types')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   addApartmentType(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser('id') userId: string,
@@ -62,7 +62,7 @@ export class IcConfigController {
   }
 
   @Patch(':id/apartment-types/:tid')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   updateApartmentType(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('tid', ParseUUIDPipe) tid: string,
@@ -73,7 +73,7 @@ export class IcConfigController {
   }
 
   @Delete(':id/apartment-types/:tid')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   deleteApartmentType(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('tid', ParseUUIDPipe) tid: string,
@@ -85,7 +85,7 @@ export class IcConfigController {
   // === Organizer sheet management ===
 
   @Get(':id/sheets')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   findSheets(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser('id') userId: string,
@@ -94,7 +94,7 @@ export class IcConfigController {
   }
 
   @Put(':id/sheets/:sheetId/columns')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   saveSheetColumns(
     @Param('id', ParseUUIDPipe) _id: string,
     @Param('sheetId', ParseUUIDPipe) sheetId: string,
@@ -105,7 +105,7 @@ export class IcConfigController {
   }
 
   @Put(':id/sheets/:sheetId/rows')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   saveSheetRows(
     @Param('id', ParseUUIDPipe) _id: string,
     @Param('sheetId', ParseUUIDPipe) sheetId: string,
@@ -116,7 +116,7 @@ export class IcConfigController {
   }
 
   @Patch(':id/sheets/:sheetId')
-  @Roles('organizer')
+  @Roles('organizer', 'admin')
   updateSheet(
     @Param('id', ParseUUIDPipe) _id: string,
     @Param('sheetId', ParseUUIDPipe) sheetId: string,
