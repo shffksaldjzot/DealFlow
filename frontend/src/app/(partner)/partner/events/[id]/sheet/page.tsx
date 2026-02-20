@@ -77,12 +77,12 @@ export default function PartnerSheetPage() {
     }
   };
 
-  const handleSaveRows = async (rows: any[]) => {
-    if (!activeSheetId) return;
+  const handleSaveRows = async (rows: any[]): Promise<any[]> => {
+    if (!activeSheetId) return [];
     try {
-      await api.put(`/ic/sheets/${activeSheetId}/rows`, { rows });
+      const res = await api.put(`/ic/sheets/${activeSheetId}/rows`, { rows });
       toast('행이 저장되었습니다.', 'success');
-      await loadData();
+      return res.data?.data || [];
     } catch {
       toast('행 저장에 실패했습니다.', 'error');
       throw new Error();
@@ -223,6 +223,7 @@ export default function PartnerSheetPage() {
             initialRows={activeSheet.rows || []}
             onSaveColumns={handleSaveColumns}
             onSaveRows={handleSaveRows}
+            onError={(msg) => toast(msg, 'error')}
           />
         </Card>
       ) : (

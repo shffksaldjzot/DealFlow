@@ -241,10 +241,11 @@ export default function OrganizerIcConfigPage() {
     return res.data?.data || [];
   };
 
-  const saveSheetRows = async (sheetId: string, rows: any[]) => {
-    if (!config) return;
-    await api.put(`/ic/configs/${config.id}/sheets/${sheetId}/rows`, { rows });
+  const saveSheetRows = async (sheetId: string, rows: any[]): Promise<any[]> => {
+    if (!config) return [];
+    const res = await api.put(`/ic/configs/${config.id}/sheets/${sheetId}/rows`, { rows });
     toast('시트가 저장되었습니다.', 'success');
+    return res.data?.data || [];
   };
 
   // ── Copy public URL ──
@@ -626,6 +627,7 @@ export default function OrganizerIcConfigPage() {
                         initialRows={sheet.rows || []}
                         onSaveColumns={(cols) => saveSheetColumns(sheet.id, cols)}
                         onSaveRows={(rows) => saveSheetRows(sheet.id, rows)}
+                        onError={(msg) => toast(msg, 'error')}
                       />
                     </div>
                   )}

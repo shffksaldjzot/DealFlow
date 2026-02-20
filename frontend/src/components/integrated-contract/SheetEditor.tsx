@@ -47,7 +47,8 @@ interface SheetEditorProps {
   initialColumns?: IcSheetColumn[];
   initialRows?: IcSheetRow[];
   onSaveColumns: (columns: Omit<ColumnDraft, '_key'>[]) => Promise<any[] | void>;
-  onSaveRows: (rows: Omit<RowDraft, '_key'>[]) => Promise<void>;
+  onSaveRows: (rows: Omit<RowDraft, '_key'>[]) => Promise<any[] | void>;
+  onError?: (message: string) => void;
   disabled?: boolean;
 }
 
@@ -123,6 +124,7 @@ export default function SheetEditor({
   initialRows = [],
   onSaveColumns,
   onSaveRows,
+  onError,
   disabled,
 }: SheetEditorProps) {
   // Sort initial data by sortOrder
@@ -334,7 +336,44 @@ export default function SheetEditor({
         };
       });
 
-      await onSaveRows(rowsToSave);
+      const savedRows = await onSaveRows(rowsToSave);
+
+      // Update internal state with new IDs from backend to keep in sync
+      if (Array.isArray(savedCols) && savedCols.length > 0) {
+        const sortedCols = [...savedCols].sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+        setColumns(sortedCols.map((c: any) => ({
+          id: c.id,
+          apartmentTypeId: c.apartmentTypeId || undefined,
+          customName: c.customName || undefined,
+          columnType: c.columnType || 'amount',
+          sortOrder: c.sortOrder,
+          _key: c.id,
+        })));
+      }
+
+      if (Array.isArray(savedRows) && savedRows.length > 0) {
+        const sortedRows = [...savedRows].sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+        setRows(sortedRows.map((r: any) => ({
+          id: r.id,
+          optionName: r.optionName,
+          popupContent: r.popupContent || undefined,
+          sortOrder: r.sortOrder,
+          prices: r.prices || {},
+          cellValues: r.cellValues || {},
+          _key: r.id,
+        })));
+      } else {
+        // Fallback: update rows from local remapped data
+        setRows(rowsToSave.map((r) => ({
+          ...r,
+          _key: r.id || nextKey(),
+        })));
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      if (onError) {
+        onError(Array.isArray(msg) ? msg.join(', ') : msg || '저장에 실패했습니다.');
+      }
     } finally {
       setSaving(false);
     }

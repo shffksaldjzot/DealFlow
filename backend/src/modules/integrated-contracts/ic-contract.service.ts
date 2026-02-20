@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { IcContract, IcContractStatus } from './entities/ic-contract.entity';
 import { IcConfig } from './entities/ic-config.entity';
 import { IcPartnerSheet, IcSheetStatus } from './entities/ic-partner-sheet.entity';
@@ -78,7 +78,7 @@ export class IcContractService {
     }
 
     const sheets = await this.sheetRepository.find({
-      where: { configId: config.id, status: IcSheetStatus.ACTIVE },
+      where: { configId: config.id, status: In([IcSheetStatus.ACTIVE, IcSheetStatus.DRAFT]) },
       relations: ['columns', 'columns.apartmentType', 'rows', 'partner'],
       order: { createdAt: 'ASC' },
     });
