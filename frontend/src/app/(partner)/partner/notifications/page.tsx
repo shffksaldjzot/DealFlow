@@ -8,6 +8,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import { Bell, Check, CheckCheck, ChevronRight } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import type { Notification } from '@/types/notification';
+import { normalizeNotification } from '@/types/notification';
 
 export default function PartnerNotifications() {
   const router = useRouter();
@@ -16,7 +17,10 @@ export default function PartnerNotifications() {
 
   useEffect(() => {
     api.get('/notifications')
-      .then((res) => setNotifications(extractData(res)))
+      .then((res) => {
+        const raw = extractData<any[]>(res);
+        setNotifications(raw.map(normalizeNotification));
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

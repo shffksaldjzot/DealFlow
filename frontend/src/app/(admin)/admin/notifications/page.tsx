@@ -7,6 +7,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import { Bell, Check, CheckCheck } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import type { Notification } from '@/types/notification';
+import { normalizeNotification } from '@/types/notification';
 
 export default function AdminNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -14,7 +15,10 @@ export default function AdminNotifications() {
 
   useEffect(() => {
     api.get('/notifications')
-      .then((res) => setNotifications(extractData(res)))
+      .then((res) => {
+        const raw = extractData<any[]>(res);
+        setNotifications(raw.map(normalizeNotification));
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

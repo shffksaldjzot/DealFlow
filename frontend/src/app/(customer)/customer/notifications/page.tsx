@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import { Bell, Check, CheckCheck, ChevronRight } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import type { Notification } from '@/types/notification';
+import { normalizeNotification } from '@/types/notification';
 
 export default function CustomerNotifications() {
   const router = useRouter();
@@ -15,7 +16,10 @@ export default function CustomerNotifications() {
 
   useEffect(() => {
     api.get('/notifications')
-      .then((res) => setNotifications(extractData(res)))
+      .then((res) => {
+        const raw = extractData<any[]>(res);
+        setNotifications(raw.map(normalizeNotification));
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

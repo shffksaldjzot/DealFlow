@@ -7,6 +7,7 @@ import { LogOut, User, Bell, Check, ChevronRight } from 'lucide-react';
 import api, { extractData } from '@/lib/api';
 import { formatDateTime } from '@/lib/utils';
 import type { Notification } from '@/types/notification';
+import { normalizeNotification } from '@/types/notification';
 
 export default function Header() {
   const { user, logout, isAuthenticated } = useAuthStore();
@@ -42,7 +43,10 @@ export default function Header() {
   useEffect(() => {
     if (showDropdown && isAuthenticated) {
       api.get('/notifications')
-        .then((res) => setNotifications(extractData<Notification[]>(res)))
+        .then((res) => {
+          const raw = extractData<any[]>(res);
+          setNotifications(raw.map(normalizeNotification));
+        })
         .catch(() => {});
     }
   }, [showDropdown, isAuthenticated]);
