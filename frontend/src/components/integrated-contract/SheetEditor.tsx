@@ -312,20 +312,29 @@ export default function SheetEditor({
         });
       }
 
-      // Remap row prices/cellValues keys to use new column IDs
-      const rowsToSave = rows.map(({ _key, ...rest }, i) => {
-        if (keyRemap.size === 0) {
-          return { ...rest, sortOrder: i };
-        }
+      // Build set of valid new column IDs to clean stale references
+      const validColIds = new Set<string>(
+        Array.isArray(savedCols)
+          ? savedCols.map((c: any) => c.id).filter(Boolean)
+          : columns.map((c) => getColumnKey(c)),
+      );
 
+      // Remap row prices/cellValues keys to use new column IDs, dropping stale keys
+      const rowsToSave = rows.map(({ _key, ...rest }, i) => {
         const remappedPrices: Record<string, number> = {};
         const remappedCellValues: Record<string, string> = {};
 
         for (const [key, val] of Object.entries(rest.prices || {})) {
-          remappedPrices[keyRemap.get(key) || key] = val;
+          const newKey = keyRemap.get(key) || key;
+          if (validColIds.has(newKey)) {
+            remappedPrices[newKey] = val;
+          }
         }
         for (const [key, val] of Object.entries(rest.cellValues || {})) {
-          remappedCellValues[keyRemap.get(key) || key] = val;
+          const newKey = keyRemap.get(key) || key;
+          if (validColIds.has(newKey)) {
+            remappedCellValues[newKey] = val;
+          }
         }
 
         return {
