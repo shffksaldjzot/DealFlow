@@ -18,6 +18,8 @@ import { ActivityLog } from './entities/activity-log.entity';
 import { Notification, NotificationStatus } from '../notifications/entities/notification.entity';
 import { ActivityLogService } from '../../shared/activity-log/activity-log.service';
 import { PaginationDto, PaginatedResult } from '../../common/dto/pagination.dto';
+import { IcContract, IcContractStatus } from '../integrated-contracts/entities/ic-contract.entity';
+import { IcConfig } from '../integrated-contracts/entities/ic-config.entity';
 import {
   RejectOrganizerDto,
   ChangeUserStatusDto,
@@ -25,6 +27,7 @@ import {
   CreateUserDto,
   AdminUpdateEventDto,
   AdminUpdateContractStatusDto,
+  AdminUpdateIcContractStatusDto,
   ResetPasswordDto,
 } from './dto/approve-organizer.dto';
 
@@ -51,6 +54,10 @@ export class AdminService {
     private readonly activityLogRepository: Repository<ActivityLog>,
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
+    @InjectRepository(IcContract)
+    private readonly icContractRepository: Repository<IcContract>,
+    @InjectRepository(IcConfig)
+    private readonly icConfigRepository: Repository<IcConfig>,
     private readonly activityLogService: ActivityLogService,
     private readonly dataSource: DataSource,
   ) {}
@@ -754,6 +761,70 @@ export class AdminService {
       adminUserId,
       'contract',
       contractId,
+    );
+
+    return saved;
+  }
+
+  // ─── IC Contracts ────────────────────────────────────────
+
+  async getIcContracts(pagination: PaginationDto): Promise<PaginatedResult<IcContract>> {
+    const { page, limit, search } = pagination;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.icContractRepository
+      .createQueryBuilder('ic')
+      .leftJoinAndSelect('ic.config', 'config')
+      .leftJoinAndSelect('config.event', 'event')
+      .leftJoinAndSelect('ic.apartmentType', 'apartmentType')
+      .orderBy('ic.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    if (search) {
+      const like = this.isPostgres ? 'ILIKE' : 'LIKE';
+      queryBuilder.andWhere(
+        `(ic.shortCode ${like} :search OR ic.customerName ${like} :search)`,
+        { search: `%${search}%` },
+      );
+    }
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+    return new PaginatedResult(data, total, page, limit);
+  }
+
+  async getIcContractDetail(id: string): Promise<IcContract> {
+    const contract = await this.icContractRepository.findOne({
+      where: { id },
+      relations: ['config', 'config.event', 'apartmentType', 'customer'],
+    });
+    if (!contract) {
+      throw new NotFoundException('통합 계약을 찾을 수 없습니다.');
+    }
+    return contract;
+  }
+
+  async updateIcContractStatus(
+    id: string,
+    dto: AdminUpdateIcContractStatusDto,
+    adminUserId?: string,
+  ): Promise<IcContract> {
+    const contract = await this.icContractRepository.findOne({ where: { id } });
+    if (!contract) {
+      throw new NotFoundException('통합 계약을 찾을 수 없습니다.');
+    }
+
+    const fromStatus = contract.status;
+    contract.status = dto.status as IcContractStatus;
+
+    const saved = await this.icContractRepository.save(contract);
+
+    await this.activityLogService.log(
+      'update_ic_contract_status',
+      `통합 계약 ${contract.shortCode} 상태를 "${fromStatus}" → "${dto.status}"로 변경`,
+      adminUserId,
+      'ic_contract',
+      id,
     );
 
     return saved;

@@ -12,6 +12,8 @@ import { ContractSignature } from '../contracts/entities/contract-signature.enti
 import { ContractHistory } from '../contracts/entities/contract-history.entity';
 import { ActivityLog } from './entities/activity-log.entity';
 import { Notification } from '../notifications/entities/notification.entity';
+import { IcContract } from '../integrated-contracts/entities/ic-contract.entity';
+import { IcConfig } from '../integrated-contracts/entities/ic-config.entity';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { Notification } from '../notifications/entities/notification.entity';
       ContractHistory,
       ActivityLog,
       Notification,
+      IcContract,
+      IcConfig,
     ]),
   ],
   controllers: [AdminController],

@@ -20,6 +20,7 @@ import {
   CreateUserDto,
   AdminUpdateEventDto,
   AdminUpdateContractStatusDto,
+  AdminUpdateIcContractStatusDto,
   ResetPasswordDto,
 } from './dto/approve-organizer.dto';
 
@@ -168,6 +169,27 @@ export class AdminController {
     @CurrentUser('id') adminUserId: string,
   ) {
     return this.adminService.updateContractStatus(id, dto, adminUserId);
+  }
+
+  // ─── IC Contracts ────────────────────────────────────────
+
+  @Get('ic-contracts')
+  listIcContracts(@Query() pagination: PaginationDto) {
+    return this.adminService.getIcContracts(pagination);
+  }
+
+  @Get('ic-contracts/:id')
+  getIcContractDetail(@Param('id', ParseUUIDPipe) id: string) {
+    return this.adminService.getIcContractDetail(id);
+  }
+
+  @Patch('ic-contracts/:id/status')
+  updateIcContractStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AdminUpdateIcContractStatusDto,
+    @CurrentUser('id') adminUserId: string,
+  ) {
+    return this.adminService.updateIcContractStatus(id, dto, adminUserId);
   }
 
   // ─── Activity Logs ────────────────────────────────────────

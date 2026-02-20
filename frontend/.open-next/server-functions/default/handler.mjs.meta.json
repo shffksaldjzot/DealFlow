@@ -3756,6 +3756,11 @@
       "imports": [],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/page_client-reference-manifest.js": {
+      "bytes": 11236,
+      "imports": [],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/page_client-reference-manifest.js": {
       "bytes": 11206,
       "imports": [],
@@ -3811,6 +3816,11 @@
       "imports": [],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/[id]/page_client-reference-manifest.js": {
+      "bytes": 11260,
+      "imports": [],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/[id]/page_client-reference-manifest.js": {
       "bytes": 11231,
       "imports": [],
@@ -3846,11 +3856,6 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/sheet/preview/page_client-reference-manifest.js": {
-      "bytes": 11327,
-      "imports": [],
-      "format": "cjs"
-    },
     ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/templates/new/page_client-reference-manifest.js": {
       "bytes": 11323,
       "imports": [],
@@ -3858,6 +3863,11 @@
     },
     ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/templates/[templateId]/page_client-reference-manifest.js": {
       "bytes": 11372,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/sheet/preview/page_client-reference-manifest.js": {
+      "bytes": 11330,
       "imports": [],
       "format": "cjs"
     },
@@ -3872,7 +3882,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-      "bytes": 94718,
+      "bytes": 97500,
       "imports": [
         {
           "path": "path",
@@ -4065,6 +4075,11 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/logs/page_client-reference-manifest.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/page_client-reference-manifest.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/events/page_client-reference-manifest.js"
@@ -4120,6 +4135,11 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/users/[id]/page_client-reference-manifest.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/[id]/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/[id]/page_client-reference-manifest.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/[id]/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/events/[id]/page_client-reference-manifest.js"
@@ -4155,11 +4175,6 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/contracts/page_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/sheet/preview/page_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/sheet/preview/page_client-reference-manifest.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/templates/new/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/templates/new/page_client-reference-manifest.js"
@@ -4168,6 +4183,11 @@
           "path": ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/templates/[templateId]/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/templates/[templateId]/page_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/sheet/preview/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/sheet/preview/page_client-reference-manifest.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/contracts/new/page_client-reference-manifest.js",
@@ -4669,7 +4689,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__ed7fd7ec._.js": {
-      "bytes": 242174,
+      "bytes": 242211,
       "imports": [
         {
           "path": "stream",
@@ -4816,27 +4836,6 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__37dd0d48._.js": {
-      "bytes": 4725,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-async-storage.external.js",
-          "kind": "require-call",
-          "original": "next/dist/server/app-render/work-async-storage.external.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-unit-async-storage.external.js",
-          "kind": "require-call",
-          "original": "next/dist/server/app-render/work-unit-async-storage.external.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/action-async-storage.external.js",
-          "kind": "require-call",
-          "original": "next/dist/server/app-render/action-async-storage.external.js"
-        }
-      ],
-      "format": "cjs"
-    },
     ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__519dd2f1._.js": {
       "bytes": 1458,
       "imports": [
@@ -4951,6 +4950,27 @@
       ],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__b1fb5d54._.js": {
+      "bytes": 5174,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-async-storage.external.js",
+          "kind": "require-call",
+          "original": "next/dist/server/app-render/work-async-storage.external.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-unit-async-storage.external.js",
+          "kind": "require-call",
+          "original": "next/dist/server/app-render/work-unit-async-storage.external.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/action-async-storage.external.js",
+          "kind": "require-call",
+          "original": "next/dist/server/app-render/action-async-storage.external.js"
+        }
+      ],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/chunks/ssr/_1a775abe._.js": {
       "bytes": 18152,
       "imports": [
@@ -4962,13 +4982,13 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/_a1866072._.js": {
-      "bytes": 16271,
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_a9f0b041._.js": {
+      "bytes": 13970,
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/_a9f0b041._.js": {
-      "bytes": 13850,
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_ef97cf1f._.js": {
+      "bytes": 16271,
       "imports": [],
       "format": "cjs"
     },
@@ -5095,6 +5115,70 @@
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/src_7e6664b3._.js": {
       "bytes": 4656,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__42342557._.js": {
+      "bytes": 1470,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/no-fallback-error.external.js",
+          "kind": "require-call",
+          "original": "next/dist/shared/lib/no-fallback-error.external.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_72976298._.js": {
+      "bytes": 18169,
+      "imports": [
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_[id]_page_actions_afaadb88.js": {
+      "bytes": 152,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/src_0bce33c6._.js": {
+      "bytes": 7622,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__85bc6f6d._.js": {
+      "bytes": 1450,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/no-fallback-error.external.js",
+          "kind": "require-call",
+          "original": "next/dist/shared/lib/no-fallback-error.external.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_c3cc0334._.js": {
+      "bytes": 18113,
+      "imports": [
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_page_actions_f4b30d84.js": {
+      "bytes": 143,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/src_621efc52._.js": {
+      "bytes": 5291,
       "imports": [],
       "format": "cjs"
     },
@@ -5339,7 +5423,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__4f006332._.js": {
-      "bytes": 19418,
+      "bytes": 19475,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-async-storage.external.js",
@@ -5779,8 +5863,8 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7749a7ae._.js": {
-      "bytes": 4852,
+    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__0f8cebee._.js": {
+      "bytes": 5301,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-async-storage.external.js",
@@ -5811,7 +5895,7 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/_9f2d9797._.js": {
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_82d3a09f._.js": {
       "bytes": 12653,
       "imports": [],
       "format": "cjs"
@@ -5880,8 +5964,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/_c188fd55._.js": {
-      "bytes": 7916,
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_acbb83fc._.js": {
+      "bytes": 7467,
       "imports": [],
       "format": "cjs"
     },
@@ -5902,12 +5986,12 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/src_app_(organizer)_organizer_events_[id]_ic-config_page_tsx_3ca7fd79._.js": {
-      "bytes": 19137,
+      "bytes": 19201,
       "imports": [],
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/src_components_integrated-contract_SheetEditor_tsx_1b6125d1._.js": {
-      "bytes": 56277,
+      "bytes": 57064,
       "imports": [],
       "format": "cjs"
     },
@@ -6183,8 +6267,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__fad22472._.js": {
-      "bytes": 4730,
+    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__d7d30c83._.js": {
+      "bytes": 5179,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-async-storage.external.js",
@@ -6215,7 +6299,7 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/_d2fe2ac2._.js": {
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_a666ae5b._.js": {
       "bytes": 16656,
       "imports": [],
       "format": "cjs"
@@ -6278,11 +6362,6 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/_5ea914af._.js": {
-      "bytes": 16406,
-      "imports": [],
-      "format": "cjs"
-    },
     ".open-next/server-functions/default/.next/server/chunks/ssr/_74898b76._.js": {
       "bytes": 18157,
       "imports": [
@@ -6292,6 +6371,11 @@
           "external": true
         }
       ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_a68ccede._.js": {
+      "bytes": 15957,
+      "imports": [],
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(partner)_partner_events_[id]_page_actions_fbd5ca96.js": {
@@ -6310,8 +6394,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/_47c59478._.js": {
-      "bytes": 11069,
+    ".open-next/server-functions/default/.next/server/chunks/ssr/_3d5bef34._.js": {
+      "bytes": 10674,
       "imports": [],
       "format": "cjs"
     },
@@ -6342,11 +6426,6 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/_752a578c._.js": {
-      "bytes": 5788,
-      "imports": [],
-      "format": "cjs"
-    },
     ".open-next/server-functions/default/.next/server/chunks/ssr/_a1593b8e._.js": {
       "bytes": 18287,
       "imports": [
@@ -6360,6 +6439,11 @@
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/ce889_server_app_(partner)_partner_events_[id]_sheet_preview_page_actions_29613134.js": {
       "bytes": 155,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/ssr/src_cbe5ce3c._.js": {
+      "bytes": 5342,
       "imports": [],
       "format": "cjs"
     },
@@ -7013,7 +7097,7 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cc033b51._.js": {
+    ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cebc6e8f._.js": {
       "bytes": 11656,
       "imports": [
         {
@@ -7268,7 +7352,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js": {
-      "bytes": 89820,
+      "bytes": 91560,
       "imports": [
         {
           "path": "next/dist/compiled/@vercel/og/index.edge.js",
@@ -7396,11 +7480,6 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_app_error_tsx_ef715cc8._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__37dd0d48._.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__37dd0d48._.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__519dd2f1._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__519dd2f1._.js"
@@ -7421,19 +7500,24 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__a457c799._.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__b1fb5d54._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__b1fb5d54._.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_1a775abe._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_1a775abe._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a1866072._.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a1866072._.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a9f0b041._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a9f0b041._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_ef97cf1f._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_ef97cf1f._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_contracts_[id]_page_actions_1641c891.js",
@@ -7524,6 +7608,46 @@
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/src_7e6664b3._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_7e6664b3._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__42342557._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__42342557._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_72976298._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_72976298._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_[id]_page_actions_afaadb88.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_[id]_page_actions_afaadb88.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/src_0bce33c6._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_0bce33c6._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__85bc6f6d._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__85bc6f6d._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_c3cc0334._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_c3cc0334._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_page_actions_f4b30d84.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_page_actions_f4b30d84.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/src_621efc52._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_621efc52._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__ba39a74b._.js",
@@ -7911,9 +8035,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/3e585_(organizer)_organizer_events_[id]_contracts_[contractId]_page_actions_9d06ff17.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7749a7ae._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__0f8cebee._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7749a7ae._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__0f8cebee._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__8caefea9._.js",
@@ -7921,9 +8045,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__8caefea9._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_9f2d9797._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_82d3a09f._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_9f2d9797._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_82d3a09f._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_e98247e5._.js",
@@ -7966,9 +8090,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__dcdea20c._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_c188fd55._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_acbb83fc._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_c188fd55._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_acbb83fc._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_f688164a._.js",
@@ -8161,9 +8285,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__3ce974be._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__fad22472._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__d7d30c83._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__fad22472._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__d7d30c83._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_1e6313b3._.js",
@@ -8171,9 +8295,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_1e6313b3._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_d2fe2ac2._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a666ae5b._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_d2fe2ac2._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a666ae5b._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(partner)_partner_contracts_[id]_page_actions_fcf51b4b.js",
@@ -8216,14 +8340,14 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__657921f4._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_5ea914af._.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_5ea914af._.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_74898b76._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_74898b76._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a68ccede._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a68ccede._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(partner)_partner_events_[id]_page_actions_fbd5ca96.js",
@@ -8236,9 +8360,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__8e6f4260._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_47c59478._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_3d5bef34._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_47c59478._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_3d5bef34._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_fec66acc._.js",
@@ -8256,11 +8380,6 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7bc6a934._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_752a578c._.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_752a578c._.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a1593b8e._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a1593b8e._.js"
@@ -8269,6 +8388,11 @@
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/ce889_server_app_(partner)_partner_events_[id]_sheet_preview_page_actions_29613134.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/ce889_server_app_(partner)_partner_events_[id]_sheet_preview_page_actions_29613134.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/src_cbe5ce3c._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_cbe5ce3c._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__58b611f6._.js",
@@ -8601,9 +8725,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_app_events_[code]_options_page_tsx_ef0c209a._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cc033b51._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cebc6e8f._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cc033b51._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cebc6e8f._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__e1584fdb._.js",
@@ -8669,7 +8793,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js": {
-      "bytes": 89830,
+      "bytes": 91570,
       "imports": [
         {
           "path": "next/dist/compiled/@vercel/og/index.edge.js",
@@ -8797,11 +8921,6 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_app_error_tsx_ef715cc8._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__37dd0d48._.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__37dd0d48._.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__519dd2f1._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__519dd2f1._.js"
@@ -8822,19 +8941,24 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__a457c799._.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__b1fb5d54._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__b1fb5d54._.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_1a775abe._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_1a775abe._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a1866072._.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a1866072._.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a9f0b041._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a9f0b041._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_ef97cf1f._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_ef97cf1f._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_contracts_[id]_page_actions_1641c891.js",
@@ -8925,6 +9049,46 @@
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/src_7e6664b3._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_7e6664b3._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__42342557._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__42342557._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_72976298._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_72976298._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_[id]_page_actions_afaadb88.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_[id]_page_actions_afaadb88.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/src_0bce33c6._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_0bce33c6._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__85bc6f6d._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__85bc6f6d._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_c3cc0334._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_c3cc0334._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_page_actions_f4b30d84.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_page_actions_f4b30d84.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/src_621efc52._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_621efc52._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__ba39a74b._.js",
@@ -9312,9 +9476,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/3e585_(organizer)_organizer_events_[id]_contracts_[contractId]_page_actions_9d06ff17.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7749a7ae._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__0f8cebee._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7749a7ae._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__0f8cebee._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__8caefea9._.js",
@@ -9322,9 +9486,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__8caefea9._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_9f2d9797._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_82d3a09f._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_9f2d9797._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_82d3a09f._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_e98247e5._.js",
@@ -9367,9 +9531,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__dcdea20c._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_c188fd55._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_acbb83fc._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_c188fd55._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_acbb83fc._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_f688164a._.js",
@@ -9562,9 +9726,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__3ce974be._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__fad22472._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__d7d30c83._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__fad22472._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__d7d30c83._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_1e6313b3._.js",
@@ -9572,9 +9736,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_1e6313b3._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_d2fe2ac2._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a666ae5b._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_d2fe2ac2._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a666ae5b._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(partner)_partner_contracts_[id]_page_actions_fcf51b4b.js",
@@ -9617,14 +9781,14 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__657921f4._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_5ea914af._.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_5ea914af._.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_74898b76._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_74898b76._.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a68ccede._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a68ccede._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(partner)_partner_events_[id]_page_actions_fbd5ca96.js",
@@ -9637,9 +9801,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__8e6f4260._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_47c59478._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_3d5bef34._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_47c59478._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_3d5bef34._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_fec66acc._.js",
@@ -9657,11 +9821,6 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7bc6a934._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_752a578c._.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_752a578c._.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/_a1593b8e._.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/_a1593b8e._.js"
@@ -9670,6 +9829,11 @@
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/ce889_server_app_(partner)_partner_events_[id]_sheet_preview_page_actions_29613134.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/ce889_server_app_(partner)_partner_events_[id]_sheet_preview_page_actions_29613134.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/src_cbe5ce3c._.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_cbe5ce3c._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__58b611f6._.js",
@@ -10002,9 +10166,9 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/src_app_events_[code]_options_page_tsx_ef0c209a._.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cc033b51._.js",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cebc6e8f._.js",
           "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cc033b51._.js"
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cebc6e8f._.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__e1584fdb._.js",
@@ -10104,6 +10268,28 @@
     },
     ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/page.js": {
       "bytes": 1123,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/ssr/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/[id]/page.js": {
+      "bytes": 1148,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../../chunks/ssr/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/page.js": {
+      "bytes": 1135,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -10708,7 +10894,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
-      "bytes": 18437,
+      "bytes": 18933,
       "imports": [
         {
           "path": "path",
@@ -10774,6 +10960,16 @@
           "path": ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/page.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/events/page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/[id]/page.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/[id]/page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/page.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/page.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/(admin)/admin/logs/page.js",
@@ -12198,7 +12394,7 @@
       "format": "esm"
     },
     ".open-next/server-functions/default/index.mjs": {
-      "bytes": 107403,
+      "bytes": 108319,
       "imports": [
         {
           "path": "node:module",
@@ -12554,6 +12750,16 @@
         },
         {
           "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
           "kind": "require-call",
           "external": true
         },
@@ -13881,6 +14087,9 @@
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/logs/page_client-reference-manifest.js": {
           "bytesInOutput": 10693
         },
+        ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/page_client-reference-manifest.js": {
+          "bytesInOutput": 10741
+        },
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/page_client-reference-manifest.js": {
           "bytesInOutput": 10705
         },
@@ -13914,6 +14123,9 @@
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/users/[id]/page_client-reference-manifest.js": {
           "bytesInOutput": 10728
         },
+        ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/[id]/page_client-reference-manifest.js": {
+          "bytesInOutput": 10770
+        },
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/[id]/page_client-reference-manifest.js": {
           "bytesInOutput": 10735
         },
@@ -13935,14 +14147,14 @@
         ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/contracts/page_client-reference-manifest.js": {
           "bytesInOutput": 10952
         },
-        ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/sheet/preview/page_client-reference-manifest.js": {
-          "bytesInOutput": 10848
-        },
         ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/templates/new/page_client-reference-manifest.js": {
           "bytesInOutput": 10845
         },
         ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/templates/[templateId]/page_client-reference-manifest.js": {
           "bytesInOutput": 10903
+        },
+        ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/sheet/preview/page_client-reference-manifest.js": {
+          "bytesInOutput": 10851
         },
         ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/contracts/new/page_client-reference-manifest.js": {
           "bytesInOutput": 11016
@@ -13951,7 +14163,7 @@
           "bytesInOutput": 10935
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-          "bytesInOutput": 68491
+          "bytesInOutput": 70531
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/app-render/dynamic-access-async-storage-instance.js": {
           "bytesInOutput": 538
@@ -14023,7 +14235,7 @@
           "bytesInOutput": 2607
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__ed7fd7ec._.js": {
-          "bytesInOutput": 248722
+          "bytesInOutput": 248762
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__ff74bc28._.js": {
           "bytesInOutput": 1006
@@ -14067,9 +14279,6 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/src_app_error_tsx_ef715cc8._.js": {
           "bytesInOutput": 1118
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__37dd0d48._.js": {
-          "bytesInOutput": 4841
-        },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__519dd2f1._.js": {
           "bytesInOutput": 1549
         },
@@ -14082,14 +14291,17 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__a457c799._.js": {
           "bytesInOutput": 2369
         },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__b1fb5d54._.js": {
+          "bytesInOutput": 5290
+        },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_1a775abe._.js": {
           "bytesInOutput": 18431
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/_a1866072._.js": {
-          "bytesInOutput": 17076
-        },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_a9f0b041._.js": {
-          "bytesInOutput": 14483
+          "bytesInOutput": 14615
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_ef97cf1f._.js": {
+          "bytesInOutput": 17076
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_contracts_[id]_page_actions_1641c891.js": {
           "bytesInOutput": 305
@@ -14144,6 +14356,30 @@
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/src_7e6664b3._.js": {
           "bytesInOutput": 4973
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__42342557._.js": {
+          "bytesInOutput": 1561
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_72976298._.js": {
+          "bytesInOutput": 18442
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_[id]_page_actions_afaadb88.js": {
+          "bytesInOutput": 311
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/src_0bce33c6._.js": {
+          "bytesInOutput": 8066
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__85bc6f6d._.js": {
+          "bytesInOutput": 1541
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_c3cc0334._.js": {
+          "bytesInOutput": 18393
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(admin)_admin_ic-contracts_page_actions_f4b30d84.js": {
+          "bytesInOutput": 303
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/src_621efc52._.js": {
+          "bytesInOutput": 5633
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__ba39a74b._.js": {
           "bytesInOutput": 1509
@@ -14230,7 +14466,7 @@
           "bytesInOutput": 295
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__4f006332._.js": {
-          "bytesInOutput": 23586
+          "bytesInOutput": 23645
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__6f32e6f8._.js": {
           "bytesInOutput": 1458
@@ -14272,7 +14508,7 @@
           "bytesInOutput": 12486
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_09769159._.js": {
-          "bytesInOutput": 15631
+          "bytesInOutput": 15632
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_29e69b7e._.js": {
           "bytesInOutput": 18458
@@ -14376,14 +14612,14 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/3e585_(organizer)_organizer_events_[id]_contracts_[contractId]_page_actions_9d06ff17.js": {
           "bytesInOutput": 319
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7749a7ae._.js": {
-          "bytesInOutput": 4968
+        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__0f8cebee._.js": {
+          "bytesInOutput": 5417
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__8caefea9._.js": {
           "bytesInOutput": 1661
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/_9f2d9797._.js": {
-          "bytesInOutput": 13144
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_82d3a09f._.js": {
+          "bytesInOutput": 13143
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_e98247e5._.js": {
           "bytesInOutput": 18632
@@ -14409,8 +14645,8 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__dcdea20c._.js": {
           "bytesInOutput": 1609
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/_c188fd55._.js": {
-          "bytesInOutput": 8044
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_acbb83fc._.js": {
+          "bytesInOutput": 7595
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_f688164a._.js": {
           "bytesInOutput": 18538
@@ -14419,10 +14655,10 @@
           "bytesInOutput": 317
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/src_app_(organizer)_organizer_events_[id]_ic-config_page_tsx_3ca7fd79._.js": {
-          "bytesInOutput": 21066
+          "bytesInOutput": 21135
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/src_components_integrated-contract_SheetEditor_tsx_1b6125d1._.js": {
-          "bytesInOutput": 60469
+          "bytesInOutput": 61383
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__0732b4e8._.js": {
           "bytesInOutput": 1621
@@ -14526,13 +14762,13 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__3ce974be._.js": {
           "bytesInOutput": 1564
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__fad22472._.js": {
-          "bytesInOutput": 4846
+        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__d7d30c83._.js": {
+          "bytesInOutput": 5295
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_1e6313b3._.js": {
           "bytesInOutput": 18452
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/_d2fe2ac2._.js": {
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_a666ae5b._.js": {
           "bytesInOutput": 17435
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(partner)_partner_contracts_[id]_page_actions_fcf51b4b.js": {
@@ -14559,11 +14795,11 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__657921f4._.js": {
           "bytesInOutput": 1553
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/_5ea914af._.js": {
-          "bytesInOutput": 17612
-        },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_74898b76._.js": {
           "bytesInOutput": 18432
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_a68ccede._.js": {
+          "bytesInOutput": 17164
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_next-internal_server_app_(partner)_partner_events_[id]_page_actions_fbd5ca96.js": {
           "bytesInOutput": 307
@@ -14571,8 +14807,8 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__8e6f4260._.js": {
           "bytesInOutput": 1577
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/_47c59478._.js": {
-          "bytesInOutput": 11805
+        ".open-next/server-functions/default/.next/server/chunks/ssr/_3d5bef34._.js": {
+          "bytesInOutput": 11415
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_fec66acc._.js": {
           "bytesInOutput": 18498
@@ -14583,14 +14819,14 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__7bc6a934._.js": {
           "bytesInOutput": 1607
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/_752a578c._.js": {
-          "bytesInOutput": 6174
-        },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_a1593b8e._.js": {
           "bytesInOutput": 18567
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/ce889_server_app_(partner)_partner_events_[id]_sheet_preview_page_actions_29613134.js": {
           "bytesInOutput": 318
+        },
+        ".open-next/server-functions/default/.next/server/chunks/ssr/src_cbe5ce3c._.js": {
+          "bytesInOutput": 5735
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__58b611f6._.js": {
           "bytesInOutput": 1645
@@ -14790,7 +15026,7 @@
         ".open-next/server-functions/default/.next/server/chunks/ssr/src_app_events_[code]_options_page_tsx_ef0c209a._.js": {
           "bytesInOutput": 16859
         },
-        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cc033b51._.js": {
+        ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__cebc6e8f._.js": {
           "bytesInOutput": 12214
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[root-of-the-server]__e1584fdb._.js": {
@@ -14827,10 +15063,10 @@
           "bytesInOutput": 251
         },
         ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js": {
-          "bytesInOutput": 45571
+          "bytesInOutput": 46450
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js": {
-          "bytesInOutput": 45586
+          "bytesInOutput": 46465
         },
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/contracts/[id]/page.js": {
           "bytesInOutput": 1264
@@ -14844,6 +15080,12 @@
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/events/page.js": {
           "bytesInOutput": 1241
         },
+        ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/[id]/page.js": {
+          "bytesInOutput": 1274
+        },
+        ".open-next/server-functions/default/.next/server/app/(admin)/admin/ic-contracts/page.js": {
+          "bytesInOutput": 1259
+        },
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/logs/page.js": {
           "bytesInOutput": 1235
         },
@@ -14854,10 +15096,10 @@
           "bytesInOutput": 1253
         },
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/page.js": {
-          "bytesInOutput": 1220
+          "bytesInOutput": 1221
         },
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/users/[id]/page.js": {
-          "bytesInOutput": 1253
+          "bytesInOutput": 1254
         },
         ".open-next/server-functions/default/.next/server/app/(admin)/admin/users/page.js": {
           "bytesInOutput": 1239
@@ -15007,7 +15249,7 @@
           "bytesInOutput": 1113
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
-          "bytesInOutput": 9066
+          "bytesInOutput": 9285
         },
         ".open-next/server-functions/default/node_modules/next/dist/lib/wait.js": {
           "bytesInOutput": 341
@@ -15154,10 +15396,10 @@
           "bytesInOutput": 633
         },
         ".open-next/server-functions/default/index.mjs": {
-          "bytesInOutput": 79161
+          "bytesInOutput": 79978
         }
       },
-      "bytes": 6054304
+      "bytes": 6138272
     }
   }
 }

@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsEmail, IsEnum, MinLength } from 'class-validator';
+import { IsOptional, IsString, IsEmail, IsEnum, IsIn, MinLength } from 'class-validator';
 
 export class RejectOrganizerDto {
   @IsString()
@@ -79,4 +79,10 @@ export class ResetPasswordDto {
   @IsString()
   @MinLength(8)
   newPassword?: string;
+}
+
+export class AdminUpdateIcContractStatusDto {
+  @IsString()
+  @IsIn(['draft', 'signed', 'completed', 'cancelled'])
+  status: string;
 }
