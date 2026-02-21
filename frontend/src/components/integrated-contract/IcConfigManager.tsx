@@ -414,7 +414,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         >
           <div className="flex items-center gap-2">
             <Building2 className="w-5 h-5 text-indigo-500" />
-            <h3 className="font-semibold text-gray-900">아파트 이름 + 계약서 제목</h3>
+            <h3 className="font-semibold text-gray-900">아파트 타입</h3>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
               {apartmentTypes.length}개
             </span>
@@ -745,7 +745,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
           ) : (
             <CustomerSheetView
               partners={sheets
-                .filter(s => s.status === 'active')
+                .filter(s => s.status !== 'inactive')
                 .reduce<any[]>((acc, sheet) => {
                   const partnerId = sheet.partner?.id || 'unknown';
                   let partner = acc.find((p: any) => p.partnerId === partnerId);

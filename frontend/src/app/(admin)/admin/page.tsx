@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
+import PeriodSelector, { PeriodValue } from '@/components/ui/PeriodSelector';
 import { Building2, Users, Calendar, FileText, AlertCircle, KeyRound } from 'lucide-react';
 import api, { extractData } from '@/lib/api';
 import { formatDateTime } from '@/lib/utils';
@@ -28,13 +29,28 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState<PeriodValue>({ from: null, to: null, label: '전체' });
 
-  useEffect(() => {
-    api.get('/admin/dashboard')
+  const fetchDashboard = useCallback((p: PeriodValue) => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (p.from) params.set('from', p.from);
+    if (p.to) params.set('to', p.to);
+    const qs = params.toString();
+    api.get(`/admin/dashboard${qs ? `?${qs}` : ''}`)
       .then((res) => setStats(extractData(res)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchDashboard(period);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handlePeriodChange = (p: PeriodValue) => {
+    setPeriod(p);
+    fetchDashboard(p);
+  };
 
   const totalPending = (stats?.pendingOrganizations || 0) + (stats?.pendingPartners || 0);
 
@@ -82,6 +98,11 @@ export default function AdminDashboard() {
   return (
     <div>
       <PageHeader title="관리자 대시보드" subtitle="전체 시스템 현황" />
+
+      {/* Period Filter */}
+      <div className="mb-4">
+        <PeriodSelector value={period} onChange={handlePeriodChange} />
+      </div>
 
       {/* Pending Approvals Alert */}
       {!loading && totalPending > 0 && (

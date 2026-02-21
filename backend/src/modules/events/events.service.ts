@@ -559,7 +559,7 @@ export class EventsService {
     }
 
     const contract = await this.contractRepository.findOne({
-      where: { id: contractId, eventId },
+      where: { id: contractId },
       relations: [
         'template',
         'template.fields',
@@ -573,6 +573,11 @@ export class EventsService {
       ],
     });
     if (!contract) {
+      throw new NotFoundException('계약서를 찾을 수 없습니다.');
+    }
+
+    // Verify contract belongs to this event
+    if (contract.eventId !== eventId) {
       throw new NotFoundException('계약서를 찾을 수 없습니다.');
     }
 

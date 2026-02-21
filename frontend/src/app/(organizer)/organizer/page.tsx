@@ -1,19 +1,32 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
+import PeriodSelector, { PeriodValue } from '@/components/ui/PeriodSelector';
 import { Calendar, FileText, Users, Plus, ChevronRight, Settings, ClipboardList, Clock } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { Event } from '@/types/event';
+
+function filterByPeriod<T extends { createdAt?: string }>(items: T[], period: PeriodValue): T[] {
+  if (!period.from && !period.to) return items;
+  return items.filter((item) => {
+    const d = item.createdAt ? new Date(item.createdAt) : null;
+    if (!d) return true;
+    if (period.from && d < new Date(period.from)) return false;
+    if (period.to) { const to = new Date(period.to); to.setHours(23, 59, 59, 999); if (d > to) return false; }
+    return true;
+  });
+}
 
 export default function OrganizerDashboard() {
   const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState<PeriodValue>({ from: null, to: null, label: '전체' });
 
   useEffect(() => {
     api.get('/events')
@@ -22,16 +35,18 @@ export default function OrganizerDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const activeEvents = events.filter((e) => e.status === 'active');
-  const draftEvents = events.filter((e) => e.status === 'draft');
-  const totalPartners = events.reduce((acc, e) => acc + (e.partners?.length || 0), 0);
-  const approvedPartners = events.reduce(
+  const filtered = useMemo(() => filterByPeriod(events as any[], period) as Event[], [events, period]);
+
+  const activeEvents = filtered.filter((e) => e.status === 'active');
+  const draftEvents = filtered.filter((e) => e.status === 'draft');
+  const totalPartners = filtered.reduce((acc, e) => acc + (e.partners?.length || 0), 0);
+  const approvedPartners = filtered.reduce(
     (acc, e) => acc + (e.partners?.filter((p: any) => p.status === 'approved')?.length || 0),
     0,
   );
 
   // Extract pending partner requests across all events
-  const pendingPartnerRequests = events.flatMap((event) =>
+  const pendingPartnerRequests = filtered.flatMap((event) =>
     (event.partners || [])
       .filter((p: any) => p.status === 'pending')
       .map((p: any) => ({
@@ -61,6 +76,11 @@ export default function OrganizerDashboard() {
           </Button>
         }
       />
+
+      {/* Period Filter */}
+      <div className="mb-4">
+        <PeriodSelector value={period} onChange={setPeriod} />
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
@@ -150,7 +170,7 @@ export default function OrganizerDashboard() {
         <div className="space-y-3">
           {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />)}
         </div>
-      ) : events.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <Card>
           <div className="text-center py-12">
             <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -162,7 +182,7 @@ export default function OrganizerDashboard() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {events.slice(0, 5).map((event) => {
+          {filtered.slice(0, 5).map((event) => {
             const partnerCount = event.partners?.length || 0;
             const approvedCount = event.partners?.filter((p: any) => p.status === 'approved')?.length || 0;
             return (

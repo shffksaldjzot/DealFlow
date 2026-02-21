@@ -1,16 +1,28 @@
 'use client';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import PeriodSelector, { PeriodValue } from '@/components/ui/PeriodSelector';
 import { FileText, ChevronRight, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera, X, XCircle } from 'lucide-react';
 import { formatDateTime, formatDate } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
 import { useToast } from '@/components/ui/Toast';
 import type { EventVisit } from '@/types/event';
+
+function filterByPeriod<T extends { createdAt?: string }>(items: T[], period: PeriodValue): T[] {
+  if (!period.from && !period.to) return items;
+  return items.filter((item) => {
+    const d = item.createdAt ? new Date(item.createdAt) : null;
+    if (!d) return true;
+    if (period.from && d < new Date(period.from)) return false;
+    if (period.to) { const to = new Date(period.to); to.setHours(23, 59, 59, 999); if (d > to) return false; }
+    return true;
+  });
+}
 
 export default function CustomerHome() {
   const { user } = useAuthStore();
@@ -23,6 +35,7 @@ export default function CustomerHome() {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const scannerRef = useRef<any>(null);
+  const [period, setPeriod] = useState<PeriodValue>({ from: null, to: null, label: '전체' });
 
   const fetchContracts = () => {
     api.get('/customer/contracts').then((res) => setContracts(extractData(res))).catch(() => {});
@@ -47,13 +60,16 @@ export default function CustomerHome() {
     }
   };
 
-  const pendingContracts = contracts.filter(
+  const filteredContracts = useMemo(() => filterByPeriod(contracts as any[], period) as Contract[], [contracts, period]);
+  const filteredVisits = useMemo(() => filterByPeriod(visits as any[], period) as EventVisit[], [visits, period]);
+
+  const pendingContracts = filteredContracts.filter(
     (c) => c.status === 'pending' || c.status === 'in_progress',
   );
-  const signedContracts = contracts.filter(
+  const signedContracts = filteredContracts.filter(
     (c) => c.status === 'signed' || c.status === 'completed',
   );
-  const activeVisits = visits.filter((v) => v.status === 'reserved');
+  const activeVisits = filteredVisits.filter((v) => v.status === 'reserved');
 
   const handleContractCodeSubmit = () => {
     const trimmed = contractCode.trim().replace(/\s/g, '');
@@ -228,6 +244,11 @@ export default function CustomerHome() {
         )}
       </div>
 
+      {/* Period Filter */}
+      <div className="mb-4">
+        <PeriodSelector value={period} onChange={setPeriod} />
+      </div>
+
       {/* Pending Signing Alert */}
       {!loading && pendingContracts.length > 0 && (
         <Card className="mb-6 border-2 border-orange-200 bg-orange-50">
@@ -252,7 +273,7 @@ export default function CustomerHome() {
         <Card>
           <div className="text-center">
             <FileText className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-            <p className="text-xl font-bold text-gray-900">{loading ? '-' : contracts.length}</p>
+            <p className="text-xl font-bold text-gray-900">{loading ? '-' : filteredContracts.length}</p>
             <p className="text-xs text-gray-500">전체</p>
           </div>
         </Card>

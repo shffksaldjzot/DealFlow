@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, MoreThanOrEqual, LessThanOrEqual, Between } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User, UserRole, UserStatus, AuthProvider } from '../users/entities/user.entity';
 import {
@@ -115,7 +115,7 @@ export class AdminService {
 
   // ─── Dashboard ────────────────────────────────────────
 
-  async getDashboard(): Promise<{
+  async getDashboard(from?: string, to?: string): Promise<{
     totalOrganizations: number;
     totalEvents: number;
     totalContracts: number;
@@ -132,6 +132,18 @@ export class AdminService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Build date range filter
+    const dateFilter: any = {};
+    if (from) dateFilter.createdAt = MoreThanOrEqual(new Date(from));
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setHours(23, 59, 59, 999);
+      dateFilter.createdAt = to && from
+        ? Between(new Date(from), toDate)
+        : LessThanOrEqual(toDate);
+    }
+    const hasPeriod = from || to;
+
     const [
       totalOrganizations,
       totalEvents,
@@ -143,36 +155,58 @@ export class AdminService {
       recentUsers,
       recentContracts,
     ] = await Promise.all([
-      this.orgRepository.count(),
-      this.eventRepository.count(),
-      this.contractRepository.count(),
-      this.userRepository.count(),
+      this.orgRepository.count(hasPeriod ? { where: dateFilter } : {}),
+      this.eventRepository.count(hasPeriod ? { where: dateFilter } : {}),
+      this.contractRepository.count(hasPeriod ? { where: dateFilter } : {}),
+      this.userRepository.count(hasPeriod ? { where: dateFilter } : {}),
       this.orgRepository.count({ where: { status: OrgStatus.PENDING, type: OrgType.ORGANIZER } }),
       this.orgRepository.count({ where: { status: OrgStatus.PENDING, type: OrgType.PARTNER } }),
       this.eventRepository.count({ where: { status: 'active' as any } }),
       this.userRepository.find({
         select: ['id', 'name', 'email', 'role', 'status', 'createdAt'],
+        where: hasPeriod ? dateFilter : undefined,
         order: { createdAt: 'DESC' },
         take: 5,
       }),
       this.contractRepository.find({
         relations: ['event', 'partner'],
+        where: hasPeriod ? dateFilter : undefined,
         order: { createdAt: 'DESC' },
         take: 5,
       }),
     ]);
 
-    const signedContractsToday = await this.contractRepository
-      .createQueryBuilder('c')
-      .where('c.signedAt >= :today', { today })
-      .getCount();
+    let signedContractsToday: number;
+    if (hasPeriod) {
+      const qb = this.contractRepository.createQueryBuilder('c')
+        .where('c.signedAt IS NOT NULL');
+      if (from) qb.andWhere('c.signedAt >= :from', { from: new Date(from) });
+      if (to) {
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+        qb.andWhere('c.signedAt <= :to', { to: toDate });
+      }
+      signedContractsToday = await qb.getCount();
+    } else {
+      signedContractsToday = await this.contractRepository
+        .createQueryBuilder('c')
+        .where('c.signedAt >= :today', { today })
+        .getCount();
+    }
 
-    const statusCounts = await this.contractRepository
+    const statusQb = this.contractRepository
       .createQueryBuilder('c')
       .select('c.status', 'status')
-      .addSelect('COUNT(*)', 'count')
-      .groupBy('c.status')
-      .getRawMany();
+      .addSelect('COUNT(*)', 'count');
+    if (hasPeriod) {
+      if (from) statusQb.where('c.createdAt >= :from', { from: new Date(from) });
+      if (to) {
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+        statusQb[from ? 'andWhere' : 'where']('c.createdAt <= :to', { to: toDate });
+      }
+    }
+    const statusCounts = await statusQb.groupBy('c.status').getRawMany();
 
     const contractsByStatus: Record<string, number> = {};
     for (const row of statusCounts) {

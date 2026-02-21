@@ -1,19 +1,32 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
+import PeriodSelector, { PeriodValue } from '@/components/ui/PeriodSelector';
 import { Calendar, FileText, QrCode, ChevronRight, Clock, CheckCircle, XCircle, Send, MapPin, Plus, Eye } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+
+function filterByPeriod<T extends { createdAt?: string }>(items: T[], period: PeriodValue): T[] {
+  if (!period.from && !period.to) return items;
+  return items.filter((item) => {
+    const d = item.createdAt ? new Date(item.createdAt) : null;
+    if (!d) return true;
+    if (period.from && d < new Date(period.from)) return false;
+    if (period.to) { const to = new Date(period.to); to.setHours(23, 59, 59, 999); if (d > to) return false; }
+    return true;
+  });
+}
 
 export default function PartnerDashboard() {
   const router = useRouter();
   const [events, setEvents] = useState<any[]>([]);
   const [contracts, setContracts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState<PeriodValue>({ from: null, to: null, label: '전체' });
 
   useEffect(() => {
     Promise.all([
@@ -22,11 +35,14 @@ export default function PartnerDashboard() {
     ]).finally(() => setLoading(false));
   }, []);
 
-  const pendingEvents = events.filter((e) => e.status === 'pending').length;
-  const approvedEvents = events.filter((e) => e.status === 'approved').length;
-  const rejectedEvents = events.filter((e) => e.status === 'rejected').length;
-  const signedContracts = contracts.filter((c) => c.status === 'signed' || c.status === 'completed').length;
-  const activeEvents = events.filter((e) => e.status === 'approved');
+  const filteredEvents = useMemo(() => filterByPeriod(events, period), [events, period]);
+  const filteredContracts = useMemo(() => filterByPeriod(contracts, period), [contracts, period]);
+
+  const pendingEvents = filteredEvents.filter((e) => e.status === 'pending').length;
+  const approvedEvents = filteredEvents.filter((e) => e.status === 'approved').length;
+  const rejectedEvents = filteredEvents.filter((e) => e.status === 'rejected').length;
+  const signedContracts = filteredContracts.filter((c) => c.status === 'signed' || c.status === 'completed').length;
+  const activeEvents = filteredEvents.filter((e) => e.status === 'approved');
 
   const eventStats = [
     { label: '승인완료', value: approvedEvents, icon: CheckCircle, color: 'text-green-600 bg-green-50' },
@@ -35,7 +51,7 @@ export default function PartnerDashboard() {
   ];
 
   const contractStats = [
-    { label: '전체 계약', value: contracts.length, icon: FileText, color: 'text-blue-600 bg-blue-50' },
+    { label: '전체 계약', value: filteredContracts.length, icon: FileText, color: 'text-blue-600 bg-blue-50' },
     { label: '서명 완료', value: signedContracts, icon: Send, color: 'text-purple-600 bg-purple-50' },
   ];
 
@@ -51,6 +67,11 @@ export default function PartnerDashboard() {
           </Button>
         }
       />
+
+      {/* Period Filter */}
+      <div className="mb-4">
+        <PeriodSelector value={period} onChange={setPeriod} />
+      </div>
 
       {/* Event Status */}
       <h3 className="text-sm font-semibold text-gray-700 mb-3">행사 현황</h3>
