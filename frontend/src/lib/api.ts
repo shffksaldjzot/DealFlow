@@ -27,6 +27,11 @@ api.interceptors.response.use(
     const requestUrl = originalRequest.url || '';
     const isAuthRequest = requestUrl.includes('/auth/');
 
+    // Network error (no response) - server may be cold starting
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
       originalRequest._retry = true;
 
@@ -45,11 +50,13 @@ api.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
-      } catch {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-          window.location.href = '/login';
+      } catch (refreshError: any) {
+        if (refreshError?.response?.status === 401 || refreshError?.response?.status === 403) {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(error);
       }

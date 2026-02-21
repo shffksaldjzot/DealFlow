@@ -75,10 +75,28 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: true,
         isLoading: false,
       });
-    } catch {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      set({ user: null, isAuthenticated: false, isLoading: false });
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 401 || status === 403) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        set({ user: null, isAuthenticated: false, isLoading: false });
+      } else {
+        // Network error (server cold start) - try to decode token for basic user info
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            set({
+              user: { id: payload.sub, email: '', name: '', role: payload.role },
+              isAuthenticated: true,
+              isLoading: false,
+            });
+            return;
+          } catch {}
+        }
+        set({ isLoading: false });
+      }
     }
   },
 

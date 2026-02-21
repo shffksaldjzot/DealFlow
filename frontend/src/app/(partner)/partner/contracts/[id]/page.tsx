@@ -23,8 +23,11 @@ export default function PartnerContractDetailPage() {
   const [cancelReason, setCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
   const [templateImageUrl, setTemplateImageUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchContract = () => {
+    setLoading(true);
+    setError(null);
     api.get(`/contracts/${id}`)
       .then((res) => {
         const data = extractData<Contract>(res);
@@ -38,7 +41,15 @@ export default function PartnerContractDetailPage() {
             .catch(() => {});
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        if (!err.response) {
+          setError('서버 연결 중입니다. 잠시 후 다시 시도해주세요.');
+        } else if (err.response?.status === 403) {
+          setError('이 계약서에 대한 접근 권한이 없습니다.');
+        } else {
+          setError('계약서를 불러올 수 없습니다.');
+        }
+      })
       .finally(() => setLoading(false));
   };
 
@@ -77,7 +88,14 @@ export default function PartnerContractDetailPage() {
     return (
       <div>
         <PageHeader title="계약 상세" backHref="/partner/events" />
-        <Card><p className="text-center text-gray-500 py-8">계약서를 찾을 수 없습니다</p></Card>
+        <Card>
+          <div className="text-center py-8">
+            <p className="text-gray-500 mb-3">{error || '계약서를 찾을 수 없습니다'}</p>
+            {error && (
+              <Button variant="outline" size="sm" onClick={fetchContract}>다시 시도</Button>
+            )}
+          </div>
+        </Card>
       </div>
     );
   }

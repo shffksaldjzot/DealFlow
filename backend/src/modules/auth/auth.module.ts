@@ -18,7 +18,7 @@ import { Notification } from '../notifications/entities/notification.entity';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
+        secret: configService.get('JWT_SECRET') || 'dealflow-jwt-secret-key',
         signOptions: {
           expiresIn: configService.get('JWT_EXPIRES_IN') || '7d',
         },

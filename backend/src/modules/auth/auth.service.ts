@@ -142,7 +142,7 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<TokenResponseDto> {
     try {
       const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get('JWT_REFRESH_SECRET'),
+        secret: this.configService.get('JWT_REFRESH_SECRET') || 'dealflow-jwt-refresh-secret-key',
       });
       const user = await this.usersRepository.findOne({
         where: { id: payload.sub },
@@ -287,12 +287,12 @@ export class AuthService {
     const payload = { sub: user.id, role: user.role };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_SECRET'),
+      secret: this.configService.get('JWT_SECRET') || 'dealflow-jwt-secret-key',
       expiresIn: this.configService.get('JWT_EXPIRES_IN') || '7d',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_REFRESH_SECRET'),
+      secret: this.configService.get('JWT_REFRESH_SECRET') || 'dealflow-jwt-refresh-secret-key',
       expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN') || '30d',
     });
 
