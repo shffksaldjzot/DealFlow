@@ -10,6 +10,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import ContractDetailView from '@/components/contract/ContractDetailView';
 import { useToast } from '@/components/ui/Toast';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function AdminContractDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,7 @@ export default function AdminContractDetailPage() {
   const [statusReason, setStatusReason] = useState('');
   const [saving, setSaving] = useState(false);
   const [templateImageUrl, setTemplateImageUrl] = useState<string | null>(null);
+  const [fieldValuesExpanded, setFieldValuesExpanded] = useState(false);
 
   const fetchContract = () => {
     setLoading(true);
@@ -156,18 +158,29 @@ export default function AdminContractDetailPage() {
       {/* Contract Image + Download */}
       <ContractDetailView contract={contract} templateImageUrl={templateImageUrl} />
 
-      {/* Field Values */}
+      {/* Field Values (collapsible) */}
       {contract.fieldValues && contract.fieldValues.length > 0 && (
         <Card className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">입력 필드값</h3>
-          <div className="space-y-2">
-            {contract.fieldValues.map((fv: any) => (
-              <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
-                <span className="text-sm text-gray-500">{fv.field?.label || '항목'}</span>
-                <span className="text-sm font-medium text-gray-900">{fv.value}</span>
-              </div>
-            ))}
-          </div>
+          <button
+            className="w-full flex items-center justify-between"
+            onClick={() => setFieldValuesExpanded(!fieldValuesExpanded)}
+          >
+            <h3 className="text-sm font-semibold text-gray-700">입력 필드값 ({contract.fieldValues.length})</h3>
+            {fieldValuesExpanded
+              ? <ChevronUp className="w-4 h-4 text-gray-400" />
+              : <ChevronDown className="w-4 h-4 text-gray-400" />
+            }
+          </button>
+          {fieldValuesExpanded && (
+            <div className="space-y-2 mt-3">
+              {contract.fieldValues.map((fv: any) => (
+                <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-500">{fv.field?.label || '항목'}</span>
+                  <span className="text-sm font-medium text-gray-900">{fv.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       )}
 

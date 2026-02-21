@@ -9,6 +9,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import { useToast } from '@/components/ui/Toast';
 import PaymentStageEditor from '@/components/integrated-contract/PaymentStageEditor';
 import SheetEditor from '@/components/integrated-contract/SheetEditor';
+import CustomerSheetView from '@/components/integrated-contract/CustomerSheetView';
 import {
   Save, Plus, Trash2, ChevronDown, ChevronUp,
   Copy, Check, Link2, Building2, FileSpreadsheet,
@@ -41,6 +42,9 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
   const [newTypeName, setNewTypeName] = useState('');
   const [editingType, setEditingType] = useState<{ id: string; name: string } | null>(null);
 
+  // Participants (for missing sheets detection)
+  const [participants, setParticipants] = useState<any[]>([]);
+
   // Partner sheets
   const [sheets, setSheets] = useState<IcPartnerSheet[]>([]);
   const [expandedSheet, setExpandedSheet] = useState<string | null>(null);
@@ -50,6 +54,13 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
   const [showNewSheet, setShowNewSheet] = useState(false);
   const [newSheetName, setNewSheetName] = useState('');
   const [creatingSheet, setCreatingSheet] = useState(false);
+
+  // Delete config
+  const [deleteConfigModal, setDeleteConfigModal] = useState(false);
+  const [deletingConfig, setDeletingConfig] = useState(false);
+
+  // Customer preview
+  const [previewModal, setPreviewModal] = useState(false);
 
   // Copy state
   const [copied, setCopied] = useState(false);
@@ -77,6 +88,10 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
       const eventData = eventRes?.data?.data;
       setEvent(eventData);
 
+      // Fetch participants
+      const participantsRes = await api.get(`/events/${eventId}/participants`).catch(() => null);
+      setParticipants(participantsRes?.data?.data || []);
+
       const cfg = configRes?.data?.data;
       if (cfg) {
         setConfig(cfg);
@@ -100,10 +115,16 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
   // ── Create Config ──
   const createConfig = async () => {
     try {
+      const defaultPaymentStages = [
+        { name: '계약금', ratio: 20 },
+        { name: '중도금', ratio: 40 },
+        { name: '잔금', ratio: 40 },
+      ];
+      const defaultLegalTerms = `1. 계약일 기준 14일 이후에는 취소가 불가능합니다.\n2. 본 계약은 해당 옵션 공사에 대한 계약이며, 별도 계약 품목은 보장하지 않습니다.\n3. 공사 일정은 입주 일정에 따라 변경될 수 있습니다.\n4. 계약 후 옵션 변경은 공사 착수 전까지만 가능합니다.`;
       const res = await api.post('/ic/configs', {
         eventId,
-        paymentStages: [],
-        legalTerms: '',
+        paymentStages: defaultPaymentStages,
+        legalTerms: defaultLegalTerms,
       });
       const cfg = res.data.data;
       setConfig(cfg);
@@ -145,6 +166,22 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
       toast(`상태가 "${status}"로 변경되었습니다.`, 'success');
     } catch {
       toast('상태 변경에 실패했습니다.', 'error');
+    }
+  };
+
+  // ── Delete Config ──
+  const deleteConfig = async () => {
+    if (!config) return;
+    setDeletingConfig(true);
+    try {
+      await api.delete(`/ic/configs/${config.id}`);
+      setConfig(null);
+      setDeleteConfigModal(false);
+      toast('통합 계약 설정이 삭제되었습니다.', 'success');
+    } catch {
+      toast('설정 삭제에 실패했습니다.', 'error');
+    } finally {
+      setDeletingConfig(false);
     }
   };
 
@@ -327,6 +364,14 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                 {action.label}
               </Button>
             ))}
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => setDeleteConfigModal(true)}
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-1" />
+              삭제
+            </Button>
           </div>
         }
       />
@@ -353,6 +398,10 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                 <ExternalLink className="w-3.5 h-3.5" />
               </Button>
             </a>
+            <Button size="sm" variant="outline" onClick={() => setPreviewModal(true)}>
+              <Eye className="w-3.5 h-3.5 mr-1" />
+              미리보기
+            </Button>
           </div>
         </Card>
       )}
@@ -365,7 +414,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         >
           <div className="flex items-center gap-2">
             <Building2 className="w-5 h-5 text-indigo-500" />
-            <h3 className="font-semibold text-gray-900">아파트 타입 (평형)</h3>
+            <h3 className="font-semibold text-gray-900">아파트 이름 + 계약서 제목</h3>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
               {apartmentTypes.length}개
             </span>
@@ -433,7 +482,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                 type="text"
                 value={newTypeName}
                 onChange={(e) => setNewTypeName(e.target.value)}
-                placeholder="새 타입명 (예: 59A, 84B)"
+                placeholder="예: 래미안 59A, 힐스테이트 84B"
                 className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onKeyDown={(e) => e.key === 'Enter' && addApartmentType()}
               />
@@ -532,6 +581,30 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
 
         {sections.sheets && (
           <div className="mt-4 space-y-3">
+            {/* Missing sheet partners */}
+            {(() => {
+              const sheetPartnerIds = new Set(sheets.map(s => s.partner?.id).filter(Boolean));
+              const approvedPartners = participants.filter(
+                (p: any) => p.status === 'approved' && p.organization?.type === 'partner'
+              );
+              const missingPartners = approvedPartners.filter(
+                (p: any) => !sheetPartnerIds.has(p.organizationId)
+              );
+              if (missingPartners.length === 0) return null;
+              return (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                  <p className="text-xs font-semibold text-yellow-800 mb-1">시트 미제출 업체 ({missingPartners.length})</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {missingPartners.map((p: any) => (
+                      <span key={p.id} className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+                        {p.organization?.name || '업체'}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* New Sheet Form */}
             {showNewSheet ? (
               <div className="border-2 border-dashed border-blue-300 rounded-xl p-4 bg-blue-50/30">
@@ -653,6 +726,76 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         <div className="flex gap-2 justify-end">
           <Button variant="outline" onClick={() => setDeleteSheetTarget(null)}>취소</Button>
           <Button variant="danger" onClick={deleteSheet}>
+            <Trash2 className="w-4 h-4 mr-1" />
+            삭제
+          </Button>
+        </div>
+      </Modal>
+
+      {/* Customer Preview Modal */}
+      <Modal
+        isOpen={previewModal}
+        onClose={() => setPreviewModal(false)}
+        title="고객 미리보기"
+        size="lg"
+      >
+        <div className="max-h-[70vh] overflow-y-auto">
+          {sheets.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">등록된 시트가 없습니다.</p>
+          ) : (
+            <CustomerSheetView
+              partners={sheets
+                .filter(s => s.status === 'active')
+                .reduce<any[]>((acc, sheet) => {
+                  const partnerId = sheet.partner?.id || 'unknown';
+                  let partner = acc.find((p: any) => p.partnerId === partnerId);
+                  if (!partner) {
+                    partner = {
+                      partnerId,
+                      partnerName: sheet.partner?.name || '업체',
+                      categories: [],
+                    };
+                    acc.push(partner);
+                  }
+                  partner.categories.push({
+                    sheetId: sheet.id,
+                    categoryName: sheet.categoryName,
+                    columns: (sheet.columns || []).map((col: any) => ({
+                      id: col.id,
+                      customName: col.customName || col.apartmentType?.name || '열',
+                      columnType: col.columnType || 'amount',
+                      apartmentTypeId: col.apartmentTypeId,
+                    })),
+                    options: (sheet.rows || []).map((row: any) => ({
+                      rowId: row.id,
+                      optionName: row.optionName,
+                      popupContent: row.popupContent,
+                      cellValues: row.cellValues || {},
+                      prices: row.prices || {},
+                    })),
+                  });
+                  return acc;
+                }, [])}
+              selectedRows={[]}
+              onToggleRow={() => {}}
+            />
+          )}
+        </div>
+      </Modal>
+
+      {/* Delete Config Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfigModal}
+        onClose={() => setDeleteConfigModal(false)}
+        title="통합 계약 설정 삭제"
+      >
+        <p className="text-sm text-gray-600 mb-4">
+          통합 계약 설정을 삭제하시겠습니까? 모든 아파트 타입, 결제단계, 시트 데이터가 함께 삭제됩니다.
+          이 작업은 되돌릴 수 없습니다.
+        </p>
+        <div className="flex gap-2 justify-end">
+          <Button variant="outline" onClick={() => setDeleteConfigModal(false)}>취소</Button>
+          <Button variant="danger" onClick={deleteConfig} loading={deletingConfig}>
             <Trash2 className="w-4 h-4 mr-1" />
             삭제
           </Button>

@@ -198,9 +198,22 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+          <button
+            onClick={() => {
+              if (!user) return;
+              const profilePaths: Record<string, string> = {
+                customer: '/customer/profile',
+                partner: '/partner/settings',
+                organizer: '/organizer/settings',
+                admin: '/admin',
+              };
+              router.push(profilePaths[user.role] || '/');
+            }}
+            className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center hover:bg-blue-200 transition-colors cursor-pointer"
+            title="마이페이지"
+          >
             <User className="w-4 h-4 text-blue-600" />
-          </div>
+          </button>
           <span className="text-sm font-medium text-gray-700 hidden sm:block">
             {user?.name}
           </span>

@@ -23,6 +23,7 @@ function LoginForm() {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [name, setName] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
+  const [phone, setPhone] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [capsLockOn, setCapsLockOn] = useState(false);
@@ -50,7 +51,6 @@ function LoginForm() {
   const handleLogin = async () => {
     if (!email || !password) return;
     setLoading(true);
-    setLoginError(null);
     try {
       await login(email, password);
       const { user } = useAuthStore.getState();
@@ -70,7 +70,7 @@ function LoginForm() {
   const passwordMismatch = passwordConfirm.length > 0 && password !== passwordConfirm;
   const signupValid =
     email && emailRegex.test(email) && password && password.length >= 8 && !passwordMismatch && passwordConfirm &&
-    name && selectedRole && agreeTerms && agreePrivacy;
+    name && phone && selectedRole && agreeTerms && agreePrivacy;
 
   const [termsModal, setTermsModal] = useState(false);
   const [privacyModal, setPrivacyModal] = useState(false);
@@ -79,7 +79,7 @@ function LoginForm() {
     if (!signupValid) return;
     setLoading(true);
     try {
-      await signup({ email, password, name, role: selectedRole });
+      await signup({ email, password, name, phone, role: selectedRole });
       toast('회원가입 완료!', 'success');
       if (selectedRole === 'partner') {
         router.push('/signup/business');
@@ -107,7 +107,7 @@ function LoginForm() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           {/* Login Form */}
           {step === 'login' && (
-            <>
+            <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
               <h2 className="text-lg font-bold text-gray-900 mb-1">로그인</h2>
               <p className="text-sm text-gray-500 mb-6">이메일과 비밀번호를 입력하세요</p>
               <div className="space-y-4 mb-6">
@@ -139,17 +139,19 @@ function LoginForm() {
                 )}
               </div>
               <div className="space-y-3">
-                <Button fullWidth size="lg" onClick={handleLogin} loading={loading}>
+                <Button fullWidth size="lg" type="submit" loading={loading}>
                   로그인
                 </Button>
                 <div className="flex items-center justify-between">
                   <button
+                    type="button"
                     onClick={() => router.push('/forgot-password')}
                     className="text-sm text-gray-400 hover:text-gray-600"
                   >
                     비밀번호를 잊으셨나요?
                   </button>
                   <button
+                    type="button"
                     onClick={() => setStep('signup')}
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
@@ -157,7 +159,7 @@ function LoginForm() {
                   </button>
                 </div>
               </div>
-            </>
+            </form>
           )}
 
           {/* Signup Form */}
@@ -239,6 +241,23 @@ function LoginForm() {
                     <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
                   )}
                 </div>
+                <Input
+                  label="연락처"
+                  type="tel"
+                  placeholder="010-0000-0000"
+                  value={phone}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/[^0-9]/g, '');
+                    let formatted = raw;
+                    if (raw.length > 3 && raw.length <= 7) {
+                      formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`;
+                    } else if (raw.length > 7) {
+                      formatted = `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+                    }
+                    setPhone(formatted);
+                  }}
+                  maxLength={13}
+                />
 
                 {/* Terms & Privacy with Agree All */}
                 <div className="space-y-3 pt-2 border-t border-gray-100">

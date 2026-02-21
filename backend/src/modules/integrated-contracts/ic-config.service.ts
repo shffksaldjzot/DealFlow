@@ -140,6 +140,21 @@ export class IcConfigService {
     return this.findOneById(id);
   }
 
+  async deleteConfig(id: string, userId: string): Promise<void> {
+    const config = await this.findOneById(id);
+    await this.verifyOrganizerAccess(config.eventId, userId);
+
+    await this.configRepository.remove(config);
+
+    await this.activityLogService.log(
+      'delete_ic_config',
+      `통합 계약 설정 삭제`,
+      userId,
+      'ic_config',
+      id,
+    );
+  }
+
   async addApartmentType(
     configId: string,
     userId: string,

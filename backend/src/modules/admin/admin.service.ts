@@ -378,6 +378,11 @@ export class AdminService {
         'organization.name',
         'organization.type',
         'organization.status',
+        'organization.representativeName',
+        'organization.contactPhone',
+        'organization.contactEmail',
+        'organization.businessNumber',
+        'organization.items',
       ])
       .getOne();
 
@@ -699,6 +704,7 @@ export class AdminService {
         'partner',
         'customer',
         'template',
+        'template.fields',
         'fieldValues',
         'fieldValues.field',
         'signatures',

@@ -51,6 +51,15 @@ export class IcConfigController {
     return this.icConfigService.update(id, userId, dto);
   }
 
+  @Delete(':id')
+  @Roles('organizer', 'admin')
+  deleteConfig(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.icConfigService.deleteConfig(id, userId);
+  }
+
   @Post(':id/apartment-types')
   @Roles('organizer', 'admin')
   addApartmentType(

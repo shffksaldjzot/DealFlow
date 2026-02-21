@@ -185,7 +185,7 @@ export default function OptionsPage() {
       toast('아파트 타입을 선택해주세요.', 'error');
       return;
     }
-    if (!legalAgreed && flow.config.legalTerms) {
+    if (!legalAgreed && flow.config.legalTerms?.trim()) {
       toast('약관에 동의해주세요.', 'error');
       return;
     }
@@ -368,7 +368,7 @@ export default function OptionsPage() {
             </Card>
 
             {/* Legal Terms */}
-            {flow.config.legalTerms && (
+            {flow.config.legalTerms?.trim() && (
               <Card>
                 <h3 className="font-bold text-gray-900 mb-2">약관</h3>
                 <div className="max-h-32 overflow-y-auto text-xs text-gray-500 bg-gray-50 rounded-lg p-3 mb-3 whitespace-pre-wrap">
@@ -434,7 +434,7 @@ export default function OptionsPage() {
               size="lg"
               onClick={handleSubmit}
               loading={signing}
-              disabled={(!legalAgreed && !!flow.config.legalTerms) || !selectedTypeId || !hasSignature}
+              disabled={(!legalAgreed && !!flow.config.legalTerms?.trim()) || !selectedTypeId || !hasSignature}
             >
               <CheckCircle className="w-5 h-5 mr-2" />
               계약 완료

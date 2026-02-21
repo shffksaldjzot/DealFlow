@@ -36,17 +36,17 @@ export default function CustomerSheetView({
               </h4>
 
               {/* Spreadsheet table */}
-              <div className="border border-gray-200 rounded-xl overflow-x-auto -mx-1 px-1">
+              <div className="relative border border-gray-200 rounded-xl overflow-x-auto -mx-1 px-1">
                 <table className="w-full text-sm min-w-0">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
                       <th className="px-2 py-2 w-8" />
-                      <th className="px-3 py-2 text-left font-medium text-gray-600 min-w-[160px] sticky left-0 bg-gray-50 z-10">
+                      <th className="px-3 py-2 text-left font-medium text-gray-600 min-w-[120px] sticky left-0 bg-gray-50 z-10">
                         옵션
                       </th>
                       <th className="px-1 py-2 w-6" />
                       {cat.columns.map((col) => (
-                        <th key={col.id} className="px-2 py-2 text-center min-w-[80px]">
+                        <th key={col.id} className="px-2 py-2 text-center min-w-[60px]">
                           <span className="text-xs font-medium text-gray-600">
                             {col.customName || `열`}
                           </span>

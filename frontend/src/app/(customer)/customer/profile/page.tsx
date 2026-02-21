@@ -150,33 +150,33 @@ export default function CustomerProfile() {
 
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">연락처</label>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 overflow-hidden">
               <select
                 value={phoneArea}
                 onChange={(e) => setPhoneArea(e.target.value)}
-                className="border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-24"
+                className="border border-gray-200 rounded-xl px-2 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-20 shrink-0"
               >
                 {['010', '011', '016', '017', '018', '019'].map((code) => (
                   <option key={code} value={code}>{code}</option>
                 ))}
               </select>
-              <span className="text-gray-400">-</span>
+              <span className="text-gray-400 shrink-0">-</span>
               <input
-                type="text"
+                type="tel"
                 maxLength={4}
                 value={phoneMid}
                 onChange={(e) => setPhoneMid(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 placeholder="0000"
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                className="flex-1 min-w-0 border border-gray-200 rounded-xl px-2 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
               />
-              <span className="text-gray-400">-</span>
+              <span className="text-gray-400 shrink-0">-</span>
               <input
-                type="text"
+                type="tel"
                 maxLength={4}
                 value={phoneLast}
                 onChange={(e) => setPhoneLast(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 placeholder="0000"
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                className="flex-1 min-w-0 border border-gray-200 rounded-xl px-2 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
               />
             </div>
           </div>

@@ -251,14 +251,29 @@ export default function AdminUserDetailPage() {
       {user.organizationMemberships && user.organizationMemberships.length > 0 && (
         <Card className="mb-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">소속 조직</h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {user.organizationMemberships.map((m: any) => (
-              <div key={m.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                <div>
+              <div key={m.id} className="py-2 border-b border-gray-50 last:border-0">
+                <div className="flex items-center justify-between mb-1">
                   <p className="text-sm font-medium text-gray-900">{m.organization?.name || '-'}</p>
-                  <p className="text-xs text-gray-400">{m.organization?.type} / {m.role}</p>
+                  <Badge status={m.organization?.status || ''} />
                 </div>
-                <Badge status={m.organization?.status || ''} />
+                <p className="text-xs text-gray-400 mb-1">{m.organization?.type} / {m.role}</p>
+                {m.organization?.representativeName && (
+                  <p className="text-xs text-gray-500">대표자: {m.organization.representativeName}</p>
+                )}
+                {m.organization?.businessNumber && (
+                  <p className="text-xs text-gray-500">사업자번호: {m.organization.businessNumber}</p>
+                )}
+                {m.organization?.contactPhone && (
+                  <p className="text-xs text-gray-500">연락처: {m.organization.contactPhone}</p>
+                )}
+                {m.organization?.contactEmail && (
+                  <p className="text-xs text-gray-500">이메일: {m.organization.contactEmail}</p>
+                )}
+                {m.organization?.items && (
+                  <p className="text-xs text-gray-500">취급품목: {m.organization.items}</p>
+                )}
               </div>
             ))}
           </div>

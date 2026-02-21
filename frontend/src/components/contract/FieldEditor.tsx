@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut, Copy } from 'lucide-react';
 
 export interface FieldDef {
   id?: string;
@@ -109,6 +109,20 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     onChange(updated);
   };
 
+  const duplicateField = (idx: number) => {
+    const field = fields[idx];
+    const newField: FieldDef = {
+      ...field,
+      id: undefined,
+      positionX: Math.min(field.positionX + 3, 100 - field.width),
+      positionY: Math.min(field.positionY + 3, 100 - field.height),
+      sortOrder: fields.length,
+      label: `${field.label} (복사)`,
+    };
+    onChange([...fields, newField]);
+    setSelectedIdx(fields.length);
+  };
+
   const startDrag = useCallback((idx: number, startX: number, startY: number) => {
     setSelectedIdx(idx);
     setDragging(idx);
@@ -136,6 +150,46 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
 
     const handleEnd = () => {
       setDragging(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
+  }, [fields]);
+
+  const startResize = useCallback((idx: number, startX: number, startY: number) => {
+    setSelectedIdx(idx);
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const field = fields[idx];
+    const startW = field.width;
+    const startH = field.height;
+
+    const handleMove = (clientX: number, clientY: number) => {
+      const dw = ((clientX - startX) / rect.width) * 100;
+      const dh = ((clientY - startY) / rect.height) * 100;
+      const newW = Math.max(5, Math.min(100 - field.positionX, startW + dw));
+      const newH = Math.max(2, Math.min(100 - field.positionY, startH + dh));
+      updateField(idx, {
+        width: Math.round(newW * 10) / 10,
+        height: Math.round(newH * 10) / 10,
+      });
+    };
+
+    const handleMouseMove = (moveE: MouseEvent) => handleMove(moveE.clientX, moveE.clientY);
+    const handleTouchMove = (moveE: TouchEvent) => {
+      moveE.preventDefault();
+      handleMove(moveE.touches[0].clientX, moveE.touches[0].clientY);
+    };
+
+    const handleEnd = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleEnd);
       document.removeEventListener('touchmove', handleTouchMove);
@@ -204,7 +258,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
               <img
                 src={templateImageUrl}
                 alt="Template"
-                className="absolute inset-0 w-full h-full object-contain"
+                className="absolute inset-0 w-full h-full object-fill"
                 onError={() => setImgError(true)}
               />
             ) : (
@@ -239,6 +293,20 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                 >
                   <Icon className="w-3 h-3 text-blue-500 shrink-0" />
                   <span className="truncate text-blue-700">{field.label}</span>
+                  {/* Resize handle (bottom-right corner) */}
+                  <div
+                    className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-blue-500 cursor-se-resize rounded-tl-sm"
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      startResize(idx, e.clientX, e.clientY);
+                    }}
+                    onTouchStart={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      startResize(idx, e.touches[0].clientX, e.touches[0].clientY);
+                    }}
+                  />
                 </div>
               );
             })}
@@ -312,6 +380,13 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                   >
                     <GripVertical className="w-3 h-3 text-gray-300" />
                     <span className="flex-1 truncate">{field.label}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); duplicateField(originalIdx); }}
+                      className="text-gray-400 hover:text-blue-500"
+                      title="복사"
+                    >
+                      <Copy className="w-3 h-3" />
+                    </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); removeField(originalIdx); }}
                       className="text-gray-400 hover:text-red-500"

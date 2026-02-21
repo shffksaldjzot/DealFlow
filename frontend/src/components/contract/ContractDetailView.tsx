@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { ZoomIn, X, Download } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { API_BASE_URL } from '@/lib/api';
 import type { Contract } from '@/types/contract';
 
 interface ContractDetailViewProps {
@@ -41,7 +42,7 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
 
   const handlePdfDownload = () => {
     if (contract.signedPdfFileId) {
-      window.open(`/api/files/${contract.signedPdfFileId}/download`, '_blank');
+      window.open(`${API_BASE_URL}/files/${contract.signedPdfFileId}/download`, '_blank');
     }
   };
 
@@ -78,11 +79,11 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
     }
 
     return (
-      <div className="relative" ref={isLightbox ? undefined : overlayRef}>
+      <div className="relative" ref={isLightbox ? undefined : overlayRef} style={{ aspectRatio: '210/297' }}>
         <img
           src={templateImageUrl}
           alt="계약서"
-          className="w-full"
+          className="absolute inset-0 w-full h-full object-fill"
           onError={() => setImgError(true)}
         />
         {/* Field value overlays */}
@@ -108,7 +109,10 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
                       {value === 'true' && <span className="text-white text-xs font-bold">✓</span>}
                     </div>
                   ) : (
-                    <span className={`text-gray-900 font-medium truncate ${isLightbox ? 'text-sm' : 'text-xs'}`}>
+                    <span
+                      className="text-gray-900 font-medium truncate"
+                      style={{ fontSize: 'clamp(8px, 1.5vw, 14px)' }}
+                    >
                       {value}
                     </span>
                   )}
