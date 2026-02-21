@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut } from 'lucide-react';
 
 export interface FieldDef {
   id?: string;
@@ -77,6 +77,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
   const [imgError, setImgError] = useState(false);
+  const [zoom, setZoom] = useState(1.0);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const addField = (type: string) => {
@@ -89,8 +90,8 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
       pageNumber: 1,
       positionX: 10 + (fields.length * 2) % 60,
       positionY: 10 + (fields.length * 5) % 60,
-      width: type === 'signature' ? 30 : type === 'checkbox' ? 5 : 25,
-      height: type === 'signature' ? 10 : type === 'checkbox' ? 5 : 5,
+      width: type === 'signature' ? 25 : type === 'checkbox' ? 5 : 20,
+      height: type === 'signature' ? 8 : type === 'checkbox' ? 5 : 4,
       sortOrder: fields.length,
     };
     onChange([...fields, newField]);
@@ -159,57 +160,89 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
 
   const selected = selectedIdx !== null ? fields[selectedIdx] : null;
 
+  // Reversed fields for list display (newest first)
+  const reversedFields = [...fields].reverse();
+
   return (
     <div className="flex gap-4 h-full">
       {/* Canvas Area */}
-      <div className="flex-1">
-        <div
-          ref={canvasRef}
-          className="relative bg-white border-2 border-dashed border-gray-200 rounded-xl overflow-hidden"
-          style={{ aspectRatio: '210/297', maxHeight: '70vh' }}
-        >
-          {templateImageUrl && !imgError ? (
-            <img
-              src={templateImageUrl}
-              alt="Template"
-              className="absolute inset-0 w-full h-full object-contain"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-              <div className="text-center">
-                <p className="text-sm">계약서 템플릿 미리보기</p>
-                <p className="text-xs mt-1">필드를 추가하고 드래그하여 배치하세요</p>
-              </div>
-            </div>
-          )}
+      <div className="flex-1 flex flex-col">
+        {/* Zoom Controls */}
+        <div className="flex items-center gap-2 mb-2">
+          <button
+            onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}
+            className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+            title="축소"
+          >
+            <ZoomOut className="w-4 h-4 text-gray-600" />
+          </button>
+          <input
+            type="range"
+            min={50}
+            max={200}
+            value={Math.round(zoom * 100)}
+            onChange={(e) => setZoom(Number(e.target.value) / 100)}
+            className="flex-1 h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-500"
+          />
+          <button
+            onClick={() => setZoom(z => Math.min(2.0, z + 0.1))}
+            className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+            title="확대"
+          >
+            <ZoomIn className="w-4 h-4 text-gray-600" />
+          </button>
+          <span className="text-xs text-gray-500 min-w-[3rem] text-center">{Math.round(zoom * 100)}%</span>
+        </div>
 
-          {/* Field overlays */}
-          {fields.map((field, idx) => {
-            const Icon = FIELD_TYPES.find(t => t.value === field.fieldType)?.icon || Type;
-            return (
-              <div
-                key={idx}
-                className={`absolute border-2 rounded cursor-move transition-colors flex items-center gap-1 px-1 text-xs ${
-                  selectedIdx === idx
-                    ? 'border-blue-500 bg-blue-50/80 z-10'
-                    : 'border-blue-300/60 bg-blue-50/50 hover:border-blue-400'
-                }`}
-                style={{
-                  left: `${field.positionX}%`,
-                  top: `${field.positionY}%`,
-                  width: `${field.width}%`,
-                  height: `${field.height}%`,
-                  minHeight: '20px',
-                }}
-                onMouseDown={(e) => handleMouseDown(idx, e)}
-                onTouchStart={(e) => handleTouchStart(idx, e)}
-              >
-                <Icon className="w-3 h-3 text-blue-500 shrink-0" />
-                <span className="truncate text-blue-700">{field.label}</span>
+        <div className="overflow-auto flex-1" style={{ maxHeight: '70vh' }}>
+          <div
+            ref={canvasRef}
+            className="relative bg-white border-2 border-dashed border-gray-200 rounded-xl overflow-hidden origin-top-left"
+            style={{ aspectRatio: '210/297', transform: `scale(${zoom})`, transformOrigin: 'top left', width: '100%' }}
+          >
+            {templateImageUrl && !imgError ? (
+              <img
+                src={templateImageUrl}
+                alt="Template"
+                className="absolute inset-0 w-full h-full object-contain"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                <div className="text-center">
+                  <p className="text-sm">계약서 템플릿 미리보기</p>
+                  <p className="text-xs mt-1">필드를 추가하고 드래그하여 배치하세요</p>
+                </div>
               </div>
-            );
-          })}
+            )}
+
+            {/* Field overlays */}
+            {fields.map((field, idx) => {
+              const Icon = FIELD_TYPES.find(t => t.value === field.fieldType)?.icon || Type;
+              return (
+                <div
+                  key={idx}
+                  className={`absolute border-2 rounded cursor-move transition-colors flex items-center text-left gap-1 px-1 text-xs ${
+                    selectedIdx === idx
+                      ? 'border-blue-500 bg-blue-50/80 z-10'
+                      : 'border-blue-300/60 bg-blue-50/50 hover:border-blue-400'
+                  }`}
+                  style={{
+                    left: `${field.positionX}%`,
+                    top: `${field.positionY}%`,
+                    width: `${field.width}%`,
+                    height: `${field.height}%`,
+                    minHeight: '20px',
+                  }}
+                  onMouseDown={(e) => handleMouseDown(idx, e)}
+                  onTouchStart={(e) => handleTouchStart(idx, e)}
+                >
+                  <Icon className="w-3 h-3 text-blue-500 shrink-0" />
+                  <span className="truncate text-blue-700">{field.label}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -258,7 +291,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
           </div>
         </div>
 
-        {/* Field List */}
+        {/* Field List (newest first) */}
         <div className="bg-white rounded-xl border border-gray-100 p-3">
           <p className="text-xs font-semibold text-gray-500 mb-2">필드 목록 ({fields.length})</p>
           <div className="space-y-1 max-h-40 overflow-y-auto">
@@ -267,24 +300,27 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                 위에서 필드를 추가하세요
               </p>
             ) : (
-              fields.map((field, idx) => (
-                <div
-                  key={idx}
-                  className={`flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer text-xs ${
-                    selectedIdx === idx ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSelectedIdx(idx)}
-                >
-                  <GripVertical className="w-3 h-3 text-gray-300" />
-                  <span className="flex-1 truncate">{field.label}</span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); removeField(idx); }}
-                    className="text-gray-400 hover:text-red-500"
+              reversedFields.map((field) => {
+                const originalIdx = fields.indexOf(field);
+                return (
+                  <div
+                    key={originalIdx}
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer text-xs ${
+                      selectedIdx === originalIdx ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => setSelectedIdx(originalIdx)}
                   >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              ))
+                    <GripVertical className="w-3 h-3 text-gray-300" />
+                    <span className="flex-1 truncate">{field.label}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeField(originalIdx); }}
+                      className="text-gray-400 hover:text-red-500"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
@@ -300,7 +336,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                 onChange={(e) => updateField(selectedIdx, { label: e.target.value })}
               />
               <Input
-                label="플레이스홀더"
+                label="안내 문구"
                 value={selected.placeholder || ''}
                 onChange={(e) => updateField(selectedIdx, { placeholder: e.target.value })}
               />

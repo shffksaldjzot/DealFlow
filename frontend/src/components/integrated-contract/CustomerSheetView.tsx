@@ -26,16 +26,18 @@ export default function CustomerSheetView({
     <div className="space-y-6">
       {partners.map((partner) => (
         <div key={partner.partnerId}>
-          <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">
-            {partner.partnerName}
-          </h3>
+          <div className="mb-3">
+            <span className="text-xs text-gray-400">{partner.partnerName}</span>
+          </div>
           {partner.categories.map((cat) => (
             <div key={cat.sheetId} className="mb-4">
-              <h4 className="text-base font-bold text-gray-900 mb-2">{cat.categoryName}</h4>
+              <h4 className="text-base font-bold text-gray-900 mb-2">
+                {cat.categoryName}
+              </h4>
 
               {/* Spreadsheet table */}
-              <div className="border border-gray-200 rounded-xl overflow-x-auto">
-                <table className="w-full text-sm">
+              <div className="border border-gray-200 rounded-xl overflow-x-auto -mx-1 px-1">
+                <table className="w-full text-sm min-w-0">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
                       <th className="px-2 py-2 w-8" />
@@ -44,19 +46,10 @@ export default function CustomerSheetView({
                       </th>
                       <th className="px-1 py-2 w-6" />
                       {cat.columns.map((col) => (
-                        <th key={col.id} className="px-2 py-2 text-center min-w-[90px]">
+                        <th key={col.id} className="px-2 py-2 text-center min-w-[80px]">
                           <span className="text-xs font-medium text-gray-600">
                             {col.customName || `열`}
                           </span>
-                          <div className="mt-0.5">
-                            <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                              col.columnType === 'text'
-                                ? 'bg-gray-100 text-gray-500'
-                                : 'bg-blue-100 text-blue-600'
-                            }`}>
-                              {col.columnType === 'text' ? '텍스트' : '금액'}
-                            </span>
-                          </div>
                         </th>
                       ))}
                     </tr>

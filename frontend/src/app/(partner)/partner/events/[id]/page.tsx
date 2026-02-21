@@ -328,7 +328,7 @@ export default function PartnerEventDetailPage() {
                 <Table
                   columns={contractColumns}
                   data={contracts}
-                  onRowClick={(item) => router.push(`/partner/events/${id}/contracts/${item.id}`)}
+                  onRowClick={(item) => router.push(`/partner/contracts/${item.id}`)}
                   emptyMessage="생성된 계약이 없습니다."
                 />
               </div>
@@ -338,7 +338,7 @@ export default function PartnerEventDetailPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-500">합계 금액</span>
                 <span className="text-lg font-bold text-blue-600">
-                  {formatCurrency(contracts.reduce((sum, c) => sum + (c.totalAmount || 0), 0))}
+                  {formatCurrency(contracts.reduce((sum, c) => sum + (Number(c.totalAmount) || 0), 0))}
                 </span>
               </div>
             </Card>

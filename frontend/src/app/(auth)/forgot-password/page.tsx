@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
             <>
               <h2 className="text-lg font-bold text-gray-900 mb-1">비밀번호 초기화 요청</h2>
               <p className="text-sm text-gray-500 mb-6">
-                가입 시 등록한 이메일과 전화번호를 입력하시면, 관리자에게 비밀번호 초기화 요청을 보내드립니다.
+                가입 시 등록한 이메일과 전화번호를 입력하시면, 임시 비밀번호를 이메일로 발송해드립니다.
               </p>
 
               <div className="space-y-4 mb-6">
@@ -59,15 +59,25 @@ export default function ForgotPasswordPage() {
                 <Input
                   label="전화번호"
                   type="tel"
-                  placeholder="01012345678"
+                  placeholder="010-0000-0000"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/[^0-9]/g, '');
+                    let formatted = raw;
+                    if (raw.length > 3 && raw.length <= 7) {
+                      formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`;
+                    } else if (raw.length > 7) {
+                      formatted = `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
+                    }
+                    setPhone(formatted);
+                  }}
+                  maxLength={13}
                 />
               </div>
 
               <div className="space-y-3">
                 <Button fullWidth size="lg" onClick={handleSubmit} loading={loading}>
-                  초기화 요청 보내기
+                  임시 비밀번호 발송
                 </Button>
                 <div className="text-center">
                   <button
@@ -86,10 +96,10 @@ export default function ForgotPasswordPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">요청이 전송되었습니다</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">임시 비밀번호 발송 완료</h3>
               <p className="text-sm text-gray-500 mb-6">
-                관리자에게 비밀번호 초기화 요청을 보냈습니다.<br />
-                처리가 완료되면 등록된 연락처로 임시 비밀번호를 알려드립니다.
+                임시 비밀번호가 이메일로 발송되었습니다.<br />
+                로그인 후 반드시 비밀번호를 변경해주세요.
               </p>
               <Button fullWidth onClick={() => router.push('/login')}>
                 로그인으로 돌아가기

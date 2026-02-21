@@ -105,10 +105,26 @@ export default function PartnerSheetPreviewPage() {
                         {(sheet.columns || [])
                           .sort((a, b) => a.sortOrder - b.sortOrder)
                           .map((col) => {
-                            const price = row.prices?.[col.id] || 0;
+                            const isText = col.columnType === 'text';
+                            const cellVal = row.cellValues?.[col.id];
+                            const priceVal = row.prices?.[col.id];
+
+                            if (isText) {
+                              const textVal = cellVal !== undefined ? String(cellVal) : '';
+                              return (
+                                <td key={col.id} className="px-4 py-2.5 text-center text-gray-700">
+                                  {textVal || '-'}
+                                </td>
+                              );
+                            }
+
+                            // amount column: prefer cellValues, fallback to prices
+                            const numVal = cellVal !== undefined
+                              ? Number(cellVal)
+                              : (priceVal ?? 0);
                             return (
                               <td key={col.id} className="px-4 py-2.5 text-right text-gray-700">
-                                {price ? `${price.toLocaleString('ko-KR')}원` : '-'}
+                                {numVal ? `${Number(numVal).toLocaleString('ko-KR')}원` : '-'}
                               </td>
                             );
                           })}

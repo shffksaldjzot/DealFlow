@@ -43,7 +43,15 @@ export default function OptionsPage() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
 
+  // Redirect to login if not authenticated (before selecting options)
   useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace(`/login?redirect=/events/${code}/options`);
+    }
+  }, [isAuthenticated, code, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
     api.get(`/ic/contract-flow-by-code/${code}`)
       .then((res) => {
         const data = extractData<IcContractFlow>(res);
@@ -55,7 +63,7 @@ export default function OptionsPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [code]);
+  }, [code, isAuthenticated]);
 
   useEffect(() => {
     if (user) {
@@ -426,7 +434,7 @@ export default function OptionsPage() {
               size="lg"
               onClick={handleSubmit}
               loading={signing}
-              disabled={(!legalAgreed && !!flow.config.legalTerms) || !selectedTypeId}
+              disabled={(!legalAgreed && !!flow.config.legalTerms) || !selectedTypeId || !hasSignature}
             >
               <CheckCircle className="w-5 h-5 mr-2" />
               계약 완료

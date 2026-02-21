@@ -15,6 +15,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ActivityLogModule } from './shared/activity-log/activity-log.module';
 import { SeedModule } from './shared/seed/seed.module';
 import { IntegratedContractsModule } from './modules/integrated-contracts/integrated-contracts.module';
+import { MailModule } from './shared/mail/mail.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { IntegratedContractsModule } from './modules/integrated-contracts/integr
     AdminModule,
     NotificationsModule,
     IntegratedContractsModule,
+    MailModule,
     SeedModule,
   ],
   providers: [

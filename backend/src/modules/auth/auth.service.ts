@@ -25,6 +25,7 @@ import {
   TokenResponseDto,
 } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { MailService } from '../../shared/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -39,6 +40,7 @@ export class AuthService {
     private notificationRepository: Repository<Notification>,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private mailService: MailService,
   ) {}
 
   async socialLogin(dto: SocialLoginDto): Promise<TokenResponseDto> {
@@ -217,19 +219,48 @@ export class AuthService {
       throw new BadRequestException('이메일과 전화번호가 일치하지 않습니다.');
     }
 
-    // Find admin users to notify
+    // Generate temporary password
+    const temporaryPassword = this.generateTemporaryPassword();
+    const passwordHash = await bcrypt.hash(temporaryPassword, 10);
+
+    // Update password in DB
+    await this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ passwordHash })
+      .where('id = :id', { id: user.id })
+      .execute();
+
+    // Send temporary password via email
+    await this.mailService.sendMail(
+      user.email,
+      '[DealFlow] 임시 비밀번호 안내',
+      `안녕하세요, ${user.name}님.\n\n임시 비밀번호가 발급되었습니다.\n\n임시 비밀번호: ${temporaryPassword}\n\n로그인 후 반드시 비밀번호를 변경해주세요.\n\n감사합니다.\nDealFlow`,
+      `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
+        <h2 style="color:#2563eb">DealFlow</h2>
+        <p>안녕하세요, <strong>${user.name}</strong>님.</p>
+        <p>임시 비밀번호가 발급되었습니다.</p>
+        <div style="background:#f1f5f9;border-radius:8px;padding:16px;margin:16px 0;text-align:center">
+          <p style="font-size:12px;color:#64748b;margin:0 0 4px">임시 비밀번호</p>
+          <p style="font-size:24px;font-weight:bold;color:#1e293b;margin:0;letter-spacing:2px">${temporaryPassword}</p>
+        </div>
+        <p style="color:#ef4444;font-size:14px">로그인 후 반드시 비밀번호를 변경해주세요.</p>
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0"/>
+        <p style="font-size:12px;color:#94a3b8">이 메일은 DealFlow에서 자동 발송되었습니다.</p>
+      </div>`,
+    );
+
+    // Also notify admins (secondary)
     const admins = await this.usersRepository.find({
       where: { role: UserRole.ADMIN, status: UserStatus.ACTIVE },
     });
-
-    // Create notification for each admin
     for (const admin of admins) {
       const notification = this.notificationRepository.create({
         userId: admin.id,
         type: NotificationType.PUSH,
-        title: '비밀번호 초기화 요청',
-        content: `${user.name} (${user.email})님이 비밀번호 초기화를 요청했습니다. 사용자 관리에서 비밀번호를 초기화해주세요.`,
-        status: NotificationStatus.PENDING,
+        title: '비밀번호 자동 초기화',
+        content: `${user.name} (${user.email})님의 비밀번호가 자동 초기화되었습니다.`,
+        status: NotificationStatus.SENT,
         metadata: {
           type: 'password_reset_request',
           targetUserId: user.id,
@@ -240,7 +271,16 @@ export class AuthService {
       await this.notificationRepository.save(notification);
     }
 
-    return { message: '관리자에게 비밀번호 초기화 요청을 보냈습니다. 잠시 후 알려드리겠습니다.' };
+    return { message: '임시 비밀번호가 이메일로 발송되었습니다.' };
+  }
+
+  private generateTemporaryPassword(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 10; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password + '!';
   }
 
   private generateTokens(user: User): TokenResponseDto {
