@@ -33,6 +33,7 @@ export default function OptionsPage() {
   const [legalAgreed, setLegalAgreed] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [unitNumber, setUnitNumber] = useState('');
   const [specialNotes, setSpecialNotes] = useState('');
 
   // Apartment type selection (in signature step)
@@ -194,6 +195,18 @@ export default function OptionsPage() {
     setHasSignature(false);
   };
 
+  // Phone number formatting: auto-format to 010-xxxx-xxxx
+  const formatPhoneNumber = (value: string) => {
+    const nums = value.replace(/[^0-9]/g, '');
+    if (nums.length <= 3) return nums;
+    if (nums.length <= 7) return `${nums.slice(0, 3)}-${nums.slice(3)}`;
+    return `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7, 11)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomerPhone(formatPhoneNumber(e.target.value));
+  };
+
   const handleSubmit = async () => {
     if (!isAuthenticated) {
       router.push(`/login?redirect=/events/${code}/options`);
@@ -206,6 +219,18 @@ export default function OptionsPage() {
     }
     if (!selectedTypeId) {
       toast('아파트 타입을 선택해주세요.', 'error');
+      return;
+    }
+    if (!customerName.trim()) {
+      toast('이름을 입력해주세요.', 'error');
+      return;
+    }
+    if (!customerPhone.trim()) {
+      toast('연락처를 입력해주세요.', 'error');
+      return;
+    }
+    if (!unitNumber.trim()) {
+      toast('동호수를 입력해주세요.', 'error');
       return;
     }
     if (!legalAgreed && flow.config.legalTerms?.trim()) {
@@ -233,6 +258,7 @@ export default function OptionsPage() {
         signatureData,
         customerName: customerName || undefined,
         customerPhone: customerPhone || undefined,
+        unitNumber: unitNumber || undefined,
         specialNotes: specialNotes || undefined,
       });
       const contract = extractData<{ id: string; shortCode: string }>(res);
@@ -370,20 +396,39 @@ export default function OptionsPage() {
               <h3 className="font-bold text-gray-900 mb-3">계약자 정보</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    이름 <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="이름을 입력해주세요"
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">연락처</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    연락처 <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="tel"
                     value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    onChange={handlePhoneChange}
+                    placeholder="010-0000-0000"
+                    maxLength={13}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    동호수 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={unitNumber}
+                    onChange={(e) => setUnitNumber(e.target.value)}
+                    placeholder="예: 101동 1201호"
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -457,7 +502,7 @@ export default function OptionsPage() {
               size="lg"
               onClick={handleSubmit}
               loading={signing}
-              disabled={(!legalAgreed && !!flow.config.legalTerms?.trim()) || !selectedTypeId || !hasSignature}
+              disabled={(!legalAgreed && !!flow.config.legalTerms?.trim()) || !selectedTypeId || !hasSignature || !customerName.trim() || !customerPhone.trim() || !unitNumber.trim()}
             >
               <CheckCircle className="w-5 h-5 mr-2" />
               계약 완료

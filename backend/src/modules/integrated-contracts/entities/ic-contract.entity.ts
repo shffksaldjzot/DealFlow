@@ -71,6 +71,9 @@ export class IcContract {
   @Column({ name: 'signature_data', type: 'text', nullable: true })
   signatureData: string;
 
+  @Column({ name: 'unit_number', length: 50, nullable: true })
+  unitNumber: string;
+
   @Column({ name: 'special_notes', type: 'text', nullable: true })
   specialNotes: string;
 

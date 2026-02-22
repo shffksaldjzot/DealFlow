@@ -268,6 +268,7 @@ export class IcContractService {
       paymentSchedule,
       legalAgreed: true,
       signatureData: dto.signatureData,
+      unitNumber: dto.unitNumber || null,
       specialNotes: dto.specialNotes || null,
       status: IcContractStatus.SIGNED,
       signedAt: new Date(),

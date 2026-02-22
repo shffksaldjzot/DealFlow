@@ -30,7 +30,7 @@ export default function CustomerSheetView({
             <div key={cat.sheetId} className="mb-6">
               <div className="mb-2">
                 <h4 className="text-lg font-bold text-gray-900">
-                  {cat.categoryName}
+                  {partner.partnerItems || cat.categoryName}
                 </h4>
                 <p className="text-xs text-gray-400 mt-0.5">{partner.partnerName}</p>
               </div>

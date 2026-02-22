@@ -41,14 +41,16 @@ export default function IcContractPrintView({ contract, flow, partnerFilter }: I
             <td style={{ padding: '6px 12px', border: '1px solid #ddd', width: '30%' }}>{contract.customerPhone || '-'}</td>
           </tr>
           <tr>
+            <td style={{ padding: '6px 12px', background: '#f5f5f5', border: '1px solid #ddd', fontWeight: 600 }}>동호수</td>
+            <td style={{ padding: '6px 12px', border: '1px solid #ddd' }}>{contract.unitNumber || '-'}</td>
             <td style={{ padding: '6px 12px', background: '#f5f5f5', border: '1px solid #ddd', fontWeight: 600 }}>평형</td>
             <td style={{ padding: '6px 12px', border: '1px solid #ddd' }}>{contract.apartmentType?.name || '-'}</td>
-            <td style={{ padding: '6px 12px', background: '#f5f5f5', border: '1px solid #ddd', fontWeight: 600 }}>서명일</td>
-            <td style={{ padding: '6px 12px', border: '1px solid #ddd' }}>{contract.signedAt ? formatDateTime(contract.signedAt) : '-'}</td>
           </tr>
           <tr>
+            <td style={{ padding: '6px 12px', background: '#f5f5f5', border: '1px solid #ddd', fontWeight: 600 }}>서명일</td>
+            <td style={{ padding: '6px 12px', border: '1px solid #ddd' }}>{contract.signedAt ? formatDateTime(contract.signedAt) : '-'}</td>
             <td style={{ padding: '6px 12px', background: '#f5f5f5', border: '1px solid #ddd', fontWeight: 600 }}>행사</td>
-            <td colSpan={3} style={{ padding: '6px 12px', border: '1px solid #ddd' }}>{contract.config?.event?.name || '-'}</td>
+            <td style={{ padding: '6px 12px', border: '1px solid #ddd' }}>{contract.config?.event?.name || '-'}</td>
           </tr>
         </tbody>
       </table>
@@ -63,7 +65,7 @@ export default function IcContractPrintView({ contract, flow, partnerFilter }: I
         flow.partners.map((partner) =>
           partner.categories.map((cat) => (
             <div key={cat.sheetId} style={{ marginBottom: '16px' }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{cat.categoryName}</p>
+              <p style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{partner.partnerItems || cat.categoryName}</p>
               <p style={{ fontSize: '10px', color: '#999', marginBottom: '6px' }}>{partner.partnerName}</p>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                 <tbody>
@@ -169,10 +171,29 @@ export default function IcContractPrintView({ contract, flow, partnerFilter }: I
         </>
       )}
 
-      {/* Special Notes */}
-      {contract.specialNotes && (
+      {/* Legal Terms (약관) */}
+      {contract.config?.legalTerms?.trim() && (
         <div style={{ marginBottom: '20px' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>특이사항</h3>
+          <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>약관</h3>
+          <p style={{ fontSize: '11px', whiteSpace: 'pre-wrap', lineHeight: '1.5', color: '#444' }}>{contract.config.legalTerms}</p>
+          {contract.legalAgreed && (
+            <p style={{ fontSize: '11px', color: '#16a34a', marginTop: '6px' }}>✓ 약관에 동의함</p>
+          )}
+        </div>
+      )}
+
+      {/* Special Terms from config (특약사항) */}
+      {contract.config?.specialNotes?.trim() && (
+        <div style={{ marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>특약사항</h3>
+          <p style={{ fontSize: '12px', whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{contract.config.specialNotes}</p>
+        </div>
+      )}
+
+      {/* Special Notes from contract (특이사항/비고) */}
+      {contract.specialNotes?.trim() && (
+        <div style={{ marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>특이사항 (비고)</h3>
           <p style={{ fontSize: '12px', whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{contract.specialNotes}</p>
         </div>
       )}

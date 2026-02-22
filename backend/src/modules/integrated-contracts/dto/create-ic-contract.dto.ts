@@ -46,5 +46,10 @@ export class CreateIcContractDto {
 
   @IsOptional()
   @IsString()
+  @Length(1, 50)
+  unitNumber?: string;
+
+  @IsOptional()
+  @IsString()
   specialNotes?: string;
 }

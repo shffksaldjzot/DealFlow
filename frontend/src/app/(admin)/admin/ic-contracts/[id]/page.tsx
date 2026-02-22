@@ -108,6 +108,10 @@ export default function AdminIcContractDetailPage() {
             <p className="font-medium mt-0.5">{contract.customerPhone || '-'}</p>
           </div>
           <div>
+            <span className="text-gray-400">동호수</span>
+            <p className="font-medium mt-0.5">{contract.unitNumber || '-'}</p>
+          </div>
+          <div>
             <span className="text-gray-400">행사</span>
             <p className="font-medium mt-0.5">{contract.config?.event?.name || '-'}</p>
           </div>

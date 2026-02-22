@@ -93,6 +93,7 @@ export interface IcContract {
   customerId?: string;
   customerName?: string;
   customerPhone?: string;
+  unitNumber?: string;
   shortCode: string;
   selectedItems: IcSelectedItem[];
   totalAmount: number;
@@ -137,6 +138,7 @@ export interface IcFlowCategory {
 export interface IcFlowPartner {
   partnerId: string;
   partnerName: string;
+  partnerItems?: string;
   categories: IcFlowCategory[];
 }
 

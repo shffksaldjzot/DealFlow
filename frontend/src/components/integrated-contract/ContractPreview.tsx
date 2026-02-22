@@ -38,6 +38,10 @@ export default function ContractPreview({ contract, flow }: ContractPreviewProps
             <p className="font-medium text-gray-900">{contract.customerPhone || '-'}</p>
           </div>
           <div>
+            <span className="text-gray-400">동호수</span>
+            <p className="font-medium text-gray-900">{contract.unitNumber || '-'}</p>
+          </div>
+          <div>
             <span className="text-gray-400">타입</span>
             <p className="font-medium text-gray-900">{contract.apartmentType?.name || '-'}</p>
           </div>
@@ -60,7 +64,7 @@ export default function ContractPreview({ contract, flow }: ContractPreviewProps
             partner.categories.map((cat) => (
               <div key={cat.sheetId}>
                 <div className="mb-2">
-                  <p className="text-sm font-bold text-gray-900">{cat.categoryName}</p>
+                  <p className="text-sm font-bold text-gray-900">{partner.partnerItems || cat.categoryName}</p>
                   <p className="text-[11px] text-gray-400">{partner.partnerName}</p>
                 </div>
                 <div className="border border-gray-200 rounded-xl overflow-hidden">
@@ -151,6 +155,37 @@ export default function ContractPreview({ contract, flow }: ContractPreviewProps
           </div>
         )}
       </div>
+
+      {/* Legal Terms (약관) */}
+      {contract.config?.legalTerms?.trim() && (
+        <div className="border-t border-gray-200 pt-4">
+          <h3 className="text-sm font-bold text-gray-500 mb-2">약관</h3>
+          <div className="text-xs text-gray-600 bg-gray-50 rounded-lg p-3 whitespace-pre-wrap max-h-40 overflow-y-auto">
+            {contract.config.legalTerms}
+          </div>
+          {contract.legalAgreed && (
+            <p className="text-xs text-green-600 mt-1.5 flex items-center gap-1">
+              <Check className="w-3.5 h-3.5" /> 약관에 동의함
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Special Terms from config (특약사항) */}
+      {contract.config?.specialNotes?.trim() && (
+        <div className="border-t border-gray-200 pt-4">
+          <h3 className="text-sm font-bold text-gray-500 mb-2">특약사항</h3>
+          <p className="text-sm text-gray-700 whitespace-pre-wrap">{contract.config.specialNotes}</p>
+        </div>
+      )}
+
+      {/* Special Notes from contract (특이사항/비고) */}
+      {contract.specialNotes?.trim() && (
+        <div className="border-t border-gray-200 pt-4">
+          <h3 className="text-sm font-bold text-gray-500 mb-2">특이사항 (비고)</h3>
+          <p className="text-sm text-gray-700 whitespace-pre-wrap">{contract.specialNotes}</p>
+        </div>
+      )}
 
       {/* Signature */}
       {contract.signatureData && (
