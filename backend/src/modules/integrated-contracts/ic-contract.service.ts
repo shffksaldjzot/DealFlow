@@ -87,6 +87,7 @@ export class IcContractService {
     const partnerMap = new Map<string, {
       partnerId: string;
       partnerName: string;
+      partnerItems: string;
       categories: typeof sheets extends (infer T)[] ? any[] : never;
     }>();
 
