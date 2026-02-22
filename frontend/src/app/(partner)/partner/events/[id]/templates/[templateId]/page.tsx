@@ -24,9 +24,16 @@ export default function TemplateFieldEditorPage() {
         const tmpl = extractData<any>(await api.get(`/contract-templates/${templateId}`));
         setTemplate(tmpl);
 
-        // Load existing fields
+        // Load existing fields - normalize decimal strings from PostgreSQL to numbers
         const existingFields = extractData<FieldDef[]>(await api.get(`/contract-templates/${templateId}/fields`));
-        setFields(existingFields);
+        setFields(existingFields.map(f => ({
+          ...f,
+          positionX: Number(f.positionX),
+          positionY: Number(f.positionY),
+          width: Number(f.width),
+          height: Number(f.height),
+          pageNumber: Number(f.pageNumber) || 1,
+        })));
 
         // Fetch template file via authenticated API and create blob URL
         if (tmpl.fileId) {

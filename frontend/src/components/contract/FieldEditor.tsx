@@ -1,8 +1,8 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut, Copy, ArrowUp, ArrowDown, AlignLeft, AlignRight, AlignStartVertical, AlignEndVertical, AlignCenterHorizontal, AlignCenterVertical } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut, Copy, ArrowUp, ArrowDown, AlignLeft, AlignRight, AlignCenterHorizontal, AlignCenterVertical } from 'lucide-react';
 
 export interface FieldDef {
   id?: string;
@@ -78,7 +78,9 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
   const [dragging, setDragging] = useState<number | null>(null);
   const [imgError, setImgError] = useState(false);
   const [zoom, setZoom] = useState(1.0);
+  const [marquee, setMarquee] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const selectSingle = (idx: number) => setSelectedIndices(new Set([idx]));
   const clearSelection = () => setSelectedIndices(new Set());
@@ -91,6 +93,46 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
       return next;
     });
   };
+
+  // Arrow key fine-tuning (single + multi-select)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedIndices.size === 0) return;
+      // Don't capture if user is typing in an input
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+      const step = e.shiftKey ? 0.5 : 1;
+      let dx = 0, dy = 0;
+      switch (e.key) {
+        case 'ArrowLeft': dx = -step; break;
+        case 'ArrowRight': dx = step; break;
+        case 'ArrowUp': dy = -step; break;
+        case 'ArrowDown': dy = step; break;
+        case 'Delete':
+        case 'Backspace':
+          if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+            e.preventDefault();
+            removeSelectedFields();
+          }
+          return;
+        default: return;
+      }
+      e.preventDefault();
+      const updated = [...fields];
+      selectedIndices.forEach(i => {
+        const f = updated[i];
+        updated[i] = {
+          ...f,
+          positionX: Math.max(0, Math.min(100 - Number(f.width), Number(f.positionX) + dx)),
+          positionY: Math.max(0, Math.min(100 - Number(f.height), Number(f.positionY) + dy)),
+        };
+      });
+      onChange(updated);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIndices, fields, onChange]);
 
   const addField = (type: string) => {
     const typeInfo = FIELD_TYPES.find(t => t.value === type);
@@ -143,8 +185,8 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     const newField: FieldDef = {
       ...field,
       id: undefined,
-      positionX: Math.min(field.positionX + 3, 100 - field.width),
-      positionY: Math.min(field.positionY + 3, 100 - field.height),
+      positionX: Math.min(Number(field.positionX) + 3, 100 - Number(field.width)),
+      positionY: Math.min(Number(field.positionY) + 3, 100 - Number(field.height)),
       sortOrder: fields.length,
       label: `${field.label} (복사)`,
     };
@@ -154,7 +196,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
 
   const moveSelectedUp = () => {
     const sorted = Array.from(selectedIndices).sort((a, b) => a - b);
-    if (sorted[0] === 0) return; // Already at top
+    if (sorted[0] === 0) return;
     const updated = [...fields];
     const newSelected = new Set<number>();
     for (const idx of sorted) {
@@ -167,7 +209,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
 
   const moveSelectedDown = () => {
     const sorted = Array.from(selectedIndices).sort((a, b) => b - a);
-    if (sorted[0] === fields.length - 1) return; // Already at bottom
+    if (sorted[0] === fields.length - 1) return;
     const updated = [...fields];
     const newSelected = new Set<number>();
     for (const idx of sorted) {
@@ -223,23 +265,38 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     onChange(updated);
   };
 
-  const startDrag = useCallback((idx: number, startX: number, startY: number) => {
-    selectSingle(idx);
+  const startDrag = useCallback((idx: number, startX: number, startY: number, isMulti: boolean) => {
+    if (!isMulti) selectSingle(idx);
     setDragging(idx);
 
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const field = fields[idx];
-    const startPosX = field.positionX;
-    const startPosY = field.positionY;
+    const startPosX = Number(field.positionX);
+    const startPosY = Number(field.positionY);
+
+    // For multi-drag, capture starting positions of ALL selected fields
+    const dragIndices = isMulti ? Array.from(selectedIndices) : [idx];
+    const startPositions = dragIndices.map(i => ({
+      idx: i,
+      x: Number(fields[i].positionX),
+      y: Number(fields[i].positionY),
+    }));
 
     const handleMove = (clientX: number, clientY: number) => {
       const dx = ((clientX - startX) / rect.width) * 100;
       const dy = ((clientY - startY) / rect.height) * 100;
-      const newX = Math.max(0, Math.min(100 - field.width, startPosX + dx));
-      const newY = Math.max(0, Math.min(100 - field.height, startPosY + dy));
-      updateField(idx, { positionX: Math.round(newX * 10) / 10, positionY: Math.round(newY * 10) / 10 });
+      const updated = [...fields];
+      startPositions.forEach(({ idx: i, x, y }) => {
+        const f = updated[i];
+        updated[i] = {
+          ...f,
+          positionX: Math.round(Math.max(0, Math.min(100 - Number(f.width), x + dx)) * 10) / 10,
+          positionY: Math.round(Math.max(0, Math.min(100 - Number(f.height), y + dy)) * 10) / 10,
+        };
+      });
+      onChange(updated);
     };
 
     const handleMouseMove = (moveE: MouseEvent) => handleMove(moveE.clientX, moveE.clientY);
@@ -260,7 +317,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     document.addEventListener('mouseup', handleEnd);
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleEnd);
-  }, [fields]);
+  }, [fields, selectedIndices]);
 
   const startResize = useCallback((idx: number, startX: number, startY: number) => {
     selectSingle(idx);
@@ -269,14 +326,14 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const field = fields[idx];
-    const startW = field.width;
-    const startH = field.height;
+    const startW = Number(field.width);
+    const startH = Number(field.height);
 
     const handleMove = (clientX: number, clientY: number) => {
       const dw = ((clientX - startX) / rect.width) * 100;
       const dh = ((clientY - startY) / rect.height) * 100;
-      const newW = Math.max(5, Math.min(100 - field.positionX, startW + dw));
-      const newH = Math.max(2, Math.min(100 - field.positionY, startH + dh));
+      const newW = Math.max(5, Math.min(100 - Number(field.positionX), startW + dw));
+      const newH = Math.max(2, Math.min(100 - Number(field.positionY), startH + dh));
       updateField(idx, {
         width: Math.round(newW * 10) / 10,
         height: Math.round(newH * 10) / 10,
@@ -302,29 +359,92 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     document.addEventListener('touchend', handleEnd);
   }, [fields]);
 
-  const handleMouseDown = useCallback((idx: number, e: React.MouseEvent) => {
+  const handleFieldMouseDown = useCallback((idx: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.ctrlKey || e.metaKey || e.altKey) {
       toggleSelection(idx);
       return;
     }
-    startDrag(idx, e.clientX, e.clientY);
-  }, [startDrag]);
+    // If this field is already in a multi-selection, drag all selected
+    const isMulti = selectedIndices.has(idx) && selectedIndices.size > 1;
+    startDrag(idx, e.clientX, e.clientY, isMulti);
+  }, [startDrag, selectedIndices]);
 
-  const handleTouchStart = useCallback((idx: number, e: React.TouchEvent) => {
+  const handleFieldTouchStart = useCallback((idx: number, e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    startDrag(idx, e.touches[0].clientX, e.touches[0].clientY);
-  }, [startDrag]);
+    const isMulti = selectedIndices.has(idx) && selectedIndices.size > 1;
+    startDrag(idx, e.touches[0].clientX, e.touches[0].clientY, isMulti);
+  }, [startDrag, selectedIndices]);
+
+  // Marquee (rubber-band) selection on canvas
+  const startMarquee = useCallback((e: React.MouseEvent) => {
+    // Only start if clicking on empty canvas area (not on a field)
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    clearSelection();
+    setMarquee({ x1: x, y1: y, x2: x, y2: y });
+
+    const handleMove = (moveE: MouseEvent) => {
+      const mx = ((moveE.clientX - rect.left) / rect.width) * 100;
+      const my = ((moveE.clientY - rect.top) / rect.height) * 100;
+      setMarquee(prev => prev ? { ...prev, x2: mx, y2: my } : null);
+    };
+
+    const handleUp = () => {
+      setMarquee(prev => {
+        if (!prev) return null;
+        // Select fields that intersect with the marquee
+        const left = Math.min(prev.x1, prev.x2);
+        const right = Math.max(prev.x1, prev.x2);
+        const top = Math.min(prev.y1, prev.y2);
+        const bottom = Math.max(prev.y1, prev.y2);
+
+        // Only select if marquee is larger than 2% (not just a click)
+        if (right - left > 2 || bottom - top > 2) {
+          const selected = new Set<number>();
+          fields.forEach((f, i) => {
+            const fx = Number(f.positionX);
+            const fy = Number(f.positionY);
+            const fw = Number(f.width);
+            const fh = Number(f.height);
+            // Check intersection
+            if (fx < right && fx + fw > left && fy < bottom && fy + fh > top) {
+              selected.add(i);
+            }
+          });
+          setSelectedIndices(selected);
+        }
+        return null;
+      });
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+    };
+
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+  }, [fields]);
 
   const singleSelectedIdx = selectedIndices.size === 1 ? Array.from(selectedIndices)[0] : null;
   const singleSelected = singleSelectedIdx !== null ? fields[singleSelectedIdx] : null;
 
+  // Marquee rect for rendering
+  const marqueeRect = marquee ? {
+    left: Math.min(marquee.x1, marquee.x2),
+    top: Math.min(marquee.y1, marquee.y2),
+    width: Math.abs(marquee.x2 - marquee.x1),
+    height: Math.abs(marquee.y2 - marquee.y1),
+  } : null;
+
   return (
-    <div className="flex gap-4 h-full">
-      {/* Canvas Area */}
-      <div className="flex-1 flex flex-col">
+    <div className="flex gap-4 h-full" ref={containerRef} tabIndex={-1}>
+      {/* Canvas Area - responsive, fills available space */}
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Zoom Controls */}
         <div className="flex items-center gap-2 mb-2">
           <button
@@ -350,14 +470,19 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
             <ZoomIn className="w-4 h-4 text-gray-600" />
           </button>
           <span className="text-xs text-gray-500 min-w-[3rem] text-center">{Math.round(zoom * 100)}%</span>
+          {selectedIndices.size > 0 && (
+            <span className="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+              {selectedIndices.size}개 선택 | 방향키로 미세조정
+            </span>
+          )}
         </div>
 
-        <div className="overflow-auto flex-1" style={{ maxHeight: '70vh' }}>
+        <div className="overflow-auto flex-1" style={{ maxHeight: 'calc(100vh - 160px)' }}>
           <div
             ref={canvasRef}
             className="relative bg-white border-2 border-dashed border-gray-200 rounded-xl overflow-hidden origin-top-left"
             style={{ aspectRatio: '210/297', transform: `scale(${zoom})`, transformOrigin: 'top left', width: '100%' }}
-            onMouseDown={() => clearSelection()}
+            onMouseDown={startMarquee}
           >
             {templateImageUrl && !imgError ? (
               <img
@@ -371,8 +496,22 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                 <div className="text-center">
                   <p className="text-sm">계약서 템플릿 미리보기</p>
                   <p className="text-xs mt-1">필드를 추가하고 드래그하여 배치하세요</p>
+                  <p className="text-xs mt-1">빈 공간 드래그로 여러 필드 선택</p>
                 </div>
               </div>
+            )}
+
+            {/* Marquee selection overlay */}
+            {marqueeRect && marqueeRect.width + marqueeRect.height > 2 && (
+              <div
+                className="absolute border-2 border-blue-400 bg-blue-100/30 pointer-events-none z-20"
+                style={{
+                  left: `${marqueeRect.left}%`,
+                  top: `${marqueeRect.top}%`,
+                  width: `${marqueeRect.width}%`,
+                  height: `${marqueeRect.height}%`,
+                }}
+              />
             )}
 
             {/* Field overlays */}
@@ -394,8 +533,8 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                     height: `${field.height}%`,
                     minHeight: '20px',
                   }}
-                  onMouseDown={(e) => handleMouseDown(idx, e)}
-                  onTouchStart={(e) => handleTouchStart(idx, e)}
+                  onMouseDown={(e) => handleFieldMouseDown(idx, e)}
+                  onTouchStart={(e) => handleFieldTouchStart(idx, e)}
                 >
                   <Icon className="w-3 h-3 text-blue-500 shrink-0" />
                   <span className="truncate text-blue-700">{field.label}</span>
@@ -421,7 +560,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
       </div>
 
       {/* Sidebar */}
-      <div className="w-72 shrink-0 space-y-4 overflow-y-auto max-h-[80vh]">
+      <div className="w-64 shrink-0 space-y-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 120px)' }}>
         {/* Field Presets */}
         {fields.length === 0 && (
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-3">
@@ -619,26 +758,44 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
               {selectedIndices.size}개 선택됨
             </p>
 
-            {/* Alignment buttons */}
-            <p className="text-[10px] font-medium text-gray-400 mb-1.5">정렬</p>
-            <div className="grid grid-cols-3 gap-1 mb-3">
-              <button onClick={() => alignSelected('left')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="좌측 정렬">
+            {/* Alignment buttons with clear text labels */}
+            <p className="text-[10px] font-medium text-gray-400 mb-1.5">가로 정렬</p>
+            <div className="grid grid-cols-3 gap-1 mb-2">
+              <button onClick={() => alignSelected('left')} className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="좌측 정렬">
                 <AlignLeft className="w-3.5 h-3.5" />
+                <span className="text-[9px]">좌측</span>
               </button>
-              <button onClick={() => alignSelected('centerH')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="가로 중앙 정렬">
+              <button onClick={() => alignSelected('centerH')} className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="가로 중앙 정렬">
                 <AlignCenterHorizontal className="w-3.5 h-3.5" />
+                <span className="text-[9px]">중앙</span>
               </button>
-              <button onClick={() => alignSelected('right')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="우측 정렬">
+              <button onClick={() => alignSelected('right')} className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="우측 정렬">
                 <AlignRight className="w-3.5 h-3.5" />
+                <span className="text-[9px]">우측</span>
               </button>
-              <button onClick={() => alignSelected('top')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="상단 정렬">
-                <AlignStartVertical className="w-3.5 h-3.5" />
+            </div>
+
+            <p className="text-[10px] font-medium text-gray-400 mb-1.5">세로 정렬</p>
+            <div className="grid grid-cols-3 gap-1 mb-3">
+              <button onClick={() => alignSelected('top')} className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="상단 정렬">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="4" y1="4" x2="20" y2="4" />
+                  <rect x="6" y="4" width="4" height="12" rx="1" fill="currentColor" opacity="0.3" />
+                  <rect x="14" y="4" width="4" height="8" rx="1" fill="currentColor" opacity="0.3" />
+                </svg>
+                <span className="text-[9px]">상단</span>
               </button>
-              <button onClick={() => alignSelected('centerV')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="세로 중앙 정렬">
+              <button onClick={() => alignSelected('centerV')} className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="세로 중앙 정렬">
                 <AlignCenterVertical className="w-3.5 h-3.5" />
+                <span className="text-[9px]">중앙</span>
               </button>
-              <button onClick={() => alignSelected('bottom')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="하단 정렬">
-                <AlignEndVertical className="w-3.5 h-3.5" />
+              <button onClick={() => alignSelected('bottom')} className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="하단 정렬">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="4" y1="20" x2="20" y2="20" />
+                  <rect x="6" y="8" width="4" height="12" rx="1" fill="currentColor" opacity="0.3" />
+                  <rect x="14" y="12" width="4" height="8" rx="1" fill="currentColor" opacity="0.3" />
+                </svg>
+                <span className="text-[9px]">하단</span>
               </button>
             </div>
 

@@ -19,7 +19,8 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
   // Build field value map
   const fieldValueMap: Record<string, string> = {};
   contract.fieldValues?.forEach((fv) => {
-    if (fv.field?.id) fieldValueMap[fv.field.id] = fv.value;
+    const fid = fv.fieldId || fv.field?.id;
+    if (fid) fieldValueMap[fid] = fv.value;
   });
 
   const signatureData = contract.signatures?.[0]?.signatureData;

@@ -189,12 +189,15 @@ export default function PartnerContractDetailPage() {
         <Card className="mb-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">입력 내용</h3>
           <div className="space-y-2">
-            {contract.fieldValues.map((fv: any) => (
-              <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
-                <span className="text-sm text-gray-500">{fv.field?.label || '항목'}</span>
-                <span className="text-sm font-medium text-gray-900">{fv.value}</span>
-              </div>
-            ))}
+            {contract.fieldValues.map((fv: any) => {
+              const fieldDef = contract.template?.fields?.find((f: any) => f.id === fv.fieldId);
+              return (
+                <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-500">{fieldDef?.label || fv.field?.label || '항목'}</span>
+                  <span className="text-sm font-medium text-gray-900">{fv.value}</span>
+                </div>
+              );
+            })}
           </div>
         </Card>
       )}

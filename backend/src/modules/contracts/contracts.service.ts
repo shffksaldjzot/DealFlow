@@ -208,7 +208,6 @@ export class ContractsService {
         'partner',
         'customer',
         'fieldValues',
-        'fieldValues.field',
         'signatures',
         'histories',
       ],
