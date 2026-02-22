@@ -6456,7 +6456,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/src_components_contract_FieldEditor_tsx_52aef94b._.js": {
-      "bytes": 15564,
+      "bytes": 20050,
       "imports": [],
       "format": "cjs"
     },
@@ -6632,7 +6632,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/_3062d334._.js": {
-      "bytes": 7688,
+      "bytes": 7731,
       "imports": [],
       "format": "cjs"
     },
@@ -15241,7 +15241,7 @@
           "bytesInOutput": 22391
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/src_components_contract_FieldEditor_tsx_52aef94b._.js": {
-          "bytesInOutput": 16850
+          "bytesInOutput": 21529
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/3e585_(partner)_partner_events_[id]_ic-contracts_[contractId]_page_actions_61a9e2ef.js": {
           "bytesInOutput": 317
@@ -15307,7 +15307,7 @@
           "bytesInOutput": 1645
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_3062d334._.js": {
-          "bytesInOutput": 8031
+          "bytesInOutput": 8074
         },
         ".open-next/server-functions/default/.next/server/chunks/ssr/_43965b24._.js": {
           "bytesInOutput": 18607
@@ -15883,7 +15883,7 @@
           "bytesInOutput": 81311
         }
       },
-      "bytes": 6359895
+      "bytes": 6364617
     }
   }
 }
