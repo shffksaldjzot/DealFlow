@@ -14,7 +14,8 @@ export class SelectedItemDto {
   @IsUUID()
   rowId: string;
 
-  @IsUUID()
+  @IsOptional()
+  @IsString()
   columnId: string;
 }
 
