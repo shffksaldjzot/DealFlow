@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-21T16:06:40.435Z",
+  "lastUpdated": "2026-02-22T08:47:54.029Z",
   "activeFeatures": [
     "frontend",
     "business",
@@ -92,7 +92,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-13T03:53:44.156Z",
-        "lastUpdated": "2026-02-17T15:09:43.366Z"
+        "lastUpdated": "2026-02-21T16:46:32.780Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/contract/[code]/view/page.tsx"
     },
@@ -248,7 +248,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-14T05:26:26.209Z",
-        "lastUpdated": "2026-02-15T14:18:45.372Z"
+        "lastUpdated": "2026-02-21T16:46:55.103Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/(partner)/partner/events/[id]/contracts/new/page.tsx"
     },
@@ -391,9 +391,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-15T06:27:01.698Z",
-        "lastUpdated": "2026-02-21T14:51:01.964Z"
+        "lastUpdated": "2026-02-21T16:49:05.287Z"
       },
-      "lastFile": "/home/user/claud-deal/frontend/src/components/contract/ContractDetailView.tsx"
+      "lastFile": "/home/user/claud-deal/frontend/src/components/contract/FieldEditor.tsx"
     },
     "partner": {
       "phase": "do",
@@ -664,9 +664,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-19T08:54:59.821Z",
-        "lastUpdated": "2026-02-20T17:03:53.614Z"
+        "lastUpdated": "2026-02-22T08:47:54.029Z"
       },
-      "lastFile": "/home/user/claud-deal/test-ic-fix.js"
+      "lastFile": "/home/user/claud-deal/test-contract-fields.js"
     },
     "ui": {
       "phase": "do",
@@ -742,7 +742,7 @@
   "session": {
     "startedAt": "2026-02-13T01:38:43.725Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-21T16:06:40.435Z"
+    "lastActivity": "2026-02-22T08:47:54.029Z"
   },
   "history": [
     {
@@ -5182,6 +5182,78 @@
     {
       "timestamp": "2026-02-21T16:06:40.433Z",
       "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:46:20.795Z",
+      "feature": "view",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:46:30.650Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:46:32.780Z",
+      "feature": "view",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:46:42.768Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:46:51.236Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:46:55.103Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:46:59.515Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:47:04.974Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:47:13.847Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:47:19.245Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-21T16:49:05.287Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T08:47:54.029Z",
+      "feature": "claud-deal",
       "phase": "do",
       "action": "updated"
     }
