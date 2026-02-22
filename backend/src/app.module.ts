@@ -30,7 +30,7 @@ import { MailModule } from './shared/mail/mail.module';
             type: 'postgres',
             url: databaseUrl,
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: configService.get('DB_SYNCHRONIZE') === 'true',
+            synchronize: configService.get('DB_SYNCHRONIZE') !== 'false',
             ssl: { rejectUnauthorized: false },
           };
         }
