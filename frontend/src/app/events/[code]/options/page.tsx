@@ -88,46 +88,43 @@ export default function OptionsPage() {
     });
   };
 
+  // Parse price from cellValues (handles comma-formatted strings like "150,000")
+  const parsePrice = (val: any): number => {
+    if (val === undefined || val === null || val === '') return 0;
+    if (typeof val === 'number') return val;
+    return Number(String(val).replace(/,/g, '')) || 0;
+  };
+
   // Resolve selected items with price for a specific apartment type column
   const resolveSelectedItems = (typeId: string): IcSelectedItem[] => {
     if (!flow) return [];
     return selectedRows.map((sel) => {
-      // Find the matching category / option
       for (const partner of flow.partners) {
         for (const cat of partner.categories) {
           if (cat.sheetId !== sel.sheetId) continue;
           const opt = cat.options.find((o: any) => o.rowId === sel.rowId);
           if (!opt) continue;
-          // Find column matching the selected type
+
           const col = cat.columns.find((c: any) => c.apartmentTypeId === typeId);
           let columnId = col?.id || '';
           let unitPrice = 0;
 
-          if (col) {
-            // Only read price from amount-type columns (or columns without explicit type)
-            if (col.columnType === 'amount' || !col.columnType) {
-              const cellVal = opt.cellValues?.[columnId];
-              unitPrice = cellVal !== undefined
-                ? (Number(cellVal) || 0)
-                : (opt.prices?.[columnId] ?? 0);
-            }
-            // If text column or price is 0, try finding price from other amount columns
-            if (unitPrice === 0) {
-              for (const amtCol of cat.columns.filter((c: any) => c.columnType === 'amount' || !c.columnType)) {
-                const price = opt.prices?.[amtCol.id] ?? 0;
-                if (price > 0) {
-                  unitPrice = price;
-                  columnId = amtCol.id;
-                  break;
-                }
-                // Also check cellValues
-                const cv = opt.cellValues?.[amtCol.id];
-                if (cv !== undefined && Number(cv) > 0) {
-                  unitPrice = Number(cv);
-                  columnId = amtCol.id;
-                  break;
-                }
-              }
+          // Try exact column match first
+          if (col && (col.columnType === 'amount' || !col.columnType)) {
+            const cellVal = opt.cellValues?.[columnId];
+            unitPrice = cellVal !== undefined
+              ? parsePrice(cellVal)
+              : parsePrice(opt.prices?.[columnId]);
+          }
+
+          // Fallback: search ALL amount columns (runs even if no column matched the type)
+          if (unitPrice === 0) {
+            const amtCols = cat.columns.filter((c: any) => c.columnType === 'amount' || !c.columnType);
+            for (const amtCol of amtCols) {
+              const p = parsePrice(opt.prices?.[amtCol.id]);
+              if (p > 0) { unitPrice = p; columnId = amtCol.id; break; }
+              const cv = parsePrice(opt.cellValues?.[amtCol.id]);
+              if (cv > 0) { unitPrice = cv; columnId = amtCol.id; break; }
             }
           }
 

@@ -96,6 +96,7 @@ export class IcContractService {
         partnerMap.set(partnerId, {
           partnerId,
           partnerName: sheet.partner?.name || '',
+          partnerItems: sheet.partner?.items || '',
           categories: [],
         });
       }

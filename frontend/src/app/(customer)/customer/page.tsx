@@ -7,11 +7,12 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import PeriodSelector, { PeriodValue } from '@/components/ui/PeriodSelector';
-import { FileText, ChevronRight, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera, X, XCircle } from 'lucide-react';
-import { formatDateTime, formatDate } from '@/lib/utils';
+import { FileText, ChevronRight, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera, X, XCircle, Layers } from 'lucide-react';
+import { formatDateTime, formatDate, formatCurrency } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
 import { useToast } from '@/components/ui/Toast';
 import type { EventVisit } from '@/types/event';
+import type { IcContract } from '@/types/integrated-contract';
 
 function filterByPeriod<T extends { createdAt?: string }>(items: T[], period: PeriodValue): T[] {
   if (!period.from && !period.to) return items;
@@ -29,6 +30,7 @@ export default function CustomerHome() {
   const router = useRouter();
   const { toast } = useToast();
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const [icContracts, setIcContracts] = useState<IcContract[]>([]);
   const [visits, setVisits] = useState<EventVisit[]>([]);
   const [loading, setLoading] = useState(true);
   const [contractCode, setContractCode] = useState('');
@@ -39,11 +41,13 @@ export default function CustomerHome() {
 
   const fetchContracts = () => {
     api.get('/customer/contracts').then((res) => setContracts(extractData(res))).catch(() => {});
+    api.get('/ic/contracts/my').then((res) => setIcContracts(extractData(res))).catch(() => {});
   };
 
   useEffect(() => {
     Promise.all([
       api.get('/customer/contracts').then((res) => setContracts(extractData(res))).catch(() => {}),
+      api.get('/ic/contracts/my').then((res) => setIcContracts(extractData(res))).catch(() => {}),
       api.get('/event-visits/my').then((res) => setVisits(extractData(res))).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, []);
@@ -61,12 +65,16 @@ export default function CustomerHome() {
   };
 
   const filteredContracts = useMemo(() => filterByPeriod(contracts as any[], period) as Contract[], [contracts, period]);
+  const filteredIcContracts = useMemo(() => filterByPeriod(icContracts as any[], period) as IcContract[], [icContracts, period]);
   const filteredVisits = useMemo(() => filterByPeriod(visits as any[], period) as EventVisit[], [visits, period]);
 
   const pendingContracts = filteredContracts.filter(
     (c) => c.status === 'pending' || c.status === 'in_progress',
   );
   const signedContracts = filteredContracts.filter(
+    (c) => c.status === 'signed' || c.status === 'completed',
+  );
+  const signedIcContracts = filteredIcContracts.filter(
     (c) => c.status === 'signed' || c.status === 'completed',
   );
   const activeVisits = filteredVisits.filter((v) => v.status === 'reserved');
@@ -269,12 +277,19 @@ export default function CustomerHome() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-4 gap-3 mb-6">
         <Card>
           <div className="text-center">
             <FileText className="w-5 h-5 text-gray-400 mx-auto mb-1" />
             <p className="text-xl font-bold text-gray-900">{loading ? '-' : filteredContracts.length}</p>
-            <p className="text-xs text-gray-500">전체</p>
+            <p className="text-xs text-gray-500">개별계약</p>
+          </div>
+        </Card>
+        <Card>
+          <div className="text-center">
+            <Layers className="w-5 h-5 text-purple-400 mx-auto mb-1" />
+            <p className="text-xl font-bold text-purple-600">{loading ? '-' : filteredIcContracts.length}</p>
+            <p className="text-xs text-gray-500">통합계약</p>
           </div>
         </Card>
         <Card>
@@ -287,7 +302,7 @@ export default function CustomerHome() {
         <Card>
           <div className="text-center">
             <CheckCircle className="w-5 h-5 text-green-400 mx-auto mb-1" />
-            <p className="text-xl font-bold text-green-600">{loading ? '-' : signedContracts.length}</p>
+            <p className="text-xl font-bold text-green-600">{loading ? '-' : signedContracts.length + signedIcContracts.length}</p>
             <p className="text-xs text-gray-500">완료</p>
           </div>
         </Card>
@@ -413,6 +428,37 @@ export default function CustomerHome() {
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Integrated Contracts */}
+      {!loading && filteredIcContracts.length > 0 && (
+        <>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3 mt-6">통합 계약</h3>
+          <div className="space-y-2">
+            {filteredIcContracts.slice(0, 5).map((ic) => (
+              <Card key={ic.id} hoverable onClick={() => router.push(`/customer/integrated-contracts/${ic.id}`)}>
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <Badge status={ic.status} />
+                      <span className="text-xs font-mono text-gray-400">{ic.shortCode}</span>
+                    </div>
+                    <p className="font-medium text-gray-900 text-sm mt-0.5 truncate">
+                      {(ic as any).config?.event?.name || '통합계약서'}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {(ic as any).apartmentType?.name} · {ic.selectedItems?.length || 0}개 품목
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0 ml-3">
+                    <p className="font-bold text-purple-600 text-sm">{formatCurrency(ic.totalAmount)}</p>
+                    <ChevronRight className="w-4 h-4 text-gray-400 ml-auto mt-1" />
+                  </div>
                 </div>
               </Card>
             ))}

@@ -28,6 +28,9 @@ export default function CustomerSheetView({
         <div key={partner.partnerId}>
           <div className="mb-3">
             <span className="text-xs text-gray-400">{partner.partnerName}</span>
+            {(partner as any).partnerItems && (
+              <span className="text-xs text-gray-300 ml-1">· {(partner as any).partnerItems}</span>
+            )}
           </div>
           {partner.categories.map((cat) => (
             <div key={cat.sheetId} className="mb-4">
