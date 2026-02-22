@@ -96,15 +96,41 @@ export default function OptionsPage() {
       for (const partner of flow.partners) {
         for (const cat of partner.categories) {
           if (cat.sheetId !== sel.sheetId) continue;
-          const opt = cat.options.find((o) => o.rowId === sel.rowId);
+          const opt = cat.options.find((o: any) => o.rowId === sel.rowId);
           if (!opt) continue;
           // Find column matching the selected type
-          const col = cat.columns.find((c) => c.apartmentTypeId === typeId);
-          const columnId = col?.id || '';
-          const cellVal = opt.cellValues?.[columnId];
-          const unitPrice = cellVal !== undefined
-            ? (Number(cellVal) || 0)
-            : (opt.prices?.[columnId] ?? 0);
+          const col = cat.columns.find((c: any) => c.apartmentTypeId === typeId);
+          let columnId = col?.id || '';
+          let unitPrice = 0;
+
+          if (col) {
+            // Only read price from amount-type columns (or columns without explicit type)
+            if (col.columnType === 'amount' || !col.columnType) {
+              const cellVal = opt.cellValues?.[columnId];
+              unitPrice = cellVal !== undefined
+                ? (Number(cellVal) || 0)
+                : (opt.prices?.[columnId] ?? 0);
+            }
+            // If text column or price is 0, try finding price from other amount columns
+            if (unitPrice === 0) {
+              for (const amtCol of cat.columns.filter((c: any) => c.columnType === 'amount' || !c.columnType)) {
+                const price = opt.prices?.[amtCol.id] ?? 0;
+                if (price > 0) {
+                  unitPrice = price;
+                  columnId = amtCol.id;
+                  break;
+                }
+                // Also check cellValues
+                const cv = opt.cellValues?.[amtCol.id];
+                if (cv !== undefined && Number(cv) > 0) {
+                  unitPrice = Number(cv);
+                  columnId = amtCol.id;
+                  break;
+                }
+              }
+            }
+          }
+
           return {
             sheetId: sel.sheetId,
             rowId: sel.rowId,

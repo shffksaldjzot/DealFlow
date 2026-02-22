@@ -218,7 +218,11 @@ export default function ContractViewPage() {
                   <div key={field.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
                     <span className="text-sm text-gray-500">{field.label}</span>
                     <span className="text-sm font-medium text-gray-900">
-                      {field.fieldType === 'checkbox' ? (value === 'true' ? '✓' : '-') : value}
+                      {field.fieldType === 'checkbox'
+                        ? (value === 'true' ? '✓' : '-')
+                        : (field.fieldType === 'number' || field.fieldType === 'amount') && !isNaN(Number(value))
+                          ? Number(value).toLocaleString('ko-KR')
+                          : value}
                     </span>
                   </div>
                 );

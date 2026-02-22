@@ -200,9 +200,28 @@ export class IcContractService {
         throw new NotFoundException(`옵션 "${item.rowId}"을 찾을 수 없습니다.`);
       }
 
-      // cellValues takes priority; fall back to prices
-      const cellVal = row.cellValues?.[item.columnId];
-      const unitPrice = cellVal !== undefined ? (Number(cellVal) || 0) : (row.prices?.[item.columnId] ?? 0);
+      // Resolve price: check column type to avoid treating text values as prices
+      let unitPrice = 0;
+      if (item.columnId) {
+        const column = await this.columnRepository.findOne({ where: { id: item.columnId } });
+        const colType = column?.columnType || 'amount';
+        if (colType === 'amount') {
+          const cellVal = row.cellValues?.[item.columnId];
+          unitPrice = cellVal !== undefined ? (Number(cellVal) || 0) : (row.prices?.[item.columnId] ?? 0);
+        }
+        // If text column or price is 0, try finding price from other amount columns in same sheet
+        if (unitPrice === 0) {
+          const amountColumns = await this.columnRepository.find({
+            where: { sheetId: item.sheetId, columnType: 'amount' },
+          });
+          for (const amtCol of amountColumns) {
+            const price = row.prices?.[amtCol.id] ?? 0;
+            if (price > 0) { unitPrice = price; break; }
+            const cv = row.cellValues?.[amtCol.id];
+            if (cv !== undefined && Number(cv) > 0) { unitPrice = Number(cv); break; }
+          }
+        }
+      }
 
       selectedItems.push({
         sheetId: item.sheetId,

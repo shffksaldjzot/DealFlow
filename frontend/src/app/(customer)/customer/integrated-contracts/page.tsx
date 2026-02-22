@@ -58,6 +58,12 @@ export default function CustomerIntegratedContractsPage() {
                   <p className="text-xs text-gray-500">
                     {c.apartmentType?.name} · {c.selectedItems?.length || 0}개 품목
                   </p>
+                  {c.selectedItems && c.selectedItems.length > 0 && (
+                    <p className="text-xs text-gray-400 truncate mt-0.5">
+                      {c.selectedItems.map(item => item.optionName).slice(0, 3).join(', ')}
+                      {c.selectedItems.length > 3 && ` 외 ${c.selectedItems.length - 3}건`}
+                    </p>
+                  )}
                 </div>
                 <div className="text-right flex-shrink-0 ml-3">
                   <p className="font-bold text-blue-600">{formatCurrency(c.totalAmount)}</p>

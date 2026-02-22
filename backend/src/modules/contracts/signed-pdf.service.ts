@@ -148,7 +148,10 @@ export class SignedPdfService {
           }
         } else {
           const fontSize = Math.min(Math.max(fieldHeight * 0.6, 8), 14);
-          page.drawText(value, {
+          const displayValue = (field.fieldType === 'number' || field.fieldType === 'amount') && !isNaN(Number(value))
+            ? Number(value).toLocaleString('ko-KR')
+            : value;
+          page.drawText(displayValue, {
             x: x + 2,
             y: y + (fieldHeight - fontSize) / 2,
             size: fontSize,
