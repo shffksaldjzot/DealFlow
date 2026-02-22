@@ -126,6 +126,7 @@ export class IcContractService {
       partnerMap.get(partnerId).categories.push({
         sheetId: sheet.id,
         categoryName: sheet.categoryName,
+        commissionRate: Number(sheet.commissionRate) || 0,
         columns,
         options,
       });

@@ -88,15 +88,25 @@ export class AdminService {
   }
 
   async getActivityLogs(pagination: PaginationDto): Promise<PaginatedResult<any>> {
-    const { page, limit } = pagination;
+    const { page, limit, search } = pagination;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.activityLogRepository.findAndCount({
-      relations: ['user'],
-      order: { createdAt: 'DESC' },
-      skip,
-      take: limit,
-    });
+    const queryBuilder = this.activityLogRepository
+      .createQueryBuilder('log')
+      .leftJoinAndSelect('log.user', 'user')
+      .orderBy('log.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    if (search) {
+      const like = this.isPostgres ? 'ILIKE' : 'LIKE';
+      queryBuilder.andWhere(
+        `(log.description ${like} :search OR user.name ${like} :search)`,
+        { search: `%${search}%` },
+      );
+    }
+
+    const [data, total] = await queryBuilder.getManyAndCount();
 
     const sanitized = data.map((log) => ({
       id: log.id,
@@ -705,8 +715,8 @@ export class AdminService {
 
   async listAllContracts(
     pagination: PaginationDto,
-  ): Promise<PaginatedResult<Contract>> {
-    const { page, limit, search } = pagination;
+  ): Promise<PaginatedResult<Contract> & { totalAmount?: number }> {
+    const { page, limit, search, startDate, endDate } = pagination;
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.contractRepository
@@ -726,8 +736,37 @@ export class AdminService {
       });
     }
 
+    if (startDate) {
+      queryBuilder.andWhere('contract.createdAt >= :startDate', { startDate: new Date(startDate) });
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      queryBuilder.andWhere('contract.createdAt <= :endDate', { endDate: end });
+    }
+
     const [data, total] = await queryBuilder.getManyAndCount();
-    return new PaginatedResult(data, total, page, limit);
+
+    // Calculate totalAmount for filtered results
+    const sumQb = this.contractRepository.createQueryBuilder('contract')
+      .select('COALESCE(SUM(contract.totalAmount), 0)', 'sum');
+    if (search) {
+      const like = this.isPostgres ? 'ILIKE' : 'LIKE';
+      sumQb.andWhere(`contract.contractNumber ${like} :search`, { search: `%${search}%` });
+    }
+    if (startDate) {
+      sumQb.andWhere('contract.createdAt >= :startDate', { startDate: new Date(startDate) });
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      sumQb.andWhere('contract.createdAt <= :endDate', { endDate: end });
+    }
+    const sumResult = await sumQb.getRawOne();
+    const totalAmount = Number(sumResult?.sum) || 0;
+
+    const result = new PaginatedResult(data, total, page, limit);
+    return { ...result, totalAmount };
   }
 
   async getContractDetail(contractId: string): Promise<any> {
@@ -808,8 +847,8 @@ export class AdminService {
 
   // ─── IC Contracts ────────────────────────────────────────
 
-  async getIcContracts(pagination: PaginationDto): Promise<PaginatedResult<IcContract>> {
-    const { page, limit, search } = pagination;
+  async getIcContracts(pagination: PaginationDto): Promise<PaginatedResult<IcContract> & { totalAmount?: number }> {
+    const { page, limit, search, startDate, endDate } = pagination;
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.icContractRepository
@@ -829,8 +868,37 @@ export class AdminService {
       );
     }
 
+    if (startDate) {
+      queryBuilder.andWhere('ic.createdAt >= :startDate', { startDate: new Date(startDate) });
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      queryBuilder.andWhere('ic.createdAt <= :endDate', { endDate: end });
+    }
+
     const [data, total] = await queryBuilder.getManyAndCount();
-    return new PaginatedResult(data, total, page, limit);
+
+    // Calculate totalAmount for filtered results
+    const sumQb = this.icContractRepository.createQueryBuilder('ic')
+      .select('COALESCE(SUM(ic.totalAmount), 0)', 'sum');
+    if (search) {
+      const like = this.isPostgres ? 'ILIKE' : 'LIKE';
+      sumQb.andWhere(`(ic.shortCode ${like} :search OR ic.customerName ${like} :search)`, { search: `%${search}%` });
+    }
+    if (startDate) {
+      sumQb.andWhere('ic.createdAt >= :startDate', { startDate: new Date(startDate) });
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      sumQb.andWhere('ic.createdAt <= :endDate', { endDate: end });
+    }
+    const sumResult = await sumQb.getRawOne();
+    const totalAmount = Number(sumResult?.sum) || 0;
+
+    const result = new PaginatedResult(data, total, page, limit);
+    return { ...result, totalAmount };
   }
 
   async getIcContractDetail(id: string): Promise<IcContract> {

@@ -7,12 +7,14 @@ import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
 import ContractPreview from '@/components/integrated-contract/ContractPreview';
 import IcContractPrintView from '@/components/integrated-contract/IcContractPrintView';
-import type { IcContract } from '@/types/integrated-contract';
+import { formatCurrency } from '@/lib/utils';
+import type { IcContract, IcContractFlow } from '@/types/integrated-contract';
 
 export default function PartnerIcContractDetailPage() {
   const { id: eventId, contractId } = useParams<{ id: string; contractId: string }>();
   const router = useRouter();
   const [contract, setContract] = useState<IcContract | null>(null);
+  const [flow, setFlow] = useState<IcContractFlow | null>(null);
   const [partnerName, setPartnerName] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
@@ -21,11 +23,17 @@ export default function PartnerIcContractDetailPage() {
       api.get(`/ic/contracts/${contractId}`).then((res) => extractData<IcContract>(res)),
       api.get('/users/profile').then((res) => res.data?.data).catch(() => null),
     ])
-      .then(([contractData, profile]) => {
+      .then(async ([contractData, profile]) => {
         setContract(contractData);
-        // Get partner org name from user's organization
         if (profile?.organizationMemberships?.[0]?.organization?.name) {
           setPartnerName(profile.organizationMemberships[0].organization.name);
+        }
+        // Load flow for commission rates
+        if (contractData.config?.eventId) {
+          try {
+            const flowRes = await api.get(`/ic/contract-flow/${contractData.config.eventId}`);
+            setFlow(extractData(flowRes));
+          } catch {}
         }
       })
       .catch(() => router.push(`/partner/events/${eventId}/ic-contracts`))
@@ -54,6 +62,22 @@ export default function PartnerIcContractDetailPage() {
     selectedItems: myItems,
   };
 
+  // Commission calculation
+  const commissionMap = new Map<string, number>();
+  if (flow) {
+    for (const partner of flow.partners) {
+      for (const cat of partner.categories) {
+        commissionMap.set(cat.sheetId, cat.commissionRate || 0);
+      }
+    }
+  }
+
+  const myRevenue = myItems.reduce((sum, item) => sum + Number(item.unitPrice), 0);
+  const myCommission = myItems.reduce((sum, item) => {
+    const rate = commissionMap.get(item.sheetId) || 0;
+    return sum + (Number(item.unitPrice) * rate / 100);
+  }, 0);
+
   return (
     <>
       <div className="print-hidden">
@@ -73,6 +97,29 @@ export default function PartnerIcContractDetailPage() {
             </div>
           }
         />
+
+        {/* Commission Summary */}
+        {myCommission > 0 && (
+          <Card className="mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-gray-500">내 매출</p>
+                <p className="text-lg font-bold text-gray-900">{formatCurrency(myRevenue)}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500">수수료율</p>
+                <p className="text-lg font-bold text-gray-600">
+                  {[...new Set(myItems.map(item => commissionMap.get(item.sheetId) || 0))].join('/')}%
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500">수수료</p>
+                <p className="text-lg font-bold text-red-600">{formatCurrency(Math.round(myCommission))}</p>
+              </div>
+            </div>
+          </Card>
+        )}
+
         <Card>
           <ContractPreview contract={filteredContract} />
         </Card>

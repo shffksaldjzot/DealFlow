@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import PageHeader from '@/components/layout/PageHeader';
 import { formatDateTime } from '@/lib/utils';
 import type { PaginatedResult } from '@/types/api';
@@ -25,11 +26,14 @@ export default function AdminLogsPage() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const limit = 50;
 
   const fetchLogs = () => {
     setLoading(true);
-    api.get('/admin/logs', { params: { page, limit: 20 } })
+    api.get('/admin/logs', { params: { page, limit, search } })
       .then((res) => {
         const result = extractData<PaginatedResult<ActivityLog>>(res);
         setLogs(result.data);
@@ -39,9 +43,9 @@ export default function AdminLogsPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchLogs(); }, [page]);
+  useEffect(() => { fetchLogs(); }, [page, search]);
 
-  const totalPages = Math.ceil(total / 20);
+  const totalPages = Math.ceil(total / limit);
 
   const getTargetLink = (log: ActivityLog): string | null => {
     if (!log.targetType || !log.targetId) return null;
@@ -55,74 +59,79 @@ export default function AdminLogsPage() {
   };
 
   const actionIcons: Record<string, string> = {
-    approve_organizer: 'bg-green-100 text-green-600',
-    reject_organizer: 'bg-red-100 text-red-600',
-    create_user: 'bg-blue-100 text-blue-600',
-    update_user: 'bg-yellow-100 text-yellow-600',
-    delete_user: 'bg-red-100 text-red-600',
-    change_user_status: 'bg-orange-100 text-orange-600',
-    create_event: 'bg-blue-100 text-blue-600',
-    update_event: 'bg-purple-100 text-purple-600',
-    update_event_status: 'bg-purple-100 text-purple-600',
-    delete_event: 'bg-red-100 text-red-600',
-    approve_partner: 'bg-green-100 text-green-600',
-    reject_partner: 'bg-red-100 text-red-600',
-    cancel_partner: 'bg-orange-100 text-orange-600',
-    partner_join_request: 'bg-cyan-100 text-cyan-600',
-    partner_cancel_participation: 'bg-orange-100 text-orange-600',
-    create_contract: 'bg-blue-100 text-blue-600',
-    contract_signed: 'bg-green-100 text-green-600',
-    cancel_contract: 'bg-red-100 text-red-600',
-    update_contract_status: 'bg-indigo-100 text-indigo-600',
-    register_organization: 'bg-teal-100 text-teal-600',
-    create_organization: 'bg-teal-100 text-teal-600',
-    reset_password: 'bg-yellow-100 text-yellow-600',
-    visit_reservation: 'bg-sky-100 text-sky-600',
-    visit_cancel: 'bg-orange-100 text-orange-600',
+    approve_organizer: 'bg-green-400',
+    reject_organizer: 'bg-red-400',
+    create_user: 'bg-blue-400',
+    update_user: 'bg-yellow-400',
+    delete_user: 'bg-red-400',
+    change_user_status: 'bg-orange-400',
+    create_event: 'bg-blue-400',
+    update_event: 'bg-purple-400',
+    update_event_status: 'bg-purple-400',
+    delete_event: 'bg-red-400',
+    approve_partner: 'bg-green-400',
+    reject_partner: 'bg-red-400',
+    cancel_partner: 'bg-orange-400',
+    partner_join_request: 'bg-cyan-400',
+    partner_cancel_participation: 'bg-orange-400',
+    create_contract: 'bg-blue-400',
+    contract_signed: 'bg-green-400',
+    cancel_contract: 'bg-red-400',
+    update_contract_status: 'bg-indigo-400',
+    register_organization: 'bg-teal-400',
+    create_organization: 'bg-teal-400',
+    reset_password: 'bg-yellow-400',
+    visit_reservation: 'bg-sky-400',
+    visit_cancel: 'bg-orange-400',
   };
 
   return (
     <div>
       <PageHeader title="활동 로그" subtitle={`총 ${total}건`} />
 
+      {/* Search */}
+      <div className="mb-4 max-w-sm">
+        <Input
+          placeholder="설명 또는 사용자명 검색"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        />
+      </div>
+
       {loading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+        <div className="space-y-1">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse" />
           ))}
         </div>
       ) : logs.length === 0 ? (
         <Card>
-          <p className="text-center text-gray-500 py-8">활동 로그가 없습니다</p>
+          <p className="text-center text-gray-500 py-8">
+            {search ? '검색 결과가 없습니다' : '활동 로그가 없습니다'}
+          </p>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50">
           {logs.map((log) => {
             const link = getTargetLink(log);
-            const colorClass = actionIcons[log.action] || 'bg-gray-100 text-gray-600';
+            const dotColor = actionIcons[log.action] || 'bg-gray-400';
             return (
-              <Card key={log.id}>
-                <div className="flex items-start gap-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${colorClass.split(' ')[0]}`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900">{log.description}</p>
-                    <div className="flex items-center gap-3 mt-1">
-                      {log.userName && (
-                        <span className="text-xs text-blue-600 font-medium">{log.userName}</span>
-                      )}
-                      <span className="text-xs text-gray-400">{formatDateTime(log.createdAt)}</span>
-                      {link && (
-                        <button
-                          onClick={() => router.push(link)}
-                          className="text-xs text-blue-600 hover:underline"
-                        >
-                          상세보기
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <div key={log.id} className="flex items-center gap-3 px-4 py-2">
+                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor}`} />
+                <p className="text-sm text-gray-900 flex-1 min-w-0 truncate">{log.description}</p>
+                {log.userName && (
+                  <span className="text-xs text-blue-600 font-medium whitespace-nowrap">{log.userName}</span>
+                )}
+                <span className="text-xs text-gray-400 whitespace-nowrap">{formatDateTime(log.createdAt)}</span>
+                {link && (
+                  <button
+                    onClick={() => router.push(link)}
+                    className="text-xs text-blue-600 hover:underline whitespace-nowrap"
+                  >
+                    보기
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>

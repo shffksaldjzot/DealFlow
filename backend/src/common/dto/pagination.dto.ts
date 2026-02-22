@@ -26,6 +26,14 @@ export class PaginationDto {
   @IsOptional()
   @IsString()
   role?: string;
+
+  @IsOptional()
+  @IsString()
+  startDate?: string;
+
+  @IsOptional()
+  @IsString()
+  endDate?: string;
 }
 
 export class PaginatedResult<T> {

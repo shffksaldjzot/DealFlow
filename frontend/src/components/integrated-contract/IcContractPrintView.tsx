@@ -73,14 +73,14 @@ export default function IcContractPrintView({ contract, flow, partnerFilter }: I
                     const isSelected = selectedRowIds.has(opt.rowId);
                     const selectedItem = selectedMap.get(opt.rowId);
                     return (
-                      <tr key={opt.rowId} style={{ background: isSelected ? '#eff6ff' : '#fff' }}>
+                      <tr key={opt.rowId} style={{ background: '#fff' }}>
                         <td style={{ padding: '4px 8px', border: '1px solid #ddd', width: '24px', textAlign: 'center' }}>
                           {isSelected ? '✓' : ''}
                         </td>
                         <td style={{ padding: '4px 8px', border: '1px solid #ddd', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#111' : '#999' }}>
                           {opt.optionName}
                         </td>
-                        <td style={{ padding: '4px 8px', border: '1px solid #ddd', textAlign: 'right', width: '100px', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#2563eb' : '#999' }}>
+                        <td style={{ padding: '4px 8px', border: '1px solid #ddd', textAlign: 'right', width: '100px', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#111' : '#999' }}>
                           {isSelected && selectedItem ? `${Number(selectedItem.unitPrice).toLocaleString()}원` : ''}
                         </td>
                       </tr>

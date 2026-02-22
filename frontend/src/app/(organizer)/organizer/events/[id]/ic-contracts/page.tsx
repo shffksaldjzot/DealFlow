@@ -8,9 +8,9 @@ import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
 import Table from '@/components/ui/Table';
 import { useToast } from '@/components/ui/Toast';
-import { FileText, TrendingUp } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { formatDate, formatCurrency } from '@/lib/utils';
-import type { IcContract } from '@/types/integrated-contract';
+import type { IcContract, IcContractFlow } from '@/types/integrated-contract';
 
 export default function OrganizerIcContractsPage() {
   const { id: eventId } = useParams<{ id: string }>();
@@ -18,14 +18,38 @@ export default function OrganizerIcContractsPage() {
   const { toast } = useToast();
 
   const [contracts, setContracts] = useState<IcContract[]>([]);
+  const [flow, setFlow] = useState<IcContractFlow | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(`/ic/contracts/event/${eventId}`)
-      .then((res) => setContracts(extractData(res)))
+    Promise.all([
+      api.get(`/ic/contracts/event/${eventId}`).then((res) => extractData<IcContract[]>(res)),
+      api.get(`/ic/contract-flow/${eventId}`).then((res) => extractData<IcContractFlow>(res)).catch(() => null),
+    ])
+      .then(([contractsData, flowData]) => {
+        setContracts(contractsData);
+        setFlow(flowData);
+      })
       .catch(() => toast('데이터를 불러올 수 없습니다.', 'error'))
       .finally(() => setLoading(false));
   }, [eventId, toast]);
+
+  // Build commission rate map: sheetId -> commissionRate
+  const commissionMap = new Map<string, number>();
+  if (flow) {
+    for (const partner of flow.partners) {
+      for (const cat of partner.categories) {
+        commissionMap.set(cat.sheetId, cat.commissionRate || 0);
+      }
+    }
+  }
+
+  const getCommission = (contract: IcContract) => {
+    return (contract.selectedItems || []).reduce((sum, item) => {
+      const rate = commissionMap.get(item.sheetId) || 0;
+      return sum + (Number(item.unitPrice) * rate / 100);
+    }, 0);
+  };
 
   if (loading) {
     return (
@@ -38,6 +62,7 @@ export default function OrganizerIcContractsPage() {
   }
 
   const totalAmount = contracts.reduce((sum, c) => sum + Number(c.totalAmount || 0), 0);
+  const totalCommission = contracts.reduce((sum, c) => sum + getCommission(c), 0);
   const signedCount = contracts.filter((c) => c.status === 'signed' || c.status === 'completed').length;
 
   const columns = [
@@ -68,18 +93,21 @@ export default function OrganizerIcContractsPage() {
       ),
     },
     {
-      key: 'items',
-      header: '품목수',
-      render: (item: IcContract) => (
-        <span className="text-gray-600">{item.selectedItems?.length || 0}개</span>
-      ),
-    },
-    {
       key: 'totalAmount',
       header: '금액',
       render: (item: IcContract) => (
         <span className="font-medium text-gray-900">{formatCurrency(item.totalAmount)}</span>
       ),
+    },
+    {
+      key: 'commission',
+      header: '수수료',
+      render: (item: IcContract) => {
+        const commission = getCommission(item);
+        return commission > 0
+          ? <span className="text-orange-600 font-medium">{formatCurrency(Math.round(commission))}</span>
+          : <span className="text-gray-400">-</span>;
+      },
     },
     {
       key: 'createdAt',
@@ -99,7 +127,7 @@ export default function OrganizerIcContractsPage() {
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <Card>
           <p className="text-xs text-gray-500">총 계약</p>
           <p className="text-xl font-bold text-gray-900">{contracts.length}건</p>
@@ -111,6 +139,10 @@ export default function OrganizerIcContractsPage() {
         <Card>
           <p className="text-xs text-gray-500">총 금액</p>
           <p className="text-xl font-bold text-blue-600">{formatCurrency(totalAmount)}</p>
+        </Card>
+        <Card>
+          <p className="text-xs text-gray-500">총 수수료</p>
+          <p className="text-xl font-bold text-orange-600">{formatCurrency(Math.round(totalCommission))}</p>
         </Card>
       </div>
 

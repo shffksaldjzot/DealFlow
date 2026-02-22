@@ -153,7 +153,13 @@ export class AdminController {
   // ─── Contracts ────────────────────────────────────────
 
   @Get('contracts')
-  listAllContracts(@Query() pagination: PaginationDto) {
+  listAllContracts(
+    @Query() pagination: PaginationDto,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    if (startDate) pagination.startDate = startDate;
+    if (endDate) pagination.endDate = endDate;
     return this.adminService.listAllContracts(pagination);
   }
 
@@ -174,7 +180,13 @@ export class AdminController {
   // ─── IC Contracts ────────────────────────────────────────
 
   @Get('ic-contracts')
-  listIcContracts(@Query() pagination: PaginationDto) {
+  listIcContracts(
+    @Query() pagination: PaginationDto,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    if (startDate) pagination.startDate = startDate;
+    if (endDate) pagination.endDate = endDate;
     return this.adminService.getIcContracts(pagination);
   }
 

@@ -107,7 +107,7 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
                 >
                   {field.fieldType === 'checkbox' ? (
                     <span className="text-gray-900" style={{ fontSize: 'clamp(10px, 1.2vw, 16px)' }}>
-                      {value === 'true' ? '☑' : '☐'}
+                      {value === 'true' ? '✓' : ''}
                     </span>
                   ) : (
                     <span

@@ -134,4 +134,14 @@ export class IcConfigController {
   ) {
     return this.icSheetService.updateSheetAsOrganizer(sheetId, userId, dto);
   }
+
+  @Patch(':id/sheets/:sheetId/commission')
+  @Roles('organizer', 'admin')
+  updateSheetCommission(
+    @Param('id', ParseUUIDPipe) _id: string,
+    @Param('sheetId', ParseUUIDPipe) sheetId: string,
+    @Body() body: { commissionRate: number },
+  ) {
+    return this.icConfigService.updateSheetCommissionRate(sheetId, body.commissionRate);
+  }
 }

@@ -7,6 +7,7 @@ import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
 import ContractPreview from '@/components/integrated-contract/ContractPreview';
 import IcContractPrintView from '@/components/integrated-contract/IcContractPrintView';
+import { formatCurrency } from '@/lib/utils';
 import type { IcContract, IcContractFlow } from '@/types/integrated-contract';
 
 export default function OrganizerIcContractDetailPage() {
@@ -44,6 +45,29 @@ export default function OrganizerIcContractDetailPage() {
 
   if (!contract) return null;
 
+  // Commission rate map
+  const commissionMap = new Map<string, number>();
+  if (flow) {
+    for (const partner of flow.partners) {
+      for (const cat of partner.categories) {
+        commissionMap.set(cat.sheetId, cat.commissionRate || 0);
+      }
+    }
+  }
+
+  // Partner-level breakdown
+  const partnerBreakdown = new Map<string, { revenue: number; commission: number }>();
+  for (const item of contract.selectedItems || []) {
+    const pName = item.partnerName || '미지정';
+    const existing = partnerBreakdown.get(pName) || { revenue: 0, commission: 0 };
+    const rate = commissionMap.get(item.sheetId) || 0;
+    existing.revenue += Number(item.unitPrice);
+    existing.commission += Number(item.unitPrice) * rate / 100;
+    partnerBreakdown.set(pName, existing);
+  }
+
+  const totalCommission = [...partnerBreakdown.values()].reduce((sum, b) => sum + b.commission, 0);
+
   return (
     <>
       <div className="print-hidden">
@@ -63,6 +87,29 @@ export default function OrganizerIcContractDetailPage() {
             </div>
           }
         />
+
+        {/* Commission Breakdown */}
+        {totalCommission > 0 && (
+          <Card className="mb-4">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">파트너별 수수료</h3>
+            <div className="space-y-2">
+              {[...partnerBreakdown.entries()].map(([name, data]) => (
+                <div key={name} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">{name}</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-gray-500">매출 {formatCurrency(data.revenue)}</span>
+                    <span className="font-medium text-orange-600">수수료 {formatCurrency(Math.round(data.commission))}</span>
+                  </div>
+                </div>
+              ))}
+              <div className="border-t border-gray-100 pt-2 flex items-center justify-between text-sm font-semibold">
+                <span className="text-gray-900">합계</span>
+                <span className="text-orange-600">{formatCurrency(Math.round(totalCommission))}</span>
+              </div>
+            </div>
+          </Card>
+        )}
+
         <Card>
           <ContractPreview contract={contract} flow={flow} />
         </Card>

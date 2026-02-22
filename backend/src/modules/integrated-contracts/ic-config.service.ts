@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IcConfig, IcConfigStatus } from './entities/ic-config.entity';
 import { IcApartmentType } from './entities/ic-apartment-type.entity';
+import { IcPartnerSheet } from './entities/ic-partner-sheet.entity';
 import { Event } from '../events/entities/event.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
 import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
@@ -24,6 +25,8 @@ export class IcConfigService {
     private readonly configRepository: Repository<IcConfig>,
     @InjectRepository(IcApartmentType)
     private readonly apartmentTypeRepository: Repository<IcApartmentType>,
+    @InjectRepository(IcPartnerSheet)
+    private readonly sheetRepository: Repository<IcPartnerSheet>,
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
     @InjectRepository(OrganizationMember)
@@ -212,5 +215,14 @@ export class IcConfigService {
     }
 
     await this.apartmentTypeRepository.remove(apartmentType);
+  }
+
+  async updateSheetCommissionRate(sheetId: string, rate: number): Promise<IcPartnerSheet> {
+    const sheet = await this.sheetRepository.findOne({ where: { id: sheetId } });
+    if (!sheet) {
+      throw new NotFoundException('시트를 찾을 수 없습니다.');
+    }
+    sheet.commissionRate = rate;
+    return this.sheetRepository.save(sheet);
   }
 }

@@ -280,6 +280,17 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
     return res.data?.data || [];
   };
 
+  const updateSheetCommission = async (sheetId: string, rate: number) => {
+    if (!config) return;
+    try {
+      await api.patch(`/ic/configs/${config.id}/sheets/${sheetId}/commission`, { commissionRate: rate });
+      setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, commissionRate: rate } : s));
+      toast('수수료율이 저장되었습니다.', 'success');
+    } catch {
+      toast('수수료율 저장에 실패했습니다.', 'error');
+    }
+  };
+
   const saveSheetRows = async (sheetId: string, rows: any[]): Promise<any[]> => {
     if (!config) return [];
     const res = await api.put(`/ic/configs/${config.id}/sheets/${sheetId}/rows`, { rows });
@@ -691,6 +702,31 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                         }
                       </button>
                     </div>
+                  </div>
+
+                  {/* Commission Rate */}
+                  <div className="px-4 py-2 border-t border-gray-100 bg-white flex items-center gap-3">
+                    <span className="text-xs text-gray-500 whitespace-nowrap">수수료율</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={sheet.commissionRate || 0}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0;
+                        setSheets(prev => prev.map(s => s.id === sheet.id ? { ...s, commissionRate: val } : s));
+                      }}
+                      className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-xs text-gray-400">%</span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updateSheetCommission(sheet.id, sheet.commissionRate || 0)}
+                    >
+                      저장
+                    </Button>
                   </div>
 
                   {/* Sheet Editor (expanded) */}

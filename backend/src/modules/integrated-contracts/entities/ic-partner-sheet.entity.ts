@@ -39,6 +39,9 @@ export class IcPartnerSheet {
   @Column({ type: 'varchar', length: 20, default: IcSheetStatus.DRAFT })
   status: IcSheetStatus;
 
+  @Column({ name: 'commission_rate', type: 'decimal', precision: 5, scale: 2, default: 0 })
+  commissionRate: number;
+
   @ManyToOne(() => IcConfig, (c) => c.sheets)
   @JoinColumn({ name: 'config_id' })
   config: IcConfig;

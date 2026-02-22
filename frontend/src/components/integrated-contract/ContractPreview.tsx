@@ -76,20 +76,20 @@ export default function ContractPreview({ contract, flow }: ContractPreviewProps
                         key={opt.rowId}
                         className={`flex items-center justify-between px-3 py-2.5 ${
                           idx > 0 ? 'border-t border-gray-100' : ''
-                        } ${isSelected ? 'bg-blue-50' : 'bg-white'}`}
+                        } bg-white`}
                       >
                         <div className="flex items-center gap-2.5">
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-200'
+                          <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${
+                            isSelected ? 'border-gray-400' : 'border-gray-200'
                           }`}>
-                            {isSelected && <Check className="w-3 h-3 text-white" />}
+                            {isSelected && <span className="text-gray-900 text-xs font-bold">✓</span>}
                           </div>
                           <span className={`text-sm ${isSelected ? 'font-medium text-gray-900' : 'text-gray-400'}`}>
                             {opt.optionName}
                           </span>
                         </div>
                         {isSelected && selectedItem && (
-                          <span className="text-sm font-medium text-blue-600">
+                          <span className="text-sm font-medium text-gray-900">
                             {Number(selectedItem.unitPrice).toLocaleString()}원
                           </span>
                         )}
@@ -119,8 +119,8 @@ export default function ContractPreview({ contract, flow }: ContractPreviewProps
                 {items.map((item, i) => (
                   <div key={i} className="flex items-center justify-between py-1.5 border-b border-gray-50">
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-white" />
+                      <div className="w-4 h-4 rounded border border-gray-400 flex items-center justify-center">
+                        <span className="text-gray-900 text-[10px] font-bold">✓</span>
                       </div>
                       <span className="text-sm text-gray-700">{item.optionName}</span>
                     </div>

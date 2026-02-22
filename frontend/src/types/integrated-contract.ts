@@ -39,6 +39,7 @@ export interface IcPartnerSheet {
   categoryName: string;
   memo?: string;
   status: IcSheetStatus;
+  commissionRate?: number;
   columns: IcSheetColumn[];
   rows: IcSheetRow[];
   partner?: { id: string; name: string };
@@ -125,6 +126,7 @@ export interface IcFlowOption {
 export interface IcFlowCategory {
   sheetId: string;
   categoryName: string;
+  commissionRate?: number;
   columns: {
     id: string;
     apartmentTypeId: string;
