@@ -52,7 +52,7 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
     setJpegExporting(true);
     try {
       const { toJpeg } = await import('html-to-image');
-      const dataUrl = await toJpeg(overlayRef.current, { quality: 0.95, backgroundColor: '#ffffff' });
+      const dataUrl = await toJpeg(overlayRef.current, { quality: 0.95, backgroundColor: '#ffffff', pixelRatio: 3 });
       const link = document.createElement('a');
       link.download = `contract-${contract.contractNumber}.jpeg`;
       link.href = dataUrl;

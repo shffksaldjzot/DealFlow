@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
 import ContractDetailView from '@/components/contract/ContractDetailView';
 import { useToast } from '@/components/ui/Toast';
-import { FileText, Building2, Calendar, PenLine, XCircle } from 'lucide-react';
+import { FileText, Building2, Calendar, PenLine, XCircle, ChevronDown } from 'lucide-react';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
 
@@ -19,6 +19,7 @@ export default function CustomerContractDetailPage() {
   const [contract, setContract] = useState<Contract | null>(null);
   const [loading, setLoading] = useState(true);
   const [templateImageUrl, setTemplateImageUrl] = useState<string | null>(null);
+  const [showFieldValues, setShowFieldValues] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
@@ -130,18 +131,26 @@ export default function CustomerContractDetailPage() {
         </div>
       </Card>
 
-      {/* Filled Field Values */}
+      {/* Filled Field Values - Collapsible */}
       {contract.fieldValues && contract.fieldValues.length > 0 && (
         <Card className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">입력 내용</h3>
-          <div className="space-y-2">
-            {contract.fieldValues.map((fv: any) => (
-              <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
-                <span className="text-sm text-gray-500">{fv.field?.label || '항목'}</span>
-                <span className="text-sm font-medium text-gray-900">{fv.value}</span>
-              </div>
-            ))}
-          </div>
+          <button
+            onClick={() => setShowFieldValues(!showFieldValues)}
+            className="w-full flex items-center justify-between"
+          >
+            <h3 className="text-sm font-semibold text-gray-700">입력 내용</h3>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showFieldValues ? 'rotate-180' : ''}`} />
+          </button>
+          {showFieldValues && (
+            <div className="space-y-2 mt-3">
+              {contract.fieldValues.map((fv: any) => (
+                <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-500">{fv.field?.label || '항목'}</span>
+                  <span className="text-sm font-medium text-gray-900">{fv.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       )}
 

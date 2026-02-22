@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     );
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
-    set({ user: data.user, isAuthenticated: true, isLoading: false });
+    set({ user: data.user as AuthUser, isAuthenticated: true, isLoading: false });
   },
 
   signup: async (signupData) => {
@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     );
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
-    set({ user: data.user, isAuthenticated: true, isLoading: false });
+    set({ user: data.user as AuthUser, isAuthenticated: true, isLoading: false });
   },
 
   socialLogin: async (provider, accessToken, role) => {
@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     );
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
-    set({ user: data.user, isAuthenticated: true, isLoading: false });
+    set({ user: data.user as AuthUser, isAuthenticated: true, isLoading: false });
   },
 
   logout: () => {
