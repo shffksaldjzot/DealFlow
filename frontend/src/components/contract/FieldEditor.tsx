@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut, Copy, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut, Copy, ArrowUp, ArrowDown, AlignLeft, AlignRight, AlignStartVertical, AlignEndVertical, AlignCenterHorizontal, AlignCenterVertical } from 'lucide-react';
 
 export interface FieldDef {
   id?: string;
@@ -178,6 +178,51 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     setSelectedIndices(newSelected);
   };
 
+  const alignSelected = (direction: 'left' | 'right' | 'top' | 'bottom' | 'centerH' | 'centerV') => {
+    if (selectedIndices.size < 2) return;
+    const indices = Array.from(selectedIndices);
+    const selected = indices.map(i => fields[i]);
+    const updated = [...fields];
+
+    switch (direction) {
+      case 'left': {
+        const minX = Math.min(...selected.map(f => Number(f.positionX)));
+        indices.forEach(i => { updated[i] = { ...updated[i], positionX: minX }; });
+        break;
+      }
+      case 'right': {
+        const maxRight = Math.max(...selected.map(f => Number(f.positionX) + Number(f.width)));
+        indices.forEach(i => { updated[i] = { ...updated[i], positionX: maxRight - Number(updated[i].width) }; });
+        break;
+      }
+      case 'top': {
+        const minY = Math.min(...selected.map(f => Number(f.positionY)));
+        indices.forEach(i => { updated[i] = { ...updated[i], positionY: minY }; });
+        break;
+      }
+      case 'bottom': {
+        const maxBottom = Math.max(...selected.map(f => Number(f.positionY) + Number(f.height)));
+        indices.forEach(i => { updated[i] = { ...updated[i], positionY: maxBottom - Number(updated[i].height) }; });
+        break;
+      }
+      case 'centerH': {
+        const minX = Math.min(...selected.map(f => Number(f.positionX)));
+        const maxRight = Math.max(...selected.map(f => Number(f.positionX) + Number(f.width)));
+        const centerX = (minX + maxRight) / 2;
+        indices.forEach(i => { updated[i] = { ...updated[i], positionX: centerX - Number(updated[i].width) / 2 }; });
+        break;
+      }
+      case 'centerV': {
+        const minY = Math.min(...selected.map(f => Number(f.positionY)));
+        const maxBottom = Math.max(...selected.map(f => Number(f.positionY) + Number(f.height)));
+        const centerY = (minY + maxBottom) / 2;
+        indices.forEach(i => { updated[i] = { ...updated[i], positionY: centerY - Number(updated[i].height) / 2 }; });
+        break;
+      }
+    }
+    onChange(updated);
+  };
+
   const startDrag = useCallback((idx: number, startX: number, startY: number) => {
     selectSingle(idx);
     setDragging(idx);
@@ -259,11 +304,17 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
 
   const handleMouseDown = useCallback((idx: number, e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (e.ctrlKey || e.metaKey || e.altKey) {
+      toggleSelection(idx);
+      return;
+    }
     startDrag(idx, e.clientX, e.clientY);
   }, [startDrag]);
 
   const handleTouchStart = useCallback((idx: number, e: React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     startDrag(idx, e.touches[0].clientX, e.touches[0].clientY);
   }, [startDrag]);
 
@@ -306,6 +357,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
             ref={canvasRef}
             className="relative bg-white border-2 border-dashed border-gray-200 rounded-xl overflow-hidden origin-top-left"
             style={{ aspectRatio: '210/297', transform: `scale(${zoom})`, transformOrigin: 'top left', width: '100%' }}
+            onMouseDown={() => clearSelection()}
           >
             {templateImageUrl && !imgError ? (
               <img
@@ -470,7 +522,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                       isSelected ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'
                     }`}
                     onClick={(e) => {
-                      if (e.ctrlKey || e.metaKey) {
+                      if (e.ctrlKey || e.metaKey || e.altKey) {
                         toggleSelection(idx);
                       } else {
                         selectSingle(idx);
@@ -566,6 +618,30 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
             <p className="text-xs font-semibold text-gray-500 mb-2">
               {selectedIndices.size}개 선택됨
             </p>
+
+            {/* Alignment buttons */}
+            <p className="text-[10px] font-medium text-gray-400 mb-1.5">정렬</p>
+            <div className="grid grid-cols-3 gap-1 mb-3">
+              <button onClick={() => alignSelected('left')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="좌측 정렬">
+                <AlignLeft className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={() => alignSelected('centerH')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="가로 중앙 정렬">
+                <AlignCenterHorizontal className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={() => alignSelected('right')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="우측 정렬">
+                <AlignRight className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={() => alignSelected('top')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="상단 정렬">
+                <AlignStartVertical className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={() => alignSelected('centerV')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="세로 중앙 정렬">
+                <AlignCenterVertical className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={() => alignSelected('bottom')} className="flex items-center justify-center gap-1 p-1.5 rounded-lg border border-gray-100 hover:bg-blue-50 hover:border-blue-200 transition-colors text-gray-600 hover:text-blue-600" title="하단 정렬">
+                <AlignEndVertical className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
             <div className="space-y-2">
               <Button
                 size="sm"
