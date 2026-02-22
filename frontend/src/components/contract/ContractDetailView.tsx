@@ -113,7 +113,9 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
                       className="text-gray-900 font-medium truncate"
                       style={{ fontSize: 'clamp(6px, 1vw, 12px)' }}
                     >
-                      {value}
+                      {(field.fieldType === 'number' || field.fieldType === 'amount') && !isNaN(Number(value))
+                        ? Number(value).toLocaleString('ko-KR')
+                        : value}
                     </span>
                   )}
                 </div>

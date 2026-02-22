@@ -125,12 +125,14 @@ export default function ContractViewPage() {
                   }}
                 >
                   {field.fieldType === 'checkbox' ? (
-                    <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${value === 'true' ? 'bg-blue-500 border-blue-500' : 'border-gray-400'}`}>
-                      {value === 'true' && <span className="text-white text-xs font-bold">✓</span>}
-                    </div>
+                    <span className="text-gray-900" style={{ fontSize: 'clamp(10px, 1.2vw, 16px)' }}>
+                      {value === 'true' ? '☑' : '☐'}
+                    </span>
                   ) : (
                     <span className={`text-gray-900 font-medium truncate ${isLightbox ? 'text-sm' : 'text-xs'}`}>
-                      {value}
+                      {(field.fieldType === 'number' || field.fieldType === 'amount') && !isNaN(Number(value))
+                        ? Number(value).toLocaleString('ko-KR')
+                        : value}
                     </span>
                   )}
                 </div>

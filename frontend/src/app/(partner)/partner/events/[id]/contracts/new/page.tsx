@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import PageHeader from '@/components/layout/PageHeader';
 import { useToast } from '@/components/ui/Toast';
-import { CheckCircle2, Copy, Check, ChevronRight, FileText, Edit3, User, QrCode, Plus } from 'lucide-react';
+import { CheckCircle2, Copy, Check, ChevronRight, ChevronDown, ChevronUp, FileText, Edit3, User, QrCode, Plus } from 'lucide-react';
 import FieldEditor, { type FieldDef } from '@/components/contract/FieldEditor';
 import ContractOverlay from '@/components/contract/ContractOverlay';
 import type { ContractTemplate, ContractField, Contract } from '@/types/contract';
@@ -53,6 +53,7 @@ export default function NewContractPage() {
   const [editMode, setEditMode] = useState(false);
   const [savingFields, setSavingFields] = useState(false);
   const [partnerFieldValues, setPartnerFieldValues] = useState<Record<string, string>>({});
+  const [fieldsExpanded, setFieldsExpanded] = useState(false);
 
   // Step 3: Customer info
   const [customerName, setCustomerName] = useState('');
@@ -407,25 +408,33 @@ export default function NewContractPage() {
                 )}
               </Card>
 
-              {/* Field Summary */}
+              {/* Field Summary (collapsible) */}
               {fields.length > 0 ? (
                 <Card padding="sm">
-                  <h4 className="text-xs font-semibold text-gray-500 mb-2">입력 필드 ({fields.length}개)</h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {fields.map((f) => (
-                      <span
-                        key={f.id}
-                        className={`inline-flex items-center px-2 py-1 rounded-md text-xs ${
-                          partnerFieldValues[f.id] ? 'bg-green-50 text-green-700' :
-                          f.isRequired ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-500'
-                        }`}
-                      >
-                        {f.label}
-                        {f.isRequired && <span className="text-red-400 ml-0.5">*</span>}
-                        {partnerFieldValues[f.id] && <span className="ml-1">✓</span>}
-                      </span>
-                    ))}
-                  </div>
+                  <button
+                    className="flex items-center justify-between w-full"
+                    onClick={() => setFieldsExpanded(v => !v)}
+                  >
+                    <h4 className="text-xs font-semibold text-gray-500">입력 필드 ({fields.length}개)</h4>
+                    {fieldsExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                  </button>
+                  {fieldsExpanded && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {fields.map((f) => (
+                        <span
+                          key={f.id}
+                          className={`inline-flex items-center px-2 py-1 rounded-md text-xs ${
+                            partnerFieldValues[f.id] ? 'bg-green-50 text-green-700' :
+                            f.isRequired ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-500'
+                          }`}
+                        >
+                          {f.label}
+                          {f.isRequired && <span className="text-red-400 ml-0.5">*</span>}
+                          {partnerFieldValues[f.id] && <span className="ml-1">✓</span>}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </Card>
               ) : (
                 <Card padding="sm">

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { ContractField } from '@/types/contract';
 
 interface ContractOverlayProps {
@@ -19,6 +20,7 @@ export default function ContractOverlay({
 }: ContractOverlayProps) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [formExpanded, setFormExpanded] = useState(false);
 
   // Filter out signature fields (handled separately)
   const overlayFields = fields
@@ -115,8 +117,15 @@ export default function ContractOverlay({
 
       {/* Form fields below the template (for fields without position or for PDFs) */}
       {(formFields.length > 0 || (fileType === 'pdf' && overlayFields.length > 0)) && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
-          <h4 className="text-sm font-semibold text-gray-700">계약 정보 입력</h4>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <button
+            className="flex items-center justify-between w-full"
+            onClick={() => setFormExpanded(v => !v)}
+          >
+            <h4 className="text-sm font-semibold text-gray-700">계약 정보 입력</h4>
+            {formExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+          </button>
+          {formExpanded && <div className="space-y-4 mt-4">
           {(fileType === 'pdf' ? overlayFields : formFields).map((field) => (
             <div key={field.id}>
               {field.fieldType === 'checkbox' ? (
@@ -163,6 +172,7 @@ export default function ContractOverlay({
               )}
             </div>
           ))}
+          </div>}
         </div>
       )}
     </div>

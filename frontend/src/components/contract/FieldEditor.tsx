@@ -2,7 +2,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut, Copy } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Type, Hash, Calendar, Phone, Mail, PenLine, CheckSquare, LayoutTemplate, ZoomIn, ZoomOut, Copy, ArrowUp, ArrowDown } from 'lucide-react';
 
 export interface FieldDef {
   id?: string;
@@ -74,11 +74,23 @@ interface FieldEditorProps {
 }
 
 export default function FieldEditor({ fields, onChange, templateImageUrl }: FieldEditorProps) {
-  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
   const [dragging, setDragging] = useState<number | null>(null);
   const [imgError, setImgError] = useState(false);
   const [zoom, setZoom] = useState(1.0);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  const selectSingle = (idx: number) => setSelectedIndices(new Set([idx]));
+  const clearSelection = () => setSelectedIndices(new Set());
+
+  const toggleSelection = (idx: number) => {
+    setSelectedIndices(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
 
   const addField = (type: string) => {
     const typeInfo = FIELD_TYPES.find(t => t.value === type);
@@ -95,13 +107,30 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
       sortOrder: fields.length,
     };
     onChange([...fields, newField]);
-    setSelectedIdx(fields.length);
+    selectSingle(fields.length);
   };
 
   const removeField = (idx: number) => {
     const updated = fields.filter((_, i) => i !== idx);
     onChange(updated);
-    setSelectedIdx(null);
+    setSelectedIndices(prev => {
+      const next = new Set<number>();
+      prev.forEach(i => {
+        if (i < idx) next.add(i);
+        else if (i > idx) next.add(i - 1);
+      });
+      return next;
+    });
+  };
+
+  const removeSelectedFields = () => {
+    const indices = Array.from(selectedIndices).sort((a, b) => b - a);
+    let updated = [...fields];
+    for (const idx of indices) {
+      updated = updated.filter((_, i) => i !== idx);
+    }
+    onChange(updated);
+    clearSelection();
   };
 
   const updateField = (idx: number, updates: Partial<FieldDef>) => {
@@ -120,11 +149,37 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
       label: `${field.label} (복사)`,
     };
     onChange([...fields, newField]);
-    setSelectedIdx(fields.length);
+    selectSingle(fields.length);
+  };
+
+  const moveSelectedUp = () => {
+    const sorted = Array.from(selectedIndices).sort((a, b) => a - b);
+    if (sorted[0] === 0) return; // Already at top
+    const updated = [...fields];
+    const newSelected = new Set<number>();
+    for (const idx of sorted) {
+      [updated[idx - 1], updated[idx]] = [updated[idx], updated[idx - 1]];
+      newSelected.add(idx - 1);
+    }
+    onChange(updated);
+    setSelectedIndices(newSelected);
+  };
+
+  const moveSelectedDown = () => {
+    const sorted = Array.from(selectedIndices).sort((a, b) => b - a);
+    if (sorted[0] === fields.length - 1) return; // Already at bottom
+    const updated = [...fields];
+    const newSelected = new Set<number>();
+    for (const idx of sorted) {
+      [updated[idx], updated[idx + 1]] = [updated[idx + 1], updated[idx]];
+      newSelected.add(idx + 1);
+    }
+    onChange(updated);
+    setSelectedIndices(newSelected);
   };
 
   const startDrag = useCallback((idx: number, startX: number, startY: number) => {
-    setSelectedIdx(idx);
+    selectSingle(idx);
     setDragging(idx);
 
     const canvas = canvasRef.current;
@@ -163,7 +218,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
   }, [fields]);
 
   const startResize = useCallback((idx: number, startX: number, startY: number) => {
-    setSelectedIdx(idx);
+    selectSingle(idx);
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -212,10 +267,8 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
     startDrag(idx, e.touches[0].clientX, e.touches[0].clientY);
   }, [startDrag]);
 
-  const selected = selectedIdx !== null ? fields[selectedIdx] : null;
-
-  // Reversed fields for list display (newest first)
-  const reversedFields = [...fields].reverse();
+  const singleSelectedIdx = selectedIndices.size === 1 ? Array.from(selectedIndices)[0] : null;
+  const singleSelected = singleSelectedIdx !== null ? fields[singleSelectedIdx] : null;
 
   return (
     <div className="flex gap-4 h-full">
@@ -273,11 +326,12 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
             {/* Field overlays */}
             {fields.map((field, idx) => {
               const Icon = FIELD_TYPES.find(t => t.value === field.fieldType)?.icon || Type;
+              const isSelected = selectedIndices.has(idx);
               return (
                 <div
                   key={idx}
                   className={`absolute border-2 rounded cursor-move transition-colors flex items-center text-left gap-1 px-1 text-xs ${
-                    selectedIdx === idx
+                    isSelected
                       ? 'border-blue-500 bg-blue-50/80 z-10'
                       : 'border-blue-300/60 bg-blue-50/50 hover:border-blue-400'
                   }`}
@@ -330,7 +384,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                   onClick={() => {
                     const presetFields = preset.fields.map((f, i) => ({ ...f, sortOrder: i }));
                     onChange(presetFields);
-                    setSelectedIdx(null);
+                    clearSelection();
                   }}
                   className="w-full text-left px-2.5 py-2 rounded-lg bg-white border border-blue-100 hover:border-blue-300 hover:bg-blue-50 transition-colors"
                 >
@@ -359,36 +413,87 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
           </div>
         </div>
 
-        {/* Field List (newest first) */}
+        {/* Field List with multi-select */}
         <div className="bg-white rounded-xl border border-gray-100 p-3">
-          <p className="text-xs font-semibold text-gray-500 mb-2">필드 목록 ({fields.length})</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-semibold text-gray-500">필드 목록 ({fields.length})</p>
+            {selectedIndices.size > 0 && (
+              <button
+                onClick={clearSelection}
+                className="text-[10px] text-gray-400 hover:text-gray-600"
+              >
+                선택 해제
+              </button>
+            )}
+          </div>
+
+          {/* Sort/Action bar when 2+ selected */}
+          {selectedIndices.size >= 2 && (
+            <div className="flex items-center gap-1 mb-2 p-1.5 bg-blue-50 rounded-lg">
+              <span className="text-[10px] text-blue-600 font-medium mr-auto">{selectedIndices.size}개 선택</span>
+              <button
+                onClick={moveSelectedUp}
+                className="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors"
+                title="위로 이동"
+              >
+                <ArrowUp className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={moveSelectedDown}
+                className="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors"
+                title="아래로 이동"
+              >
+                <ArrowDown className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={removeSelectedFields}
+                className="p-1 rounded hover:bg-red-100 text-red-500 transition-colors"
+                title="선택 삭제"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           <div className="space-y-1 max-h-40 overflow-y-auto">
             {fields.length === 0 ? (
               <p className="text-xs text-gray-400 text-center py-3">
                 위에서 필드를 추가하세요
               </p>
             ) : (
-              reversedFields.map((field) => {
-                const originalIdx = fields.indexOf(field);
+              fields.map((field, idx) => {
+                const isSelected = selectedIndices.has(idx);
                 return (
                   <div
-                    key={originalIdx}
+                    key={idx}
                     className={`flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer text-xs ${
-                      selectedIdx === originalIdx ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'
+                      isSelected ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'
                     }`}
-                    onClick={() => setSelectedIdx(originalIdx)}
+                    onClick={(e) => {
+                      if (e.ctrlKey || e.metaKey) {
+                        toggleSelection(idx);
+                      } else {
+                        selectSingle(idx);
+                      }
+                    }}
                   >
-                    <GripVertical className="w-3 h-3 text-gray-300" />
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelection(idx)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-3 h-3 rounded border-gray-300 text-blue-600 shrink-0"
+                    />
                     <span className="flex-1 truncate">{field.label}</span>
                     <button
-                      onClick={(e) => { e.stopPropagation(); duplicateField(originalIdx); }}
+                      onClick={(e) => { e.stopPropagation(); duplicateField(idx); }}
                       className="text-gray-400 hover:text-blue-500"
                       title="복사"
                     >
                       <Copy className="w-3 h-3" />
                     </button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); removeField(originalIdx); }}
+                      onClick={(e) => { e.stopPropagation(); removeField(idx); }}
                       className="text-gray-400 hover:text-red-500"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -400,27 +505,27 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
           </div>
         </div>
 
-        {/* Field Properties */}
-        {selected && selectedIdx !== null && (
+        {/* Field Properties - Single selection */}
+        {singleSelected && singleSelectedIdx !== null && (
           <div className="bg-white rounded-xl border border-gray-100 p-3">
             <p className="text-xs font-semibold text-gray-500 mb-2">필드 속성</p>
             <div className="space-y-3">
               <Input
                 label="라벨"
-                value={selected.label}
-                onChange={(e) => updateField(selectedIdx, { label: e.target.value })}
+                value={singleSelected.label}
+                onChange={(e) => updateField(singleSelectedIdx, { label: e.target.value })}
               />
               <Input
                 label="안내 문구"
-                value={selected.placeholder || ''}
-                onChange={(e) => updateField(selectedIdx, { placeholder: e.target.value })}
+                value={singleSelected.placeholder || ''}
+                onChange={(e) => updateField(singleSelectedIdx, { placeholder: e.target.value })}
               />
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="required"
-                  checked={selected.isRequired}
-                  onChange={(e) => updateField(selectedIdx, { isRequired: e.target.checked })}
+                  checked={singleSelected.isRequired}
+                  onChange={(e) => updateField(singleSelectedIdx, { isRequired: e.target.checked })}
                   className="rounded border-gray-300"
                 />
                 <label htmlFor="required" className="text-xs text-gray-600">필수 입력</label>
@@ -429,28 +534,66 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
                 <Input
                   label="X (%)"
                   type="number"
-                  value={String(selected.positionX)}
-                  onChange={(e) => updateField(selectedIdx, { positionX: Number(e.target.value) })}
+                  value={String(singleSelected.positionX)}
+                  onChange={(e) => updateField(singleSelectedIdx, { positionX: Number(e.target.value) })}
                 />
                 <Input
                   label="Y (%)"
                   type="number"
-                  value={String(selected.positionY)}
-                  onChange={(e) => updateField(selectedIdx, { positionY: Number(e.target.value) })}
+                  value={String(singleSelected.positionY)}
+                  onChange={(e) => updateField(singleSelectedIdx, { positionY: Number(e.target.value) })}
                 />
                 <Input
                   label="너비 (%)"
                   type="number"
-                  value={String(selected.width)}
-                  onChange={(e) => updateField(selectedIdx, { width: Number(e.target.value) })}
+                  value={String(singleSelected.width)}
+                  onChange={(e) => updateField(singleSelectedIdx, { width: Number(e.target.value) })}
                 />
                 <Input
                   label="높이 (%)"
                   type="number"
-                  value={String(selected.height)}
-                  onChange={(e) => updateField(selectedIdx, { height: Number(e.target.value) })}
+                  value={String(singleSelected.height)}
+                  onChange={(e) => updateField(singleSelectedIdx, { height: Number(e.target.value) })}
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Multi-selection panel */}
+        {selectedIndices.size > 1 && (
+          <div className="bg-white rounded-xl border border-gray-100 p-3">
+            <p className="text-xs font-semibold text-gray-500 mb-2">
+              {selectedIndices.size}개 선택됨
+            </p>
+            <div className="space-y-2">
+              <Button
+                size="sm"
+                variant="outline"
+                fullWidth
+                onClick={moveSelectedUp}
+              >
+                <ArrowUp className="w-3.5 h-3.5 mr-1" />
+                위로 이동
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                fullWidth
+                onClick={moveSelectedDown}
+              >
+                <ArrowDown className="w-3.5 h-3.5 mr-1" />
+                아래로 이동
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                fullWidth
+                onClick={removeSelectedFields}
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-1" />
+                선택 삭제
+              </Button>
             </div>
           </div>
         )}
