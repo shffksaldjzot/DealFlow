@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-22T08:47:54.029Z",
+  "lastUpdated": "2026-02-22T10:46:14.257Z",
   "activeFeatures": [
     "frontend",
     "business",
@@ -66,9 +66,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-13T02:30:58.747Z",
-        "lastUpdated": "2026-02-21T15:48:28.156Z"
+        "lastUpdated": "2026-02-22T09:34:23.410Z"
       },
-      "lastFile": "/home/user/claud-deal/frontend/src/lib/api.ts"
+      "lastFile": "/home/user/claud-deal/frontend/src/app/layout.tsx"
     },
     "business": {
       "phase": "do",
@@ -92,7 +92,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-13T03:53:44.156Z",
-        "lastUpdated": "2026-02-21T16:46:32.780Z"
+        "lastUpdated": "2026-02-22T09:08:25.564Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/contract/[code]/view/page.tsx"
     },
@@ -105,7 +105,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-13T03:54:13.862Z",
-        "lastUpdated": "2026-02-21T15:50:25.029Z"
+        "lastUpdated": "2026-02-22T10:01:14.643Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/(partner)/partner/contracts/[id]/page.tsx"
     },
@@ -196,9 +196,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-14T05:21:53.044Z",
-        "lastUpdated": "2026-02-19T02:33:15.113Z"
+        "lastUpdated": "2026-02-22T10:43:51.982Z"
       },
-      "lastFile": "/home/user/claud-deal/backend/src/modules/contracts/contract-flow.service.ts"
+      "lastFile": "/home/user/claud-deal/backend/src/modules/contracts/dto/save-fields.dto.ts"
     },
     "organizations": {
       "phase": "do",
@@ -261,7 +261,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-14T05:27:32.125Z",
-        "lastUpdated": "2026-02-14T06:00:08.364Z"
+        "lastUpdated": "2026-02-22T10:43:58.002Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/(partner)/partner/events/[id]/templates/[templateId]/page.tsx"
     },
@@ -274,9 +274,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-14T05:27:48.626Z",
-        "lastUpdated": "2026-02-21T03:37:19.550Z"
+        "lastUpdated": "2026-02-22T09:34:15.471Z"
       },
-      "lastFile": "/home/user/claud-deal/frontend/src/components/layout/Header.tsx"
+      "lastFile": "/home/user/claud-deal/frontend/src/components/layout/PageId.tsx"
     },
     "settings": {
       "phase": "do",
@@ -391,7 +391,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-15T06:27:01.698Z",
-        "lastUpdated": "2026-02-21T16:49:05.287Z"
+        "lastUpdated": "2026-02-22T10:46:14.257Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/components/contract/FieldEditor.tsx"
     },
@@ -495,9 +495,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-15T15:15:23.900Z",
-        "lastUpdated": "2026-02-21T16:06:40.433Z"
+        "lastUpdated": "2026-02-22T09:21:50.149Z"
       },
-      "lastFile": "/tmp/test-period.js"
+      "lastFile": "/tmp/test-resolve.js"
     },
     "sign": {
       "phase": "do",
@@ -560,9 +560,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-19T06:52:12.308Z",
-        "lastUpdated": "2026-02-21T03:35:31.905Z"
+        "lastUpdated": "2026-02-22T09:09:00.485Z"
       },
-      "lastFile": "/home/user/claud-deal/backend/src/modules/integrated-contracts/ic-config.controller.ts"
+      "lastFile": "/home/user/claud-deal/backend/src/modules/integrated-contracts/ic-contract.service.ts"
     },
     "integrated-contract": {
       "phase": "do",
@@ -612,7 +612,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-19T07:08:49.487Z",
-        "lastUpdated": "2026-02-21T03:34:22.314Z"
+        "lastUpdated": "2026-02-22T09:08:52.185Z"
       },
       "lastFile": "/home/user/claud-deal/frontend/src/app/events/[code]/options/page.tsx"
     },
@@ -742,7 +742,7 @@
   "session": {
     "startedAt": "2026-02-13T01:38:43.725Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-22T08:47:54.029Z"
+    "lastActivity": "2026-02-22T10:46:14.257Z"
   },
   "history": [
     {
@@ -5254,6 +5254,168 @@
     {
       "timestamp": "2026-02-22T08:47:54.029Z",
       "feature": "claud-deal",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T08:56:00.026Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T08:56:49.951Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:08:17.592Z",
+      "feature": "contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:08:25.564Z",
+      "feature": "view",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:08:35.056Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:08:52.185Z",
+      "feature": "options",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:09:00.485Z",
+      "feature": "integrated-contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:21:50.149Z",
+      "feature": "tmp",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:26:32.549Z",
+      "feature": "[templateId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:26:43.239Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:26:47.520Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:26:53.575Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:26:57.989Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:27:08.907Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:27:18.694Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:27:34.197Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:34:15.471Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:34:19.563Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:34:23.410Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T09:58:40.685Z",
+      "feature": "[templateId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T10:00:49.443Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T10:01:05.444Z",
+      "feature": "contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T10:01:14.643Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T10:01:58.801Z",
+      "feature": "contract",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T10:43:51.982Z",
+      "feature": "contracts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T10:43:58.002Z",
+      "feature": "[templateId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-22T10:46:14.257Z",
+      "feature": "contract",
       "phase": "do",
       "action": "updated"
     }
