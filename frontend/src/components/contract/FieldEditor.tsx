@@ -222,7 +222,7 @@ export default function FieldEditor({ fields, onChange, templateImageUrl }: Fiel
       positionX: Math.min(Number(field.positionX) + 3, 100 - Number(field.width)),
       positionY: Math.min(Number(field.positionY) + 3, 100 - Number(field.height)),
       sortOrder: fields.length,
-      label: `${field.label} (복사)`,
+      label: field.label,
     };
     changeFields([...fields, newField]);
     selectSingle(fields.length);

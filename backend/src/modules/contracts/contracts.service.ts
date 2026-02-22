@@ -435,12 +435,23 @@ export class ContractsService {
       throw new NotFoundException('템플릿을 찾을 수 없습니다.');
     }
 
-    // Remove existing fields for this template
-    await this.fieldRepository.delete({ templateId });
+    // Upsert logic: update existing fields, create new ones, delete removed ones
+    const existingFields = await this.fieldRepository.find({ where: { templateId } });
+    const existingIds = new Set(existingFields.map(f => f.id));
+    const incomingIds = new Set(dto.fields.filter(f => f.id).map(f => f.id));
 
-    // Create new fields
-    const fields = dto.fields.map((f, index) =>
-      this.fieldRepository.create({
+    // Delete removed fields (and their field values first to avoid FK violation)
+    const toDeleteIds = [...existingIds].filter(id => !incomingIds.has(id));
+    if (toDeleteIds.length > 0) {
+      await this.fieldValueRepository.delete({ fieldId: In(toDeleteIds) });
+      await this.fieldRepository.delete({ id: In(toDeleteIds) });
+    }
+
+    // Update existing + create new
+    const result: ContractField[] = [];
+    for (let i = 0; i < dto.fields.length; i++) {
+      const f = dto.fields[i];
+      const data = {
         templateId,
         fieldType: f.fieldType,
         label: f.label,
@@ -451,13 +462,23 @@ export class ContractsService {
         positionY: f.positionY,
         width: f.width,
         height: f.height,
-        sortOrder: f.sortOrder ?? index,
+        sortOrder: f.sortOrder ?? i,
         defaultValue: f.defaultValue,
         validationRule: f.validationRule,
-      }),
-    );
+      };
 
-    return this.fieldRepository.save(fields);
+      if (f.id && existingIds.has(f.id)) {
+        // Update existing field in place (preserves ID and FK references)
+        await this.fieldRepository.update(f.id, data);
+        result.push({ ...existingFields.find(e => e.id === f.id)!, ...data });
+      } else {
+        // Create new field
+        const newField = this.fieldRepository.create(data);
+        result.push(await this.fieldRepository.save(newField));
+      }
+    }
+
+    return result;
   }
 
   async getFields(

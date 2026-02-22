@@ -53,6 +53,7 @@ export default function TemplateFieldEditorPage() {
     setSaving(true);
     try {
       const fieldsToSave = fields.map((f, i) => ({
+        ...(f.id ? { id: f.id } : {}),
         fieldType: f.fieldType,
         label: f.label,
         placeholder: f.placeholder || undefined,
