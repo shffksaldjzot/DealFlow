@@ -1,26 +1,25 @@
 'use client';
-import type { IcContract } from '@/types/integrated-contract';
+import type { IcContract, IcContractFlow } from '@/types/integrated-contract';
 import { formatDateTime } from '@/lib/utils';
 
 interface IcContractPrintViewProps {
   contract: IcContract;
+  flow?: IcContractFlow | null;
   partnerFilter?: string;
 }
 
-export default function IcContractPrintView({ contract, partnerFilter }: IcContractPrintViewProps) {
+export default function IcContractPrintView({ contract, flow, partnerFilter }: IcContractPrintViewProps) {
+  const totalAmount = Number(contract.totalAmount) || 0;
+
+  // Build set of selected rowIds for quick lookup
+  const selectedRowIds = new Set(contract.selectedItems.map(si => si.rowId));
+  const selectedMap = new Map(contract.selectedItems.map(si => [si.rowId, si]));
+
   const items = partnerFilter
     ? contract.selectedItems.filter((item) => item.partnerName === partnerFilter)
     : contract.selectedItems;
 
-  // Group by partner > category
-  const grouped = items.reduce<Record<string, typeof items>>((acc, item) => {
-    const key = `${item.partnerName} - ${item.categoryName}`;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(item);
-    return acc;
-  }, {});
-
-  const filteredTotal = items.reduce((sum, item) => sum + item.unitPrice, 0);
+  const filteredTotal = items.reduce((sum, item) => sum + Number(item.unitPrice), 0);
 
   return (
     <div className="ic-print-container">
@@ -54,42 +53,92 @@ export default function IcContractPrintView({ contract, partnerFilter }: IcContr
         </tbody>
       </table>
 
-      {/* Selected Items */}
+      {/* Contract Items */}
       <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '10px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>
-        선택 내역 {partnerFilter && <span style={{ fontSize: '12px', fontWeight: 400, color: '#666' }}>({partnerFilter})</span>}
+        계약 사항 {partnerFilter && <span style={{ fontSize: '12px', fontWeight: 400, color: '#666' }}>({partnerFilter})</span>}
       </h3>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '12px' }}>
-        <thead>
-          <tr style={{ background: '#f0f0f0' }}>
-            <th style={{ padding: '6px 8px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 600 }}>파트너</th>
-            <th style={{ padding: '6px 8px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 600 }}>카테고리</th>
-            <th style={{ padding: '6px 8px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 600 }}>옵션</th>
-            <th style={{ padding: '6px 8px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 600 }}>금액</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(grouped).map(([group, groupItems]) =>
-            groupItems.map((item, idx) => (
-              <tr key={`${group}-${idx}`}>
-                {idx === 0 ? (
-                  <>
-                    <td rowSpan={groupItems.length} style={{ padding: '5px 8px', border: '1px solid #ddd', verticalAlign: 'top' }}>{item.partnerName}</td>
-                    <td rowSpan={groupItems.length} style={{ padding: '5px 8px', border: '1px solid #ddd', verticalAlign: 'top' }}>{item.categoryName}</td>
-                  </>
-                ) : null}
-                <td style={{ padding: '5px 8px', border: '1px solid #ddd' }}>{item.optionName}</td>
-                <td style={{ padding: '5px 8px', border: '1px solid #ddd', textAlign: 'right' }}>{item.unitPrice.toLocaleString()}원</td>
-              </tr>
-            ))
-          )}
-        </tbody>
+
+      {flow && !partnerFilter ? (
+        // Full flow: show ALL options with checkmarks for selected ones
+        flow.partners.map((partner) =>
+          partner.categories.map((cat) => (
+            <div key={cat.sheetId} style={{ marginBottom: '16px' }}>
+              <p style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{cat.categoryName}</p>
+              <p style={{ fontSize: '10px', color: '#999', marginBottom: '6px' }}>{partner.partnerName}</p>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                <tbody>
+                  {cat.options.map((opt) => {
+                    const isSelected = selectedRowIds.has(opt.rowId);
+                    const selectedItem = selectedMap.get(opt.rowId);
+                    return (
+                      <tr key={opt.rowId} style={{ background: isSelected ? '#eff6ff' : '#fff' }}>
+                        <td style={{ padding: '4px 8px', border: '1px solid #ddd', width: '24px', textAlign: 'center' }}>
+                          {isSelected ? '✓' : ''}
+                        </td>
+                        <td style={{ padding: '4px 8px', border: '1px solid #ddd', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#111' : '#999' }}>
+                          {opt.optionName}
+                        </td>
+                        <td style={{ padding: '4px 8px', border: '1px solid #ddd', textAlign: 'right', width: '100px', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#2563eb' : '#999' }}>
+                          {isSelected && selectedItem ? `${Number(selectedItem.unitPrice).toLocaleString()}원` : ''}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ))
+        )
+      ) : (
+        // Fallback: show only selected items (or partner-filtered)
+        (() => {
+          const grouped = items.reduce<Record<string, typeof items>>((acc, item) => {
+            const key = `${item.partnerName} - ${item.categoryName}`;
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+            return acc;
+          }, {});
+
+          return (
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '12px' }}>
+              <thead>
+                <tr style={{ background: '#f0f0f0' }}>
+                  <th style={{ padding: '6px 8px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 600 }}>파트너</th>
+                  <th style={{ padding: '6px 8px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 600 }}>카테고리</th>
+                  <th style={{ padding: '6px 8px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 600 }}>옵션</th>
+                  <th style={{ padding: '6px 8px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 600 }}>금액</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(grouped).map(([group, groupItems]) =>
+                  groupItems.map((item, idx) => (
+                    <tr key={`${group}-${idx}`}>
+                      {idx === 0 ? (
+                        <>
+                          <td rowSpan={groupItems.length} style={{ padding: '5px 8px', border: '1px solid #ddd', verticalAlign: 'top' }}>{item.partnerName}</td>
+                          <td rowSpan={groupItems.length} style={{ padding: '5px 8px', border: '1px solid #ddd', verticalAlign: 'top' }}>{item.categoryName}</td>
+                        </>
+                      ) : null}
+                      <td style={{ padding: '5px 8px', border: '1px solid #ddd' }}>{item.optionName}</td>
+                      <td style={{ padding: '5px 8px', border: '1px solid #ddd', textAlign: 'right' }}>{Number(item.unitPrice).toLocaleString()}원</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          );
+        })()
+      )}
+
+      {/* Total */}
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '13px' }}>
         <tfoot>
           <tr style={{ background: '#f9f9f9', fontWeight: 700 }}>
-            <td colSpan={3} style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'right' }}>
+            <td style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'right' }}>
               {partnerFilter ? '소계' : '총 계약금액'}
             </td>
-            <td style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'right', fontSize: '14px' }}>
-              {(partnerFilter ? filteredTotal : contract.totalAmount).toLocaleString()}원
+            <td style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'right', width: '120px', fontSize: '14px' }}>
+              {(partnerFilter ? filteredTotal : totalAmount).toLocaleString()}원
             </td>
           </tr>
         </tfoot>
@@ -112,7 +161,7 @@ export default function IcContractPrintView({ contract, partnerFilter }: IcContr
                 <tr key={idx}>
                   <td style={{ padding: '5px 8px', border: '1px solid #ddd' }}>{stage.name}</td>
                   <td style={{ padding: '5px 8px', border: '1px solid #ddd', textAlign: 'right' }}>{stage.ratio}%</td>
-                  <td style={{ padding: '5px 8px', border: '1px solid #ddd', textAlign: 'right' }}>{stage.amount.toLocaleString()}원</td>
+                  <td style={{ padding: '5px 8px', border: '1px solid #ddd', textAlign: 'right' }}>{Number(stage.amount).toLocaleString()}원</td>
                 </tr>
               ))}
             </tbody>

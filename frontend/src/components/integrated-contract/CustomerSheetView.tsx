@@ -26,17 +26,14 @@ export default function CustomerSheetView({
     <div className="space-y-6">
       {partners.map((partner) => (
         <div key={partner.partnerId}>
-          <div className="mb-3">
-            <span className="text-xs text-gray-400">{partner.partnerName}</span>
-            {(partner as any).partnerItems && (
-              <span className="text-xs text-gray-300 ml-1">· {(partner as any).partnerItems}</span>
-            )}
-          </div>
           {partner.categories.map((cat) => (
-            <div key={cat.sheetId} className="mb-4">
-              <h4 className="text-base font-bold text-gray-900 mb-2">
-                {cat.categoryName}
-              </h4>
+            <div key={cat.sheetId} className="mb-6">
+              <div className="mb-2">
+                <h4 className="text-lg font-bold text-gray-900">
+                  {cat.categoryName}
+                </h4>
+                <p className="text-xs text-gray-400 mt-0.5">{partner.partnerName}</p>
+              </div>
 
               {/* Spreadsheet table */}
               <div className="relative border border-gray-200 rounded-xl overflow-x-auto -mx-1 px-1">

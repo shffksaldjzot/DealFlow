@@ -7,17 +7,27 @@ import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
 import ContractPreview from '@/components/integrated-contract/ContractPreview';
 import IcContractPrintView from '@/components/integrated-contract/IcContractPrintView';
-import type { IcContract } from '@/types/integrated-contract';
+import type { IcContract, IcContractFlow } from '@/types/integrated-contract';
 
 export default function OrganizerIcContractDetailPage() {
   const { id: eventId, contractId } = useParams<{ id: string; contractId: string }>();
   const router = useRouter();
   const [contract, setContract] = useState<IcContract | null>(null);
+  const [flow, setFlow] = useState<IcContractFlow | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.get(`/ic/contracts/${contractId}`)
-      .then((res) => setContract(extractData(res)))
+      .then(async (res) => {
+        const c = extractData<IcContract>(res);
+        setContract(c);
+        if (c.config?.eventId) {
+          try {
+            const flowRes = await api.get(`/ic/contract-flow/${c.config.eventId}`);
+            setFlow(extractData(flowRes));
+          } catch {}
+        }
+      })
       .catch(() => router.push(`/organizer/events/${eventId}/ic-contracts`))
       .finally(() => setLoading(false));
   }, [contractId, eventId, router]);
@@ -54,14 +64,14 @@ export default function OrganizerIcContractDetailPage() {
           }
         />
         <Card>
-          <ContractPreview contract={contract} />
+          <ContractPreview contract={contract} flow={flow} />
         </Card>
       </div>
 
       {/* Print View */}
       <div className="hidden" style={{ display: 'none' }}>
         <div className="ic-print-container">
-          <IcContractPrintView contract={contract} />
+          <IcContractPrintView contract={contract} flow={flow} />
         </div>
       </div>
     </>

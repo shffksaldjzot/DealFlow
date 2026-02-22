@@ -1,22 +1,21 @@
 'use client';
-import type { IcContract } from '@/types/integrated-contract';
+import { Check } from 'lucide-react';
+import type { IcContract, IcContractFlow } from '@/types/integrated-contract';
 import { formatDateTime } from '@/lib/utils';
 
 interface ContractPreviewProps {
   contract: IcContract;
+  flow?: IcContractFlow | null;
 }
 
-export default function ContractPreview({ contract }: ContractPreviewProps) {
-  // Group selected items by category
-  const grouped = contract.selectedItems.reduce<Record<string, typeof contract.selectedItems>>(
-    (acc, item) => {
-      const key = `${item.partnerName} - ${item.categoryName}`;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    },
-    {},
-  );
+export default function ContractPreview({ contract, flow }: ContractPreviewProps) {
+  const totalAmount = Number(contract.totalAmount) || 0;
+
+  // Build set of selected rowIds for quick lookup
+  const selectedRowIds = new Set(contract.selectedItems.map(si => si.rowId));
+
+  // Build map of selected items for price lookup
+  const selectedMap = new Map(contract.selectedItems.map(si => [si.rowId, si]));
 
   return (
     <div className="space-y-6">
@@ -51,22 +50,85 @@ export default function ContractPreview({ contract }: ContractPreviewProps) {
         </div>
       </div>
 
-      {/* Selected Items */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-bold text-gray-500">선택 내역</h3>
-        {Object.entries(grouped).map(([group, items]) => (
-          <div key={group}>
-            <p className="text-xs text-gray-400 mb-1">{group}</p>
-            {items.map((item, i) => (
-              <div key={i} className="flex justify-between py-1.5 border-b border-gray-50">
-                <span className="text-sm text-gray-700">{item.optionName}</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {item.unitPrice.toLocaleString()}원
-                </span>
+      {/* Contract Items - Full list with checkmarks */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-bold text-gray-500">계약 사항</h3>
+
+        {flow ? (
+          // Full flow available: show all options with checkmarks
+          flow.partners.map((partner) =>
+            partner.categories.map((cat) => (
+              <div key={cat.sheetId}>
+                <div className="mb-2">
+                  <p className="text-sm font-bold text-gray-900">{cat.categoryName}</p>
+                  <p className="text-[11px] text-gray-400">{partner.partnerName}</p>
+                </div>
+                <div className="border border-gray-200 rounded-xl overflow-hidden">
+                  {cat.options.map((opt, idx) => {
+                    const isSelected = selectedRowIds.has(opt.rowId);
+                    const selectedItem = selectedMap.get(opt.rowId);
+                    return (
+                      <div
+                        key={opt.rowId}
+                        className={`flex items-center justify-between px-3 py-2.5 ${
+                          idx > 0 ? 'border-t border-gray-100' : ''
+                        } ${isSelected ? 'bg-blue-50' : 'bg-white'}`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-200'
+                          }`}>
+                            {isSelected && <Check className="w-3 h-3 text-white" />}
+                          </div>
+                          <span className={`text-sm ${isSelected ? 'font-medium text-gray-900' : 'text-gray-400'}`}>
+                            {opt.optionName}
+                          </span>
+                        </div>
+                        {isSelected && selectedItem && (
+                          <span className="text-sm font-medium text-blue-600">
+                            {Number(selectedItem.unitPrice).toLocaleString()}원
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            ))}
-          </div>
-        ))}
+            ))
+          )
+        ) : (
+          // Fallback: show only selected items (grouped)
+          (() => {
+            const grouped = contract.selectedItems.reduce<Record<string, typeof contract.selectedItems>>(
+              (acc, item) => {
+                const key = `${item.categoryName}`;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(item);
+                return acc;
+              },
+              {},
+            );
+            return Object.entries(grouped).map(([group, items]) => (
+              <div key={group}>
+                <p className="text-sm font-bold text-gray-900 mb-1">{group}</p>
+                <p className="text-[11px] text-gray-400 mb-2">{items[0]?.partnerName}</p>
+                {items.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between py-1.5 border-b border-gray-50">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      </div>
+                      <span className="text-sm text-gray-700">{item.optionName}</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">
+                      {Number(item.unitPrice).toLocaleString()}원
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ));
+          })()
+        )}
       </div>
 
       {/* Total & Payment Schedule */}
@@ -74,7 +136,7 @@ export default function ContractPreview({ contract }: ContractPreviewProps) {
         <div className="flex justify-between mb-3">
           <span className="font-bold text-gray-900">총 계약금액</span>
           <span className="text-lg font-bold text-blue-600">
-            {contract.totalAmount.toLocaleString()}원
+            {totalAmount.toLocaleString()}원
           </span>
         </div>
 
@@ -83,7 +145,7 @@ export default function ContractPreview({ contract }: ContractPreviewProps) {
             {contract.paymentSchedule.map((stage, i) => (
               <div key={i} className="flex justify-between text-sm">
                 <span className="text-gray-600">{stage.name} ({stage.ratio}%)</span>
-                <span className="font-medium">{stage.amount.toLocaleString()}원</span>
+                <span className="font-medium">{Number(stage.amount).toLocaleString()}원</span>
               </div>
             ))}
           </div>

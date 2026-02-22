@@ -380,7 +380,7 @@ export class IcContractService {
   async findOneById(id: string): Promise<IcContract> {
     const contract = await this.contractRepository.findOne({
       where: { id },
-      relations: ['config', 'apartmentType', 'customer'],
+      relations: ['config', 'config.event', 'apartmentType', 'customer'],
     });
     if (!contract) {
       throw new NotFoundException('통합 계약서를 찾을 수 없습니다.');
