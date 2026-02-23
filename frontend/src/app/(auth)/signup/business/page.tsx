@@ -101,8 +101,10 @@ export default function BusinessRegistration() {
       });
       toast('업체 등록이 완료되었습니다. DealFlow 승인 후 이용 가능합니다.', 'success');
       router.push('/pending-approval');
-    } catch {
-      toast('업체 등록에 실패했습니다.', 'error');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      const errorMessage = Array.isArray(msg) ? msg[0] : (msg || '업체 등록에 실패했습니다.');
+      toast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }

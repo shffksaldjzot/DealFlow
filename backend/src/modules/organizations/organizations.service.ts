@@ -33,6 +33,20 @@ export class OrganizationsService {
     userId: string,
     dto: CreateOrganizationDto,
   ): Promise<Organization> {
+    // 이미 업체 등록한 사용자인지 확인
+    const existingMembership = await this.memberRepository.findOne({ where: { userId } });
+    if (existingMembership) {
+      throw new ConflictException('이미 업체 등록이 완료되었습니다.');
+    }
+
+    // 사업자번호 중복 확인
+    if (dto.businessNumber) {
+      const existingOrg = await this.orgRepository.findOne({ where: { businessNumber: dto.businessNumber } });
+      if (existingOrg) {
+        throw new ConflictException('이미 등록된 사업자번호입니다.');
+      }
+    }
+
     const organization = this.orgRepository.create({
       type: dto.type,
       name: dto.name,

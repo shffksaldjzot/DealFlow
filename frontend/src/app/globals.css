@@ -124,7 +124,8 @@ html {
     display: none !important;
   }
 
-  .ic-print-container {
+  .ic-print-container,
+  .contract-print-container {
     display: block !important;
     width: 100%;
     max-width: 210mm;

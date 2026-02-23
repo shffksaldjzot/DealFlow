@@ -9,9 +9,10 @@ import Modal from '@/components/ui/Modal';
 import PageHeader from '@/components/layout/PageHeader';
 import QRCodeDisplay from '@/components/contract/QRCodeDisplay';
 import ContractDetailView from '@/components/contract/ContractDetailView';
+import ContractPrintView from '@/components/contract/ContractPrintView';
 import { useToast } from '@/components/ui/Toast';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
-import { XCircle, User, FileText, Clock } from 'lucide-react';
+import { XCircle, User, FileText, Clock, Printer } from 'lucide-react';
 import type { Contract } from '@/types/contract';
 
 export default function PartnerContractDetailPage() {
@@ -103,16 +104,25 @@ export default function PartnerContractDetailPage() {
   const canCancel = contract.status !== 'completed' && contract.status !== 'cancelled';
 
   return (
-    <div>
+    <>
+    <div className="print-hidden">
       <PageHeader
         title="계약 상세"
         backHref={`/partner/events/${contract.eventId}`}
         actions={
-          canCancel ? (
-            <Button variant="danger" size="sm" onClick={() => setCancelModal(true)}>
-              <XCircle className="w-4 h-4 mr-1" /> 취소
-            </Button>
-          ) : undefined
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.print()}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+            >
+              <Printer className="w-4 h-4 inline mr-1" />인쇄
+            </button>
+            {canCancel && (
+              <Button variant="danger" size="sm" onClick={() => setCancelModal(true)}>
+                <XCircle className="w-4 h-4 mr-1" /> 취소
+              </Button>
+            )}
+          </div>
         }
       />
 
@@ -236,5 +246,13 @@ export default function PartnerContractDetailPage() {
         </div>
       </Modal>
     </div>
+
+    {/* Print View */}
+    <div className="hidden" style={{ display: 'none' }}>
+      <div className="contract-print-container">
+        <ContractPrintView contract={contract} />
+      </div>
+    </div>
+    </>
   );
 }

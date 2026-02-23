@@ -7,8 +7,9 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
 import ContractDetailView from '@/components/contract/ContractDetailView';
+import ContractPrintView from '@/components/contract/ContractPrintView';
 import { useToast } from '@/components/ui/Toast';
-import { FileText, Building2, Calendar, PenLine, XCircle, ChevronDown } from 'lucide-react';
+import { FileText, Building2, Calendar, PenLine, XCircle, ChevronDown, Printer } from 'lucide-react';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
 
@@ -81,8 +82,20 @@ export default function CustomerContractDetailPage() {
   }
 
   return (
-    <div>
-      <PageHeader title="계약 상세" backHref="/customer/contracts" />
+    <>
+    <div className="print-hidden">
+      <PageHeader
+        title="계약 상세"
+        backHref="/customer/contracts"
+        actions={
+          <button
+            onClick={() => window.print()}
+            className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+          >
+            <Printer className="w-4 h-4 inline mr-1" />인쇄
+          </button>
+        }
+      />
 
       {/* Status & Contract Number */}
       <Card className="mb-4">
@@ -207,5 +220,13 @@ export default function CustomerContractDetailPage() {
         </div>
       )}
     </div>
+
+    {/* Print View */}
+    <div className="hidden" style={{ display: 'none' }}>
+      <div className="contract-print-container">
+        <ContractPrintView contract={contract} />
+      </div>
+    </div>
+    </>
   );
 }

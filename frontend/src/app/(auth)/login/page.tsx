@@ -86,8 +86,10 @@ function LoginForm() {
       } else {
         router.push(roleHome[selectedRole]);
       }
-    } catch {
-      toast('회원가입에 실패했습니다.', 'error');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      const errorMessage = Array.isArray(msg) ? msg[0] : (msg || '회원가입에 실패했습니다.');
+      toast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }

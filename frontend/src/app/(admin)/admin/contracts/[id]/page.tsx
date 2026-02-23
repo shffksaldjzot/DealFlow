@@ -8,9 +8,10 @@ import Badge from '@/components/ui/Badge';
 import Modal from '@/components/ui/Modal';
 import PageHeader from '@/components/layout/PageHeader';
 import ContractDetailView from '@/components/contract/ContractDetailView';
+import ContractPrintView from '@/components/contract/ContractPrintView';
 import { useToast } from '@/components/ui/Toast';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Printer } from 'lucide-react';
 
 export default function AdminContractDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -91,14 +92,23 @@ export default function AdminContractDetailPage() {
   }
 
   return (
-    <div>
+    <>
+    <div className="print-hidden">
       <PageHeader
         title={`계약 ${contract.contractNumber}`}
         backHref="/admin/contracts"
         actions={
-          <Button size="sm" variant="outline" onClick={() => { setNewStatus(contract.status); setStatusModal(true); }}>
-            상태 변경
-          </Button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.print()}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+            >
+              <Printer className="w-4 h-4 inline mr-1" />인쇄
+            </button>
+            <Button size="sm" variant="outline" onClick={() => { setNewStatus(contract.status); setStatusModal(true); }}>
+              상태 변경
+            </Button>
+          </div>
         }
       />
 
@@ -250,5 +260,13 @@ export default function AdminContractDetailPage() {
         </div>
       </Modal>
     </div>
+
+    {/* Print View */}
+    <div className="hidden" style={{ display: 'none' }}>
+      <div className="contract-print-container">
+        <ContractPrintView contract={contract} />
+      </div>
+    </div>
+    </>
   );
 }
