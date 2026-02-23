@@ -38,10 +38,21 @@ export default function BusinessRegistration() {
     items: '',
   });
 
-  // Pre-fill email from signup
+  // Pre-fill email, name, phone from signup
   useEffect(() => {
-    if (user?.email) {
-      setForm((prev) => ({ ...prev, contactEmail: user.email }));
+    if (user) {
+      const updates: Partial<typeof form> = {};
+      if (user.email) updates.contactEmail = user.email;
+      if (user.name) updates.name = user.name;
+      if (user.phone) {
+        const digits = user.phone.replace(/[^0-9]/g, '');
+        if (digits.length >= 10) {
+          updates.phone1 = digits.slice(0, 3);
+          updates.phone2 = digits.slice(3, digits.length - 4);
+          updates.phone3 = digits.slice(digits.length - 4);
+        }
+      }
+      setForm((prev) => ({ ...prev, ...updates }));
     }
   }, [user]);
 

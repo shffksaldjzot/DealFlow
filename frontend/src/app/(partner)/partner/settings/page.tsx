@@ -90,10 +90,24 @@ export default function PartnerSettingsPage() {
     if (!org) return;
     setSaving(true);
     try {
-      await api.patch(`/organizations/${org.id}`, form);
+      // Strip empty strings to avoid backend validation failures
+      // (@IsUUID, @IsEmail, @Length validators reject empty strings even with @IsOptional)
+      const payload: Record<string, any> = {};
+      if (form.contactPhone) payload.contactPhone = form.contactPhone;
+      if (form.contactEmail) payload.contactEmail = form.contactEmail;
+      if (form.address) payload.address = form.address;
+      if (form.items !== undefined) payload.items = form.items || undefined;
+      if (form.businessLicenseFileId) payload.businessLicenseFileId = form.businessLicenseFileId;
+      await api.patch(`/organizations/${org.id}`, payload);
       toast('저장되었습니다.', 'success');
-    } catch {
-      toast('저장에 실패했습니다.', 'error');
+      // Re-fetch to confirm changes persisted
+      const res = await api.get('/organizations/me');
+      const data = extractData<Organization>(res);
+      setOrg(data);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      const errorMessage = Array.isArray(msg) ? msg[0] : (msg || '저장에 실패했습니다.');
+      toast(errorMessage, 'error');
     } finally {
       setSaving(false);
     }

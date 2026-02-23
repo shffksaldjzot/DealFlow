@@ -41,7 +41,36 @@ export default function AdminUserDetailPage() {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [status, setStatus] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone1, setPhone1] = useState('');
+  const [phone2, setPhone2] = useState('');
+  const [phone3, setPhone3] = useState('');
+
+  // Org edit form
+  const [orgId, setOrgId] = useState<string | null>(null);
+  const [bizNum1, setBizNum1] = useState('');
+  const [bizNum2, setBizNum2] = useState('');
+  const [bizNum3, setBizNum3] = useState('');
+  const [orgPhone1, setOrgPhone1] = useState('');
+  const [orgPhone2, setOrgPhone2] = useState('');
+  const [orgPhone3, setOrgPhone3] = useState('');
+  const [orgEmail, setOrgEmail] = useState('');
+  const [savingOrg, setSavingOrg] = useState(false);
+
+  const parsePhone = (phone: string) => {
+    const digits = phone.replace(/[^0-9]/g, '');
+    if (digits.length >= 10) {
+      return { p1: digits.slice(0, 3), p2: digits.slice(3, digits.length - 4), p3: digits.slice(digits.length - 4) };
+    }
+    return { p1: '', p2: '', p3: '' };
+  };
+
+  const parseBizNum = (biz: string) => {
+    const digits = biz.replace(/[^0-9]/g, '');
+    if (digits.length === 10) {
+      return { b1: digits.slice(0, 3), b2: digits.slice(3, 5), b3: digits.slice(5) };
+    }
+    return { b1: '', b2: '', b3: '' };
+  };
 
   const fetchUser = () => {
     setLoading(true);
@@ -52,7 +81,20 @@ export default function AdminUserDetailPage() {
         setName(data.name);
         setRole(data.role);
         setStatus(data.status);
-        setPhone(data.phone || '');
+        const ph = parsePhone(data.phone || '');
+        setPhone1(ph.p1); setPhone2(ph.p2); setPhone3(ph.p3);
+
+        // Load org data if available
+        const membership = data.organizationMemberships?.[0];
+        if (membership?.organization) {
+          const org = membership.organization;
+          setOrgId(org.id);
+          const biz = parseBizNum(org.businessNumber || '');
+          setBizNum1(biz.b1); setBizNum2(biz.b2); setBizNum3(biz.b3);
+          const oph = parsePhone(org.contactPhone || '');
+          setOrgPhone1(oph.p1); setOrgPhone2(oph.p2); setOrgPhone3(oph.p3);
+          setOrgEmail(org.contactEmail || '');
+        }
       })
       .catch(() => toast('사용자를 불러올 수 없습니다.', 'error'))
       .finally(() => setLoading(false));
@@ -61,15 +103,36 @@ export default function AdminUserDetailPage() {
   useEffect(() => { fetchUser(); }, [id]);
 
   const handleSave = async () => {
+    const phone = phone1 && phone2 && phone3 ? `${phone1}-${phone2}-${phone3}` : '';
     setSaving(true);
     try {
-      await api.patch(`/admin/users/${id}`, { name, role, status, phone });
+      await api.patch(`/admin/users/${id}`, { name, role, status, phone: phone || undefined });
       toast('사용자 정보가 수정되었습니다.', 'success');
       fetchUser();
     } catch {
       toast('수정에 실패했습니다.', 'error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveOrg = async () => {
+    if (!orgId) return;
+    const businessNumber = bizNum1 && bizNum2 && bizNum3 ? `${bizNum1}-${bizNum2}-${bizNum3}` : undefined;
+    const contactPhone = orgPhone1 && orgPhone2 && orgPhone3 ? `${orgPhone1}-${orgPhone2}-${orgPhone3}` : undefined;
+    const payload: Record<string, any> = {};
+    if (businessNumber) payload.businessNumber = businessNumber;
+    if (contactPhone) payload.contactPhone = contactPhone;
+    if (orgEmail) payload.contactEmail = orgEmail;
+    setSavingOrg(true);
+    try {
+      await api.patch(`/admin/organizations/${orgId}`, payload);
+      toast('업체 정보가 수정되었습니다.', 'success');
+      fetchUser();
+    } catch {
+      toast('업체 정보 수정에 실패했습니다.', 'error');
+    } finally {
+      setSavingOrg(false);
     }
   };
 
@@ -219,7 +282,28 @@ export default function AdminUserDetailPage() {
 
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">연락처</label>
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="010-0000-0000" />
+            <div className="grid grid-cols-[3fr_auto_4fr_auto_4fr] items-center gap-1">
+              <input
+                type="text" inputMode="numeric" placeholder="010" maxLength={3}
+                value={phone1}
+                onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 3); setPhone1(v); if (v.length === 3) document.getElementById('adm-ph2')?.focus(); }}
+                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-gray-400 font-bold">-</span>
+              <input
+                id="adm-ph2" type="text" inputMode="numeric" placeholder="0000" maxLength={4}
+                value={phone2}
+                onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 4); setPhone2(v); if (v.length === 4) document.getElementById('adm-ph3')?.focus(); }}
+                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-gray-400 font-bold">-</span>
+              <input
+                id="adm-ph3" type="text" inputMode="numeric" placeholder="0000" maxLength={4}
+                value={phone3}
+                onChange={(e) => { setPhone3(e.target.value.replace(/\D/g, '').slice(0, 4)); }}
+                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           <div>
@@ -247,36 +331,101 @@ export default function AdminUserDetailPage() {
         </div>
       </Card>
 
-      {/* Organization Memberships */}
+      {/* Organization Memberships - Editable */}
       {user.organizationMemberships && user.organizationMemberships.length > 0 && (
         <Card className="mb-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">소속 조직</h3>
-          <div className="space-y-3">
-            {user.organizationMemberships.map((m: any) => (
-              <div key={m.id} className="py-2 border-b border-gray-50 last:border-0">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-medium text-gray-900">{m.organization?.name || '-'}</p>
-                  <Badge status={m.organization?.status || ''} />
+          {user.organizationMemberships.map((m: any) => (
+            <div key={m.id}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-gray-900">{m.organization?.name || '-'}</p>
+                <Badge status={m.organization?.status || ''} />
+              </div>
+              <p className="text-xs text-gray-400 mb-3">{m.organization?.type} / {m.role}</p>
+
+              <div className="space-y-4">
+                {/* 사업자등록번호 - 3-2-5 */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">사업자등록번호</label>
+                  <div className="grid grid-cols-[3fr_auto_2fr_auto_5fr] items-center gap-1">
+                    <input
+                      type="text" inputMode="numeric" placeholder="000" maxLength={3}
+                      value={bizNum1}
+                      onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 3); setBizNum1(v); if (v.length === 3) document.getElementById('adm-biz2')?.focus(); }}
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-400 font-bold">-</span>
+                    <input
+                      id="adm-biz2" type="text" inputMode="numeric" placeholder="00" maxLength={2}
+                      value={bizNum2}
+                      onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 2); setBizNum2(v); if (v.length === 2) document.getElementById('adm-biz3')?.focus(); }}
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-400 font-bold">-</span>
+                    <input
+                      id="adm-biz3" type="text" inputMode="numeric" placeholder="00000" maxLength={5}
+                      value={bizNum3}
+                      onChange={(e) => { setBizNum3(e.target.value.replace(/\D/g, '').slice(0, 5)); }}
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
-                <p className="text-xs text-gray-400 mb-1">{m.organization?.type} / {m.role}</p>
+
+                {/* 업체 연락처 - 3-4-4 */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">업체 연락처</label>
+                  <div className="grid grid-cols-[3fr_auto_4fr_auto_4fr] items-center gap-1">
+                    <input
+                      type="text" inputMode="numeric" placeholder="010" maxLength={3}
+                      value={orgPhone1}
+                      onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 3); setOrgPhone1(v); if (v.length === 3) document.getElementById('adm-oph2')?.focus(); }}
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-400 font-bold">-</span>
+                    <input
+                      id="adm-oph2" type="text" inputMode="numeric" placeholder="0000" maxLength={4}
+                      value={orgPhone2}
+                      onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 4); setOrgPhone2(v); if (v.length === 4) document.getElementById('adm-oph3')?.focus(); }}
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-400 font-bold">-</span>
+                    <input
+                      id="adm-oph3" type="text" inputMode="numeric" placeholder="0000" maxLength={4}
+                      value={orgPhone3}
+                      onChange={(e) => { setOrgPhone3(e.target.value.replace(/\D/g, '').slice(0, 4)); }}
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                {/* 업체 이메일 */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">업체 이메일</label>
+                  <Input value={orgEmail} onChange={(e) => setOrgEmail(e.target.value)} placeholder="company@example.com" />
+                </div>
+
                 {m.organization?.representativeName && (
-                  <p className="text-xs text-gray-500">대표자: {m.organization.representativeName}</p>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-1 block">대표자</label>
+                    <div className="px-4 py-3 bg-gray-50 rounded-xl text-sm text-gray-600">{m.organization.representativeName}</div>
+                  </div>
                 )}
-                {m.organization?.businessNumber && (
-                  <p className="text-xs text-gray-500">사업자번호: {m.organization.businessNumber}</p>
-                )}
-                {m.organization?.contactPhone && (
-                  <p className="text-xs text-gray-500">연락처: {m.organization.contactPhone}</p>
-                )}
-                {m.organization?.contactEmail && (
-                  <p className="text-xs text-gray-500">이메일: {m.organization.contactEmail}</p>
-                )}
+
                 {m.organization?.items && (
-                  <p className="text-xs text-gray-500">취급품목: {m.organization.items}</p>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-1 block">취급품목</label>
+                    <div className="px-4 py-3 bg-gray-50 rounded-xl text-sm text-gray-600">{m.organization.items}</div>
+                  </div>
                 )}
               </div>
-            ))}
-          </div>
+
+              <div className="mt-4">
+                <Button onClick={handleSaveOrg} disabled={savingOrg}>
+                  {savingOrg ? '저장 중...' : '업체 정보 저장'}
+                </Button>
+              </div>
+            </div>
+          ))}
         </Card>
       )}
 

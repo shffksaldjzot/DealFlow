@@ -30,6 +30,7 @@ import {
   AdminUpdateIcContractStatusDto,
   ResetPasswordDto,
 } from './dto/approve-organizer.dto';
+import { UpdateOrganizationDto } from '../organizations/dto/update-organization.dto';
 
 @Injectable()
 export class AdminService {
@@ -453,6 +454,25 @@ export class AdminService {
     await this.activityLogService.log('update_user', `사용자 "${user.name}" 정보 수정`, adminUserId, 'user', userId);
     const { passwordHash, ...result } = saved;
     return result as Omit<User, 'passwordHash'>;
+  }
+
+  async updateOrganization(orgId: string, dto: UpdateOrganizationDto, adminUserId?: string): Promise<Organization> {
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    if (!org) throw new NotFoundException('조직을 찾을 수 없습니다.');
+
+    if (dto.name !== undefined) org.name = dto.name;
+    if (dto.businessNumber !== undefined) org.businessNumber = dto.businessNumber;
+    if (dto.businessLicenseFileId !== undefined) org.businessLicenseFileId = dto.businessLicenseFileId;
+    if (dto.representativeName !== undefined) org.representativeName = dto.representativeName;
+    if (dto.contactPhone !== undefined) org.contactPhone = dto.contactPhone;
+    if (dto.contactEmail !== undefined) org.contactEmail = dto.contactEmail;
+    if (dto.emergencyEmail !== undefined) org.emergencyEmail = dto.emergencyEmail;
+    if (dto.address !== undefined) org.address = dto.address;
+    if (dto.items !== undefined) org.items = dto.items;
+
+    const saved = await this.orgRepository.save(org);
+    await this.activityLogService.log('update_organization', `업체 "${org.name}" 정보 수정 (관리자)`, adminUserId, 'organization', orgId);
+    return saved;
   }
 
   async createUser(dto: CreateUserDto, adminUserId?: string): Promise<Omit<User, 'passwordHash'>> {

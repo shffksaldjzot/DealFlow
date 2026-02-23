@@ -23,6 +23,7 @@ import {
   AdminUpdateIcContractStatusDto,
   ResetPasswordDto,
 } from './dto/approve-organizer.dto';
+import { UpdateOrganizationDto } from '../organizations/dto/update-organization.dto';
 
 @Controller('admin')
 @Roles('admin')
@@ -47,6 +48,15 @@ export class AdminController {
     @CurrentUser('id') adminUserId: string,
   ) {
     return this.adminService.approveOrganizer(id, adminUserId);
+  }
+
+  @Patch('organizations/:id')
+  updateOrganization(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateOrganizationDto,
+    @CurrentUser('id') adminUserId: string,
+  ) {
+    return this.adminService.updateOrganization(id, dto, adminUserId);
   }
 
   @Patch('organizers/:id/reject')
