@@ -19,7 +19,10 @@ export class MailService {
         port: Number(port) || 587,
         secure: Number(port) === 465,
         auth: { user, pass },
-      });
+        tls: { rejectUnauthorized: false },
+        // Force IPv4 — Render does not support IPv6 outbound
+        dnsOptions: { family: 4 },
+      } as any);
       this.logger.log(`Mail transporter configured: ${host}`);
     } else {
       this.logger.warn('SMTP not configured – emails will be logged to console');
