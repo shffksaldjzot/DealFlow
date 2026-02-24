@@ -39,6 +39,9 @@ export class IcConfig {
   @Column({ name: 'special_notes', type: 'text', nullable: true })
   specialNotes: string;
 
+  @Column({ type: JSON_COLUMN_TYPE, nullable: true })
+  categories: string[];
+
   @Column({ type: 'varchar', length: 20, default: IcConfigStatus.DRAFT })
   status: IcConfigStatus;
 

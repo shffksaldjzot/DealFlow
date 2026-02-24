@@ -450,6 +450,91 @@ export class IcContractService {
     );
   }
 
+  async getIcSettlement(eventId: string) {
+    const config = await this.configRepository.findOne({
+      where: { eventId },
+    });
+    if (!config) {
+      throw new NotFoundException('해당 행사의 통합 계약 설정을 찾을 수 없습니다.');
+    }
+
+    const contracts = await this.contractRepository.find({
+      where: { configId: config.id },
+    });
+
+    const sheets = await this.sheetRepository.find({
+      where: { configId: config.id },
+      relations: ['rows', 'partner'],
+    });
+
+    // Build rowId -> sheet info map
+    const rowInfoMap = new Map<string, {
+      optionName: string;
+      categoryName: string;
+      partnerName: string;
+      partnerId: string;
+      commissionRate: number;
+    }>();
+    for (const sheet of sheets) {
+      for (const row of sheet.rows || []) {
+        rowInfoMap.set(row.id, {
+          optionName: row.optionName,
+          categoryName: sheet.categoryName,
+          partnerName: sheet.partner?.name || '',
+          partnerId: sheet.partnerId,
+          commissionRate: Number(sheet.commissionRate) || 0,
+        });
+      }
+    }
+
+    // Aggregate from contracts
+    const productMap = new Map<string, {
+      rowId: string;
+      optionName: string;
+      categoryName: string;
+      partnerName: string;
+      partnerId: string;
+      contractCount: number;
+      totalRevenue: number;
+      commissionRate: number;
+    }>();
+
+    for (const contract of contracts) {
+      for (const item of contract.selectedItems || []) {
+        const info = rowInfoMap.get(item.rowId);
+        const key = item.rowId;
+        if (!productMap.has(key)) {
+          productMap.set(key, {
+            rowId: item.rowId,
+            optionName: item.optionName || info?.optionName || '',
+            categoryName: item.categoryName || info?.categoryName || '',
+            partnerName: item.partnerName || info?.partnerName || '',
+            partnerId: info?.partnerId || '',
+            contractCount: 0,
+            totalRevenue: 0,
+            commissionRate: info?.commissionRate || 0,
+          });
+        }
+        const entry = productMap.get(key)!;
+        entry.contractCount += 1;
+        entry.totalRevenue += item.unitPrice || 0;
+      }
+    }
+
+    const products = Array.from(productMap.values());
+    const totalContracts = contracts.length;
+    const totalRevenue = products.reduce((s, p) => s + p.totalRevenue, 0);
+    const totalCommission = products.reduce(
+      (s, p) => s + Math.round((p.totalRevenue * p.commissionRate) / 100),
+      0,
+    );
+
+    return {
+      products,
+      totals: { totalContracts, totalRevenue, totalCommission },
+    };
+  }
+
   private async resolveEventIdByInviteCode(inviteCode: string): Promise<string> {
     const event = await this.eventRepository.findOne({
       where: { inviteCode },

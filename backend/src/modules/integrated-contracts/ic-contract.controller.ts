@@ -69,6 +69,12 @@ export class IcContractController {
     return this.icContractService.findByShortCode(shortCode);
   }
 
+  @Get('settlement/:eventId')
+  @Roles('organizer', 'admin')
+  getIcSettlement(@Param('eventId', ParseUUIDPipe) eventId: string) {
+    return this.icContractService.getIcSettlement(eventId);
+  }
+
   @Get('contracts/event/:eventId')
   @Roles('organizer', 'admin')
   findByEventId(@Param('eventId', ParseUUIDPipe) eventId: string) {

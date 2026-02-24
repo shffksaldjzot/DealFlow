@@ -56,6 +56,9 @@ export class Event {
   })
   commissionRate: number;
 
+  @Column({ name: 'banner_image_url', type: 'text', nullable: true })
+  bannerImageUrl: string;
+
   @Column({ type: 'varchar', length: 20, default: EventStatus.DRAFT })
   status: EventStatus;
 

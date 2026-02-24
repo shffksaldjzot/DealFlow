@@ -12,6 +12,7 @@ export interface Event {
   isPrivate: boolean;
   inviteCode: string;
   commissionRate: number;
+  bannerImageUrl?: string;
   status: EventStatus;
   createdAt: string;
   organizer?: { id: string; name: string };

@@ -14,6 +14,7 @@ export interface IcConfig {
   paymentStages: PaymentStage[];
   legalTerms?: string;
   specialNotes?: string;
+  categories?: string[];
   status: IcConfigStatus;
   apartmentTypes: IcApartmentType[];
   event?: { id: string; name: string };

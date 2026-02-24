@@ -1,7 +1,9 @@
 'use client';
-import { Check } from 'lucide-react';
-import PopupViewer from './PopupViewer';
-import type { IcFlowPartner, IcFlowOption, IcFlowCategory } from '@/types/integrated-contract';
+import { useState } from 'react';
+import ProductCard from './ProductCard';
+import ProductDetailModal from './ProductDetailModal';
+import { Info } from 'lucide-react';
+import type { IcFlowPartner, IcFlowOption } from '@/types/integrated-contract';
 
 interface SelectedRow {
   sheetId: string;
@@ -12,121 +14,153 @@ interface CustomerSheetViewProps {
   partners: IcFlowPartner[];
   selectedRows: SelectedRow[];
   onToggleRow: (sheetId: string, rowId: string, optionName: string, categoryName: string, partnerName: string) => void;
+  selectedTypeId?: string;
 }
 
 export default function CustomerSheetView({
   partners,
   selectedRows,
   onToggleRow,
+  selectedTypeId,
 }: CustomerSheetViewProps) {
+  const [detailModal, setDetailModal] = useState<{
+    optionName: string;
+    popupContent: string;
+    price?: number;
+    sheetId: string;
+    rowId: string;
+    categoryName: string;
+    partnerName: string;
+  } | null>(null);
+
   const isSelected = (sheetId: string, rowId: string) =>
     selectedRows.some((s) => s.sheetId === sheetId && s.rowId === rowId);
 
+  // Build flat list of categories with partner info
+  const allCategories: {
+    id: string;
+    name: string;
+    partnerName: string;
+    partnerId: string;
+    options: IcFlowOption[];
+    columns: any[];
+  }[] = [];
+
+  partners.forEach((partner) => {
+    partner.categories.forEach((cat) => {
+      allCategories.push({
+        id: cat.sheetId,
+        name: cat.categoryName,
+        partnerName: partner.partnerName,
+        partnerId: partner.partnerId,
+        options: cat.options,
+        columns: cat.columns,
+      });
+    });
+  });
+
+  // Get price for an option given the selected apartment type
+  const getOptionPrice = (opt: IcFlowOption, columns: any[]): number | undefined => {
+    if (!selectedTypeId) return undefined;
+    const col = columns.find((c: any) => c.apartmentTypeId === selectedTypeId);
+    if (col) {
+      const cellVal = opt.cellValues?.[col.id];
+      if (cellVal !== undefined && cellVal !== '' && cellVal !== '0') {
+        const num = Number(String(cellVal).replace(/,/g, ''));
+        if (num > 0) return num;
+      }
+      const priceVal = opt.prices?.[col.id];
+      if (priceVal && priceVal > 0) return priceVal;
+    }
+    // Fallback: first amount column with a value
+    for (const c of columns) {
+      if (c.columnType === 'amount' || !c.columnType) {
+        const p = opt.prices?.[c.id];
+        if (p && p > 0) return p;
+        const cv = opt.cellValues?.[c.id];
+        if (cv) {
+          const num = Number(String(cv).replace(/,/g, ''));
+          if (num > 0) return num;
+        }
+      }
+    }
+    return undefined;
+  };
+
   return (
     <div className="space-y-6">
-      {partners.map((partner) => (
-        <div key={partner.partnerId}>
-          {partner.categories.map((cat) => (
-            <div key={cat.sheetId} className="mb-6">
-              <div className="mb-2">
-                <h4 className="text-lg font-bold text-gray-800">
-                  {partner.partnerItems || cat.categoryName}
-                </h4>
-                <p className="text-xs text-gray-400 mt-0.5">{partner.partnerName}</p>
-              </div>
+      {/* Render all categories as sections (와이어프레임 1-3) */}
+      {allCategories.map((cat) => (
+        <div key={cat.id}>
+          {/* Section header with category name + info icon */}
+          <div className="flex items-center gap-2 mb-3">
+            <h4 className="text-base font-bold text-gray-800">{cat.name}</h4>
+            <button className="text-gray-400 hover:text-gray-600">
+              <Info className="w-4 h-4" />
+            </button>
+          </div>
 
-              {/* Spreadsheet table */}
-              <div className="relative border border-gray-200 rounded-lg overflow-x-auto -mx-1 px-1">
-                <table className="w-full text-sm min-w-0">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="px-2 py-2 w-8" />
-                      <th className="px-3 py-2 text-left font-medium text-gray-600 min-w-[120px] sticky left-0 bg-gray-50 z-10">
-                        옵션
-                      </th>
-                      <th className="px-1 py-2 w-6" />
-                      {cat.columns.map((col) => (
-                        <th key={col.id} className="px-2 py-2 text-center min-w-[60px]">
-                          <span className="text-xs font-medium text-gray-600">
-                            {col.customName || `열`}
-                          </span>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {cat.options.map((opt) => {
-                      const selected = isSelected(cat.sheetId, opt.rowId);
-                      return (
-                        <tr
-                          key={opt.rowId}
-                          onClick={() => onToggleRow(
-                            cat.sheetId,
-                            opt.rowId,
-                            opt.optionName,
-                            cat.categoryName,
-                            partner.partnerName,
-                          )}
-                          className={`border-b border-gray-200 cursor-pointer transition-colors ${
-                            selected ? 'bg-blue-50' : 'hover:bg-gray-50'
-                          }`}
-                        >
-                          {/* Check circle */}
-                          <td className="px-2 py-2 text-center">
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mx-auto ${
-                              selected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                            }`}>
-                              {selected && <Check className="w-3 h-3 text-white" />}
-                            </div>
-                          </td>
-                          {/* Option name */}
-                          <td className={`px-3 py-2 sticky left-0 z-10 ${selected ? 'bg-blue-50' : 'bg-white'}`}>
-                            <span className={`text-sm font-medium ${selected ? 'text-blue-700' : 'text-gray-800'}`}>
-                              {opt.optionName}
-                            </span>
-                          </td>
-                          {/* Popup */}
-                          <td className="px-1 py-2 text-center" onClick={(e) => e.stopPropagation()}>
-                            {opt.popupContent && (
-                              <PopupViewer content={opt.popupContent} optionName={opt.optionName} />
-                            )}
-                          </td>
-                          {/* Values per column */}
-                          {cat.columns.map((col) => {
-                            const isAmount = col.columnType === 'amount';
-                            const cellVal = opt.cellValues?.[col.id];
-                            const priceVal = opt.prices?.[col.id];
-                            const displayVal = cellVal !== undefined
-                              ? cellVal
-                              : (priceVal !== undefined ? String(priceVal) : '');
-
-                            return (
-                              <td key={col.id} className={`px-2 py-2 ${isAmount ? 'text-right' : 'text-center'}`}>
-                                <span className={`text-sm ${selected ? 'text-blue-600 font-medium' : 'text-gray-700'}`}>
-                                  {isAmount
-                                    ? (Number(displayVal) ? `${Number(displayVal).toLocaleString()}원` : '-')
-                                    : (displayVal || '-')}
-                                </span>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
-                    {cat.options.length === 0 && (
-                      <tr>
-                        <td colSpan={cat.columns.length + 3} className="px-4 py-6 text-center text-gray-400 text-sm">
-                          등록된 옵션이 없습니다.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+          {/* Horizontal scroll product cards (와이어프레임 1-3) */}
+          {cat.options.length > 0 ? (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+              {cat.options.map((opt) => {
+                const price = getOptionPrice(opt, cat.columns);
+                const selected = isSelected(cat.id, opt.rowId);
+                return (
+                  <ProductCard
+                    key={opt.rowId}
+                    optionName={opt.optionName}
+                    price={price}
+                    popupContent={opt.popupContent}
+                    selected={selected}
+                    onSelect={() => onToggleRow(cat.id, opt.rowId, opt.optionName, cat.name, cat.partnerName)}
+                    onDetail={opt.popupContent ? () => setDetailModal({
+                      optionName: opt.optionName,
+                      popupContent: opt.popupContent!,
+                      price,
+                      sheetId: cat.id,
+                      rowId: opt.rowId,
+                      categoryName: cat.name,
+                      partnerName: cat.partnerName,
+                    }) : undefined}
+                  />
+                );
+              })}
             </div>
-          ))}
+          ) : (
+            <div className="text-center py-8 text-gray-400 text-sm">
+              등록된 옵션이 없습니다.
+            </div>
+          )}
         </div>
       ))}
+
+      {allCategories.length === 0 && (
+        <div className="text-center py-12 text-gray-400 text-sm">
+          등록된 품목이 없습니다.
+        </div>
+      )}
+
+      {/* Detail Modal */}
+      {detailModal && (
+        <ProductDetailModal
+          isOpen={true}
+          onClose={() => setDetailModal(null)}
+          optionName={detailModal.optionName}
+          popupContent={detailModal.popupContent}
+          price={detailModal.price}
+          selected={isSelected(detailModal.sheetId, detailModal.rowId)}
+          onSelect={() => {
+            onToggleRow(
+              detailModal.sheetId,
+              detailModal.rowId,
+              detailModal.optionName,
+              detailModal.categoryName,
+              detailModal.partnerName,
+            );
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -27,4 +27,9 @@ export class UpdateIcConfigDto {
   @IsOptional()
   @IsEnum(IcConfigStatus)
   status?: IcConfigStatus;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categories?: string[];
 }

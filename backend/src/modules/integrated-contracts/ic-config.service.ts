@@ -93,6 +93,7 @@ export class IcConfigService {
       paymentStages: dto.paymentStages || [],
       legalTerms: dto.legalTerms || null,
       specialNotes: dto.specialNotes || null,
+      categories: dto.categories || [],
     });
 
     const saved = await this.configRepository.save(config);
@@ -138,6 +139,7 @@ export class IcConfigService {
     if (dto.legalTerms !== undefined) config.legalTerms = dto.legalTerms;
     if (dto.specialNotes !== undefined) config.specialNotes = dto.specialNotes;
     if (dto.status !== undefined) config.status = dto.status;
+    if (dto.categories !== undefined) config.categories = dto.categories;
 
     await this.configRepository.save(config);
     return this.findOneById(id);

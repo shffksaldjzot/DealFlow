@@ -3,32 +3,53 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useNotificationStore } from '@/stores/notificationStore';
-import { Home, FileText, User, Bell } from 'lucide-react';
+import { Home, FileText, User, Bell, Calendar, QrCode, Building2 } from 'lucide-react';
 
-export default function BottomNav() {
+type NavItem = { label: string; href: string; icon: typeof Home; badge?: number };
+
+const navItemsByRole: Record<string, (unreadCount: number) => NavItem[]> = {
+  // 고객: 홈 | 내계약 | 마이페이지 (3탭, 와이어프레임 1-1)
+  customer: () => [
+    { label: '홈', href: '/customer', icon: Home },
+    { label: '내계약', href: '/customer/contracts', icon: FileText },
+    { label: '마이페이지', href: '/customer/profile', icon: User },
+  ],
+  // 업체: 홈 | 마이페이지 (2탭 기본)
+  partner: () => [
+    { label: '홈', href: '/partner', icon: Home },
+    { label: '행사', href: '/partner/events', icon: Calendar },
+    { label: '마이페이지', href: '/partner/settings', icon: User },
+  ],
+  // 주관사: 행사 | 알림 | 설정
+  organizer: (unreadCount) => [
+    { label: '행사', href: '/organizer/events', icon: Calendar },
+    { label: '알림', href: '/organizer/notifications', icon: Bell, badge: unreadCount },
+    { label: '설정', href: '/organizer/settings', icon: Building2 },
+  ],
+};
+
+export default function BottomNav({ role = 'customer' }: { role?: string }) {
   const pathname = usePathname();
   const { unreadCount } = useNotificationStore();
 
-  const items: Array<{ label: string; href: string; icon: typeof Home; badge?: number }> = [
-    { label: '홈', href: '/customer', icon: Home },
-    { label: '내 계약', href: '/customer/contracts', icon: FileText },
-    { label: '알림', href: '/customer/notifications', icon: Bell, badge: unreadCount },
-    { label: '프로필', href: '/customer/profile', icon: User },
-  ];
+  const getItems = navItemsByRole[role] || navItemsByRole.customer;
+  const items = getItems(unreadCount);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 pb-[env(safe-area-inset-bottom)] lg:hidden">
       <div className="flex items-center justify-around h-14">
         {items.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          const isActive = item.href === `/${role}`
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(item.href + '/');
 
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center gap-0.5 px-4 py-1.5 relative min-w-[44px] min-h-[44px] justify-center',
+                'flex flex-col items-center gap-0.5 px-3 py-1.5 relative min-w-[44px] min-h-[44px] justify-center',
                 isActive ? 'text-blue-600' : 'text-gray-400',
               )}
             >

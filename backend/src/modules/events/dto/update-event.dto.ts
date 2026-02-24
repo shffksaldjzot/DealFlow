@@ -41,4 +41,8 @@ export class UpdateEventDto {
   @Min(0)
   @Max(100)
   commissionRate?: number;
+
+  @IsOptional()
+  @IsString()
+  bannerImageUrl?: string;
 }

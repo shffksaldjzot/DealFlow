@@ -37,4 +37,9 @@ export class CreateIcConfigDto {
   @IsOptional()
   @IsString()
   specialNotes?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categories?: string[];
 }
