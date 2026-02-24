@@ -74,15 +74,15 @@ export default function NewTemplatePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Template Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              템플릿 이름 <span className="text-red-500">*</span>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              템플릿 이름 <span className="text-error">*</span>
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="예: 행사 참여 동의서"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -97,7 +97,7 @@ export default function NewTemplatePage() {
               onUploadComplete={handleUploadComplete}
             />
             {fileId && (
-              <p className="text-xs text-green-600 mt-1">
+              <p className="text-xs text-success mt-1">
                 파일 업로드 완료: {fileName}
               </p>
             )}
@@ -113,7 +113,7 @@ export default function NewTemplatePage() {
             </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <Button
               type="button"
               variant="secondary"

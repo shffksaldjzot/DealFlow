@@ -25,7 +25,7 @@ export default function QRCodeDisplay({ contractNumber, qrCode, qrCodeUrl }: QRC
     <Card>
       <div className="text-center">
         <p className="text-xs text-gray-400 font-mono mb-1">{contractNumber}</p>
-        <div className="inline-block p-4 bg-white rounded-xl border border-gray-100 my-3">
+        <div className="inline-block p-4 bg-white rounded-xl border border-gray-200 my-3">
           <QRCodeSVG
             value={fullUrl}
             size={200}

@@ -37,7 +37,7 @@ export default function PartnerSheetPreviewPage() {
     return (
       <div className="space-y-4">
         {[1, 2].map((i) => (
-          <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />
+          <div key={i} className="h-32 bg-white rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -68,7 +68,7 @@ export default function PartnerSheetPreviewPage() {
         <Card key={sheet.id} className="mb-4">
           <div className="flex items-center gap-3 mb-4">
             <FileSpreadsheet className="w-5 h-5 text-blue-500" />
-            <h3 className="font-bold text-gray-900">{sheet.categoryName}</h3>
+            <h3 className="font-bold text-gray-800">{sheet.categoryName}</h3>
             <Badge status={sheet.status} />
           </div>
 
@@ -93,8 +93,8 @@ export default function PartnerSheetPreviewPage() {
                   {sheet.rows
                     .sort((a, b) => a.sortOrder - b.sortOrder)
                     .map((row) => (
-                      <tr key={row.id} className="border-b border-gray-100">
-                        <td className="px-4 py-2.5 font-medium text-gray-900">
+                      <tr key={row.id} className="border-b border-gray-200">
+                        <td className="px-4 py-2.5 font-medium text-gray-800">
                           {row.optionName}
                           {row.popupContent && (
                             <span className="ml-1 text-blue-400 cursor-help" title={row.popupContent}>

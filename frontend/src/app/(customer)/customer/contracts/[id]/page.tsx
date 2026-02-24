@@ -66,7 +66,7 @@ export default function CustomerContractDetailPage() {
       <div>
         <PageHeader title="계약 상세" backHref="/customer/contracts" />
         <div className="space-y-4">
-          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-xl animate-pulse" />)}
         </div>
       </div>
     );
@@ -90,9 +90,9 @@ export default function CustomerContractDetailPage() {
         actions={
           <button
             onClick={() => window.print()}
-            className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+            className="px-3.5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5"
           >
-            <Printer className="w-4 h-4 inline mr-1" />인쇄
+            <Printer className="w-4 h-4" />인쇄
           </button>
         }
       />
@@ -103,10 +103,10 @@ export default function CustomerContractDetailPage() {
           <Badge status={contract.status} />
           <span className="text-xs text-gray-400 font-mono">{contract.contractNumber}</span>
         </div>
-        <h2 className="text-lg font-bold text-gray-900">
+        <h2 className="text-lg font-bold text-gray-800">
           {contract.event?.name || '계약서'}
         </h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-[13px] text-gray-500 mt-1">
           {formatDateTime(contract.createdAt)}
         </p>
       </Card>
@@ -116,27 +116,33 @@ export default function CustomerContractDetailPage() {
 
       {/* Contract Info */}
       <Card className="mb-4">
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">계약 정보</h3>
-        <div className="space-y-3">
+        <h3 className="text-base font-semibold text-gray-800 mb-4">계약 정보</h3>
+        <div className="space-y-3.5">
           <div className="flex items-center gap-3">
-            <Building2 className="w-4 h-4 text-gray-400" />
+            <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+              <Building2 className="w-4 h-4 text-gray-500" />
+            </div>
             <div>
-              <p className="text-xs text-gray-400">협력업체</p>
-              <p className="text-sm font-medium text-gray-900">{contract.partner?.name || '-'}</p>
+              <p className="text-xs text-gray-500">협력업체</p>
+              <p className="text-sm font-medium text-gray-800">{contract.partner?.name || '-'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Calendar className="w-4 h-4 text-gray-400" />
+            <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+              <Calendar className="w-4 h-4 text-gray-500" />
+            </div>
             <div>
-              <p className="text-xs text-gray-400">이벤트</p>
-              <p className="text-sm font-medium text-gray-900">{contract.event?.name || '-'}</p>
+              <p className="text-xs text-gray-500">이벤트</p>
+              <p className="text-sm font-medium text-gray-800">{contract.event?.name || '-'}</p>
             </div>
           </div>
           {contract.totalAmount && (
             <div className="flex items-center gap-3">
-              <FileText className="w-4 h-4 text-gray-400" />
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                <FileText className="w-4 h-4 text-blue-600" />
+              </div>
               <div>
-                <p className="text-xs text-gray-400">계약 금액</p>
+                <p className="text-xs text-gray-500">계약 금액</p>
                 <p className="text-sm font-bold text-blue-600">{formatCurrency(contract.totalAmount)}</p>
               </div>
             </div>
@@ -149,17 +155,17 @@ export default function CustomerContractDetailPage() {
         <Card className="mb-4">
           <button
             onClick={() => setShowFieldValues(!showFieldValues)}
-            className="w-full flex items-center justify-between"
+            className="w-full flex items-center justify-between min-h-[36px]"
           >
-            <h3 className="text-sm font-semibold text-gray-700">입력 내용</h3>
-            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showFieldValues ? 'rotate-180' : ''}`} />
+            <h3 className="text-base font-semibold text-gray-800">입력 내용</h3>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showFieldValues ? 'rotate-180' : ''}`} />
           </button>
           {showFieldValues && (
-            <div className="space-y-2 mt-3">
+            <div className="space-y-0 mt-3">
               {contract.fieldValues.map((fv: any) => (
-                <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                <div key={fv.id} className="flex justify-between py-2.5 border-b border-gray-100 last:border-0">
                   <span className="text-sm text-gray-500">{fv.field?.label || '항목'}</span>
-                  <span className="text-sm font-medium text-gray-900">{fv.value}</span>
+                  <span className="text-sm font-medium text-gray-800">{fv.value}</span>
                 </div>
               ))}
             </div>
@@ -170,13 +176,15 @@ export default function CustomerContractDetailPage() {
       {/* Signatures info */}
       {contract.signatures && contract.signatures.length > 0 && (
         <Card className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">서명 정보</h3>
+          <h3 className="text-base font-semibold text-gray-800 mb-3">서명 정보</h3>
           {contract.signatures.map((sig: any) => (
             <div key={sig.id} className="flex items-center gap-3">
-              <PenLine className="w-4 h-4 text-green-500" />
+              <div className="w-8 h-8 rounded-lg bg-success-light flex items-center justify-center shrink-0">
+                <PenLine className="w-4 h-4 text-success" />
+              </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">전자서명 완료</p>
-                <p className="text-xs text-gray-400">{formatDateTime(sig.signedAt)}</p>
+                <p className="text-sm font-medium text-gray-800">전자서명 완료</p>
+                <p className="text-xs text-gray-500">{formatDateTime(sig.signedAt)}</p>
               </div>
             </div>
           ))}
@@ -185,30 +193,40 @@ export default function CustomerContractDetailPage() {
 
       {/* Cancel Button */}
       {canCancel && (
-        <div className="mt-6 pt-4 border-t border-gray-100">
+        <div className="mt-6 pt-4 border-t border-gray-200">
           <Button variant="danger" className="w-full" onClick={() => setShowCancelModal(true)}>
-            <XCircle className="w-4 h-4 mr-1" /> 계약 취소
+            <XCircle className="w-4 h-4 mr-1.5" /> 계약 취소
           </Button>
         </div>
       )}
 
       {/* Cancel Modal */}
       {showCancelModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">계약 취소</h3>
-            <p className="text-sm text-gray-500">이 계약을 취소하시겠습니까?</p>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">취소 사유 (선택)</label>
-              <input
-                type="text"
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                placeholder="취소 사유를 입력하세요"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white rounded-t-xl sm:rounded-xl w-full sm:max-w-[480px] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-800">계약 취소</h3>
+              <button
+                onClick={() => { setShowCancelModal(false); setCancelReason(''); }}
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
+              >
+                <XCircle className="w-5 h-5 text-gray-400" />
+              </button>
             </div>
-            <div className="flex gap-3 justify-end">
+            <div className="px-6 py-5 space-y-4">
+              <p className="text-sm text-gray-600">이 계약을 취소하시겠습니까?</p>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">취소 사유 (선택)</label>
+                <input
+                  type="text"
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="취소 사유를 입력하세요"
+                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end px-6 py-4 bg-gray-50 border-t border-gray-200">
               <Button variant="secondary" onClick={() => { setShowCancelModal(false); setCancelReason(''); }}>
                 닫기
               </Button>

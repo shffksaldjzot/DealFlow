@@ -74,7 +74,7 @@ export default function AdminDashboard() {
       value: stats?.totalEvents || 0,
       sub: `진행 중: ${stats?.activeEvents || 0}`,
       icon: Calendar,
-      color: 'text-green-600 bg-green-100',
+      color: 'text-success bg-success-light',
       href: '/admin/events',
     },
     {
@@ -107,21 +107,21 @@ export default function AdminDashboard() {
       {/* Pending Approvals Alert */}
       {!loading && totalPending > 0 && (
         <div
-          className="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-red-100 transition-colors"
+          className="mb-4 p-4 bg-error-light border border-error rounded-xl flex items-center gap-4 cursor-pointer hover:bg-error-light transition-colors"
           onClick={() => router.push('/admin/organizers')}
         >
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-100">
-            <AlertCircle className="w-5 h-5 text-red-600" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-error-light">
+            <AlertCircle className="w-5 h-5 text-error" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-bold text-red-800">
+            <p className="text-sm font-bold text-error">
               승인 대기 {totalPending}건
             </p>
-            <p className="text-xs text-red-600">
+            <p className="text-xs text-error">
               주관사 {stats?.pendingOrganizations || 0}건, 협력업체 {stats?.pendingPartners || 0}건 - 클릭하여 처리
             </p>
           </div>
-          <span className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-sm font-bold text-white bg-red-500 rounded-full">
+          <span className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-sm font-bold text-white bg-error-light0 rounded-full">
             {totalPending}
           </span>
         </div>
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
 
       {/* Password Reset Requests */}
       {!loading && stats?.passwordResetRequests && stats.passwordResetRequests.length > 0 && (
-        <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+        <div className="mb-4 p-4 bg-warning-light border border-amber-200 rounded-xl">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-100">
               <KeyRound className="w-5 h-5 text-amber-600" />
@@ -149,10 +149,10 @@ export default function AdminDashboard() {
                 onClick={() => router.push(`/admin/users/${req.metadata?.targetUserId}`)}
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{req.metadata?.targetUserName}</p>
+                  <p className="text-sm font-medium text-gray-800">{req.metadata?.targetUserName}</p>
                   <p className="text-xs text-gray-500">{req.metadata?.targetUserEmail}</p>
                 </div>
-                <Button size="sm" variant="outline">처리</Button>
+                <Button size="sm" variant="secondary">처리</Button>
               </div>
             ))}
           </div>
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{c.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{loading ? '-' : c.value}</p>
+                  <p className="text-2xl font-bold text-gray-800">{loading ? '-' : c.value}</p>
                   {c.sub && <p className="text-xs text-gray-400">{loading ? '' : c.sub}</p>}
                 </div>
               </div>
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
                   <Card key={status}>
                     <div className="text-center">
                       <Badge status={status} />
-                      <p className="text-xl font-bold text-gray-900 mt-1">{count}</p>
+                      <p className="text-xl font-bold text-gray-800 mt-1">{count}</p>
                       <p className="text-xs text-gray-400">{statusLabels[status] || status}</p>
                     </div>
                   </Card>
@@ -206,12 +206,12 @@ export default function AdminDashboard() {
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 가입 사용자</h3>
                 <Card>
-                  <div className="divide-y divide-gray-50">
+                  <div className="divide-y divide-gray-100">
                     {stats.recentUsers.map((u: any) => {
                       const roleMap: Record<string, { label: string; color: string }> = {
                         admin: { label: '관리자', color: 'bg-purple-100 text-purple-800' },
                         organizer: { label: '주관사', color: 'bg-blue-100 text-blue-800' },
-                        partner: { label: '협력업체', color: 'bg-green-100 text-green-800' },
+                        partner: { label: '협력업체', color: 'bg-success-light text-success' },
                         customer: { label: '고객', color: 'bg-gray-100 text-gray-600' },
                       };
                       const role = roleMap[u.role] || { label: u.role, color: 'bg-gray-100 text-gray-600' };
@@ -222,7 +222,7 @@ export default function AdminDashboard() {
                           onClick={() => router.push(`/admin/users/${u.id}`)}
                         >
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{u.name}</p>
+                            <p className="text-sm font-medium text-gray-800">{u.name}</p>
                             <p className="text-xs text-gray-400">{u.email}</p>
                           </div>
                           <div className="text-right">
@@ -244,7 +244,7 @@ export default function AdminDashboard() {
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 계약</h3>
                 <Card>
-                  <div className="divide-y divide-gray-50">
+                  <div className="divide-y divide-gray-100">
                     {stats.recentContracts.map((c: any) => (
                       <div
                         key={c.id}
@@ -252,7 +252,7 @@ export default function AdminDashboard() {
                         onClick={() => router.push(`/admin/contracts/${c.id}`)}
                       >
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{c.event?.name || '계약서'}</p>
+                          <p className="text-sm font-medium text-gray-800">{c.event?.name || '계약서'}</p>
                           <p className="text-xs text-gray-400 font-mono">{c.contractNumber}</p>
                         </div>
                         <div className="text-right">

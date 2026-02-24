@@ -51,7 +51,7 @@ export default function SelectionSummary({
                 {groupItems.map((item, i) => (
                   <div key={i} className="flex items-center justify-between py-1">
                     <span className="text-sm text-gray-700">{item.optionName}</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-gray-800">
                       {item.unitPrice ? `${item.unitPrice.toLocaleString()}원` : '무료'}
                     </span>
                   </div>
@@ -65,7 +65,7 @@ export default function SelectionSummary({
       {/* Total */}
       <div className="border-t border-gray-200 pt-3">
         <div className="flex items-center justify-between">
-          <span className="font-bold text-gray-900">총액</span>
+          <span className="font-bold text-gray-800">총액</span>
           <span className="text-xl font-bold text-blue-600">
             {totalAmount.toLocaleString()}원
           </span>
@@ -81,7 +81,7 @@ export default function SelectionSummary({
               <span className="text-sm text-gray-600">
                 {stage.name || `${i + 1}차`} ({stage.ratio}%)
               </span>
-              <span className="text-sm font-medium text-gray-900">
+              <span className="text-sm font-medium text-gray-800">
                 {stage.amount.toLocaleString()}원
               </span>
             </div>

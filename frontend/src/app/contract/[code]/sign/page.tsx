@@ -43,16 +43,16 @@ export default function ContractSignPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 px-4 py-3 sticky top-0 z-30">
+      <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-30">
         <div className="max-w-lg mx-auto">
-          <p className="text-sm font-bold text-gray-900">전자서명</p>
+          <p className="text-sm font-bold text-gray-800">전자서명</p>
         </div>
       </div>
 
       <div className="max-w-lg mx-auto p-4 space-y-4">
         {/* Progress */}
         <div className="flex items-center gap-2 text-xs font-medium">
-          <span className="text-green-600">1. 내용 확인 &#10003;</span>
+          <span className="text-success">1. 내용 확인 &#10003;</span>
           <div className="flex-1 h-0.5 bg-blue-500" />
           <span className="text-blue-600">2. 서명</span>
           <div className="flex-1 h-0.5 bg-gray-200" />
@@ -61,7 +61,7 @@ export default function ContractSignPage() {
 
         <Card padding="lg">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-gray-900">서명을 입력해주세요</h3>
+            <h3 className="font-bold text-gray-800">서명을 입력해주세요</h3>
             <button
               onClick={clearSignature}
               className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"

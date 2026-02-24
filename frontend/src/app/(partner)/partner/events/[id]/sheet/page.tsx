@@ -94,7 +94,7 @@ export default function PartnerSheetPage() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+          <div key={i} className="h-24 bg-white rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -122,7 +122,7 @@ export default function PartnerSheetPage() {
         backHref={`/partner/events/${eventId}`}
         actions={
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => router.push(`/partner/events/${eventId}/sheet/preview`)}
           >
@@ -136,13 +136,13 @@ export default function PartnerSheetPage() {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <h3 className="font-bold text-gray-900">{sheet.categoryName}</h3>
+              <h3 className="font-bold text-gray-800">{sheet.categoryName}</h3>
               <Badge status={sheet.status} />
             </div>
             <div className="flex items-center gap-2">
               {sheet.status === 'draft' && (
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={() => handleUpdateSheetStatus('active')}
                 >
@@ -151,7 +151,7 @@ export default function PartnerSheetPage() {
               )}
               {sheet.status === 'active' && (
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={() => handleUpdateSheetStatus('inactive')}
                 >

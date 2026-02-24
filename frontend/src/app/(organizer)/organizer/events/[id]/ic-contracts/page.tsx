@@ -55,7 +55,7 @@ export default function OrganizerIcContractsPage() {
     return (
       <div className="space-y-4">
         {[1, 2].map((i) => (
-          <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+          <div key={i} className="h-24 bg-white rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -75,7 +75,7 @@ export default function OrganizerIcContractsPage() {
       key: 'shortCode',
       header: '계약번호',
       render: (item: IcContract) => (
-        <span className="font-mono font-medium text-gray-900 text-xs">{item.shortCode}</span>
+        <span className="font-mono font-medium text-gray-800 text-xs">{item.shortCode}</span>
       ),
     },
     {
@@ -96,7 +96,7 @@ export default function OrganizerIcContractsPage() {
       key: 'totalAmount',
       header: '금액',
       render: (item: IcContract) => (
-        <span className="font-medium text-gray-900">{formatCurrency(item.totalAmount)}</span>
+        <span className="font-medium text-gray-800">{formatCurrency(item.totalAmount)}</span>
       ),
     },
     {
@@ -130,11 +130,11 @@ export default function OrganizerIcContractsPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <Card>
           <p className="text-xs text-gray-500">총 계약</p>
-          <p className="text-xl font-bold text-gray-900">{contracts.length}건</p>
+          <p className="text-xl font-bold text-gray-800">{contracts.length}건</p>
         </Card>
         <Card>
           <p className="text-xs text-gray-500">체결 완료</p>
-          <p className="text-xl font-bold text-green-600">{signedCount}건</p>
+          <p className="text-xl font-bold text-success">{signedCount}건</p>
         </Card>
         <Card>
           <p className="text-xs text-gray-500">총 금액</p>

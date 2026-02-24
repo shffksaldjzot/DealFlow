@@ -38,7 +38,7 @@ export default function CustomerContractsPage() {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors min-h-[32px] ${
                 tab === t ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -52,7 +52,7 @@ export default function CustomerContractsPage() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />)}
         </div>
       ) : !hasAny ? (
         <EmptyState
@@ -61,7 +61,7 @@ export default function CustomerContractsPage() {
           description="QR 코드를 스캔하여 계약을 진행해보세요"
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {/* Regular contracts */}
           {(tab === 'all' || tab === 'regular') && contracts.map((c) => (
             <Card
@@ -72,7 +72,7 @@ export default function CustomerContractsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-400 font-mono">{c.contractNumber}</p>
-                  <p className="font-semibold text-gray-900 mt-0.5">
+                  <p className="font-semibold text-gray-800 mt-0.5">
                     {c.event?.name || '계약서'}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
@@ -83,14 +83,14 @@ export default function CustomerContractsPage() {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1.5">
                     <Badge status={c.status} />
                     <span className="text-xs text-gray-400">
                       {formatDateTime(c.createdAt)}
                     </span>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
+                <ChevronRight className="w-5 h-5 text-gray-300 shrink-0" />
               </div>
             </Card>
           ))}
@@ -105,16 +105,16 @@ export default function CustomerContractsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <Layers className="w-3.5 h-3.5 text-purple-500" />
+                    <Layers className="w-3.5 h-3.5 text-blue-400" />
                     <span className="text-xs font-mono text-gray-400">{ic.shortCode}</span>
                   </div>
-                  <p className="font-semibold text-gray-900 mt-0.5 truncate">
+                  <p className="font-semibold text-gray-800 mt-0.5 truncate">
                     {(ic as any).config?.event?.name || '통합계약서'}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">
                     {(ic as any).apartmentType?.name} · {ic.selectedItems?.length || 0}개 품목
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1.5">
                     <Badge status={ic.status} />
                     <span className="text-xs text-gray-400">
                       {formatDateTime(ic.createdAt)}
@@ -122,8 +122,8 @@ export default function CustomerContractsPage() {
                   </div>
                 </div>
                 <div className="text-right flex-shrink-0 ml-3">
-                  <p className="font-bold text-purple-600 text-sm">{formatCurrency(ic.totalAmount)}</p>
-                  <ChevronRight className="w-4 h-4 text-gray-400 ml-auto mt-1" />
+                  <p className="font-bold text-blue-600 text-sm">{formatCurrency(ic.totalAmount)}</p>
+                  <ChevronRight className="w-4 h-4 text-gray-300 ml-auto mt-1" />
                 </div>
               </div>
             </Card>

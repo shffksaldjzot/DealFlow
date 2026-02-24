@@ -106,11 +106,11 @@ function LoginForm() {
           <p className="text-gray-500 text-sm">계약 자동화 플랫폼</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {/* Login Form */}
           {step === 'login' && (
             <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">로그인</h2>
+              <h2 className="text-lg font-bold text-gray-800 mb-1">로그인</h2>
               <p className="text-sm text-gray-500 mb-6">이메일과 비밀번호를 입력하세요</p>
               <div className="space-y-4 mb-6">
                 <Input
@@ -131,11 +131,11 @@ function LoginForm() {
                     onKeyUp={detectCapsLock}
                   />
                   {capsLockOn && (
-                    <p className="text-xs text-orange-500 mt-1">Caps Lock이 켜져 있습니다</p>
+                    <p className="text-[13px] text-warning mt-1">Caps Lock이 켜져 있습니다</p>
                   )}
                 </div>
                 {loginError && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600 text-center">
+                  <div className="bg-error-light border border-error rounded-lg p-3 text-sm text-error text-center">
                     {loginError}
                   </div>
                 )}
@@ -167,17 +167,17 @@ function LoginForm() {
           {/* Signup Form */}
           {step === 'signup' && (
             <>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">회원가입</h2>
+              <h2 className="text-lg font-bold text-gray-800 mb-1">회원가입</h2>
               <p className="text-sm text-gray-500 mb-6">새 계정을 만듭니다</p>
               <div className="space-y-4 mb-6">
                 {/* Role Selection - FIRST */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">가입 유형 선택</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">가입 유형 선택</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => setSelectedRole('customer')}
-                      className={`p-3 rounded-xl border-2 text-left transition-colors ${
+                      className={`p-3 rounded-lg border-2 text-left transition-colors ${
                         selectedRole === 'customer'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
@@ -189,7 +189,7 @@ function LoginForm() {
                     <button
                       type="button"
                       onClick={() => setSelectedRole('partner')}
-                      className={`p-3 rounded-xl border-2 text-left transition-colors ${
+                      className={`p-3 rounded-lg border-2 text-left transition-colors ${
                         selectedRole === 'partner'
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
@@ -216,7 +216,7 @@ function LoginForm() {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   {emailInvalid && (
-                    <p className="text-xs text-red-500 mt-1">이메일 형식으로 작성해주세요</p>
+                    <p className="text-[13px] text-error mt-1">이메일 형식으로 작성해주세요</p>
                   )}
                 </div>
                 <div>
@@ -228,7 +228,7 @@ function LoginForm() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   {password.length > 0 && password.length < 8 && (
-                    <p className="text-xs text-red-500 mt-1">비밀번호는 8자 이상이어야 합니다</p>
+                    <p className="text-[13px] text-error mt-1">비밀번호는 8자 이상이어야 합니다</p>
                   )}
                 </div>
                 <div>
@@ -240,7 +240,7 @@ function LoginForm() {
                     onChange={(e) => setPasswordConfirm(e.target.value)}
                   />
                   {passwordMismatch && (
-                    <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+                    <p className="text-[13px] text-error mt-1">비밀번호가 일치하지 않습니다</p>
                   )}
                 </div>
                 <Input
@@ -262,7 +262,7 @@ function LoginForm() {
                 />
 
                 {/* Terms & Privacy with Agree All */}
-                <div className="space-y-3 pt-2 border-t border-gray-100">
+                <div className="space-y-3 pt-2 border-t border-gray-200">
                   <div className="flex items-center gap-2.5 pb-2">
                     <input
                       type="checkbox"
@@ -273,7 +273,7 @@ function LoginForm() {
                       }}
                       className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-sm font-semibold text-gray-900">모두 동의합니다</span>
+                    <span className="text-sm font-semibold text-gray-800">모두 동의합니다</span>
                   </div>
                   <div className="flex items-start gap-2.5 pl-1">
                     <input
@@ -283,7 +283,7 @@ function LoginForm() {
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-0.5 cursor-pointer"
                     />
                     <span className="text-sm text-gray-600">
-                      <button type="button" onClick={() => setTermsModal(true)} className="underline text-gray-700 hover:text-blue-600">이용약관</button>에 동의합니다 <span className="text-red-500">*</span>
+                      <button type="button" onClick={() => setTermsModal(true)} className="underline text-gray-700 hover:text-blue-600">이용약관</button>에 동의합니다 <span className="text-error">*</span>
                     </span>
                   </div>
                   <div className="flex items-start gap-2.5 pl-1">
@@ -294,7 +294,7 @@ function LoginForm() {
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-0.5 cursor-pointer"
                     />
                     <span className="text-sm text-gray-600">
-                      <button type="button" onClick={() => setPrivacyModal(true)} className="underline text-gray-700 hover:text-blue-600">개인정보처리방침</button>에 동의합니다 <span className="text-red-500">*</span>
+                      <button type="button" onClick={() => setPrivacyModal(true)} className="underline text-gray-700 hover:text-blue-600">개인정보처리방침</button>에 동의합니다 <span className="text-error">*</span>
                     </span>
                   </div>
                 </div>

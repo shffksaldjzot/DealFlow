@@ -76,7 +76,7 @@ export default function AdminContractDetailPage() {
       <div>
         <PageHeader title="계약 상세" backHref="/admin/contracts" />
         <div className="space-y-4">
-          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-xl animate-pulse" />)}
         </div>
       </div>
     );
@@ -105,7 +105,7 @@ export default function AdminContractDetailPage() {
             >
               <Printer className="w-4 h-4 inline mr-1" />인쇄
             </button>
-            <Button size="sm" variant="outline" onClick={() => { setNewStatus(contract.status); setStatusModal(true); }}>
+            <Button size="sm" variant="secondary" onClick={() => { setNewStatus(contract.status); setStatusModal(true); }}>
               상태 변경
             </Button>
           </div>
@@ -159,7 +159,7 @@ export default function AdminContractDetailPage() {
           {contract.cancelReason && (
             <div className="md:col-span-2">
               <p className="text-xs text-gray-400">취소 사유</p>
-              <p className="text-sm text-red-600">{contract.cancelReason}</p>
+              <p className="text-sm text-error">{contract.cancelReason}</p>
             </div>
           )}
         </div>
@@ -186,7 +186,7 @@ export default function AdminContractDetailPage() {
               {contract.fieldValues.map((fv: any) => (
                 <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
                   <span className="text-sm text-gray-500">{fv.field?.label || '항목'}</span>
-                  <span className="text-sm font-medium text-gray-900">{fv.value}</span>
+                  <span className="text-sm font-medium text-gray-800">{fv.value}</span>
                 </div>
               ))}
             </div>
@@ -236,7 +236,7 @@ export default function AdminContractDetailPage() {
             <select
               value={newStatus}
               onChange={(e) => setNewStatus(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {statusOptions.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -249,12 +249,12 @@ export default function AdminContractDetailPage() {
               value={statusReason}
               onChange={(e) => setStatusReason(e.target.value)}
               placeholder="상태 변경 사유를 입력하세요"
-              className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={3}
             />
           </div>
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => setStatusModal(false)}>취소</Button>
+            <Button variant="secondary" onClick={() => setStatusModal(false)}>취소</Button>
             <Button onClick={handleStatusChange} loading={saving}>변경</Button>
           </div>
         </div>

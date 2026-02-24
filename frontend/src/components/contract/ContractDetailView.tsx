@@ -106,12 +106,12 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
                   }}
                 >
                   {field.fieldType === 'checkbox' ? (
-                    <span className="text-gray-900" style={{ fontSize: 'clamp(10px, 1.2vw, 16px)' }}>
+                    <span className="text-gray-800" style={{ fontSize: 'clamp(10px, 1.2vw, 16px)' }}>
                       {value === 'true' ? '✓' : ''}
                     </span>
                   ) : (
                     <span
-                      className="text-gray-900 font-medium truncate"
+                      className="text-gray-800 font-medium truncate"
                       style={{ fontSize: 'clamp(6px, 1vw, 12px)' }}
                     >
                       {(field.fieldType === 'number' || field.fieldType === 'amount') && !isNaN(Number(value))
@@ -152,7 +152,7 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
     <>
       {/* Contract Image Preview */}
       {templateImageUrl && !imgError && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-700">계약서 미리보기</h3>
             <button
@@ -174,7 +174,7 @@ export default function ContractDetailView({ contract, templateImageUrl }: Contr
 
       {/* Signature display (if not on template or no template image) */}
       {signatureData && (!signatureField || !templateImageUrl) && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">전자서명</h3>
           <div className="bg-gray-50 rounded-xl p-4 flex justify-center">
             <img src={signatureData} alt="서명" className="max-h-24 object-contain" />

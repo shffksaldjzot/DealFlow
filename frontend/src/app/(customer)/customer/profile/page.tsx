@@ -109,20 +109,22 @@ export default function CustomerProfile() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">프로필</h2>
+        <h2 className="text-xl font-bold text-gray-800">프로필</h2>
         <p className="text-sm text-gray-500 mt-1">내 정보를 관리하세요</p>
       </div>
 
       {/* Profile Card */}
       <Card className="mb-4">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center">
-            <User className="w-8 h-8 text-blue-600" />
+          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+            <span className="text-lg font-bold text-blue-700">
+              {user?.name?.charAt(0) || <User className="w-6 h-6 text-blue-600" />}
+            </span>
           </div>
           <div>
-            <p className="text-lg font-bold text-gray-900">{user?.name}</p>
+            <p className="text-lg font-bold text-gray-800">{user?.name}</p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-semibold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full">
                 {roleLabels[user?.role || 'customer']}
               </span>
             </div>
@@ -131,7 +133,7 @@ export default function CustomerProfile() {
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">이름</label>
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">이름</label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -140,21 +142,21 @@ export default function CustomerProfile() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">이메일</label>
-            <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-xl">
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">이메일</label>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 bg-gray-50 rounded-lg border border-gray-200">
               <Mail className="w-4 h-4 text-gray-400" />
               <span className="text-sm text-gray-600">{user?.email}</span>
             </div>
-            <p className="text-xs text-gray-400 mt-1">이메일은 변경할 수 없습니다</p>
+            <p className="text-[13px] text-gray-500 mt-1">이메일은 변경할 수 없습니다</p>
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">연락처</label>
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">연락처</label>
             <div className="flex items-center gap-1.5 overflow-hidden">
               <select
                 value={phoneArea}
                 onChange={(e) => setPhoneArea(e.target.value)}
-                className="border border-gray-200 rounded-xl px-2 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-20 shrink-0"
+                className="border border-gray-300 rounded-lg px-2 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-20 shrink-0"
               >
                 {['010', '011', '016', '017', '018', '019'].map((code) => (
                   <option key={code} value={code}>{code}</option>
@@ -167,7 +169,7 @@ export default function CustomerProfile() {
                 value={phoneMid}
                 onChange={(e) => setPhoneMid(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 placeholder="0000"
-                className="flex-1 min-w-0 border border-gray-200 rounded-xl px-2 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                className="flex-1 min-w-0 border border-gray-300 rounded-lg px-2 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
               />
               <span className="text-gray-400 shrink-0">-</span>
               <input
@@ -176,13 +178,13 @@ export default function CustomerProfile() {
                 value={phoneLast}
                 onChange={(e) => setPhoneLast(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 placeholder="0000"
-                className="flex-1 min-w-0 border border-gray-200 rounded-xl px-2 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                className="flex-1 min-w-0 border border-gray-300 rounded-lg px-2 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">주소</label>
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">주소</label>
             <Input
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -195,15 +197,15 @@ export default function CustomerProfile() {
           <Button onClick={handleSave} disabled={saving}>
             {saving ? '저장 중...' : saved ? '저장 완료!' : '저장'}
           </Button>
-          {saved && <span className="text-sm text-green-600">변경사항이 저장되었습니다</span>}
+          {saved && <span className="text-sm text-success">변경사항이 저장되었습니다</span>}
         </div>
       </Card>
 
       {/* Password Change Card */}
       <Card className="mb-4">
         <div className="flex items-center gap-2 mb-4">
-          <Lock className="w-5 h-5 text-gray-600" />
-          <h3 className="text-sm font-semibold text-gray-700">비밀번호 변경</h3>
+          <Lock className="w-5 h-5 text-gray-500" />
+          <h3 className="text-base font-semibold text-gray-800">비밀번호 변경</h3>
         </div>
         <div className="space-y-4">
           <Input
@@ -222,7 +224,7 @@ export default function CustomerProfile() {
               placeholder="8자 이상 입력하세요"
             />
             {newPassword.length > 0 && newPassword.length < 8 && (
-              <p className="text-xs text-red-500 mt-1">비밀번호는 8자 이상이어야 합니다</p>
+              <p className="text-[13px] text-error mt-1">비밀번호는 8자 이상이어야 합니다</p>
             )}
           </div>
           <div>
@@ -234,13 +236,13 @@ export default function CustomerProfile() {
               placeholder="새 비밀번호를 다시 입력하세요"
             />
             {passwordMismatch && (
-              <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+              <p className="text-[13px] text-error mt-1">비밀번호가 일치하지 않습니다</p>
             )}
           </div>
         </div>
-        <div className="mt-4">
+        <div className="mt-5">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleChangePassword}
             disabled={changingPassword || !currentPassword || !newPassword || !newPasswordConfirm || passwordMismatch}
           >
@@ -251,23 +253,23 @@ export default function CustomerProfile() {
 
       {/* Account Info */}
       <Card>
-        <h3 className="text-sm font-semibold text-gray-700 mb-4">계정 정보</h3>
+        <h3 className="text-base font-semibold text-gray-800 mb-4">계정 정보</h3>
         <div className="space-y-3">
           <div className="flex items-center gap-3 text-sm">
             <Shield className="w-4 h-4 text-gray-400" />
             <span className="text-gray-500">가입일:</span>
-            <span className="text-gray-900">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '-'}</span>
+            <span className="text-gray-800">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '-'}</span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <Phone className="w-4 h-4 text-gray-400" />
             <span className="text-gray-500">연락처:</span>
-            <span className="text-gray-900">{phone || '미등록'}</span>
+            <span className="text-gray-800">{phone || '미등록'}</span>
           </div>
           {address && (
             <div className="flex items-center gap-3 text-sm">
               <MapPin className="w-4 h-4 text-gray-400" />
               <span className="text-gray-500">주소:</span>
-              <span className="text-gray-900">{address}</span>
+              <span className="text-gray-800">{address}</span>
             </div>
           )}
         </div>

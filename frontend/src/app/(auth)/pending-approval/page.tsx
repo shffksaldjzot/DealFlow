@@ -12,7 +12,7 @@ export default function PendingApproval() {
         <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-6">
           <Clock className="w-10 h-10 text-blue-600" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">승인 대기 중</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">승인 대기 중</h1>
         <p className="text-gray-500 mb-8">
           업체 등록 신청이 완료되었습니다.
           <br />

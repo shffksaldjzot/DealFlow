@@ -76,9 +76,9 @@ export default function PopupContentEditor({
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md space-y-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900">팝업 콘텐츠</h3>
+              <h3 className="text-lg font-bold text-gray-800">팝업 콘텐츠</h3>
               <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
@@ -92,7 +92,7 @@ export default function PopupContentEditor({
               placeholder="옵션에 대한 상세 설명을 입력하세요..."
               rows={4}
               disabled={disabled}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:bg-gray-50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:bg-gray-50"
             />
 
             {/* Image Upload */}
@@ -108,9 +108,9 @@ export default function PopupContentEditor({
                   <button
                     onClick={() => setDraftImage(null)}
                     disabled={disabled}
-                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow hover:bg-red-50"
+                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow hover:bg-error-light"
                   >
-                    <Trash2 className="w-4 h-4 text-red-500" />
+                    <Trash2 className="w-4 h-4 text-error" />
                   </button>
                 </div>
               ) : (

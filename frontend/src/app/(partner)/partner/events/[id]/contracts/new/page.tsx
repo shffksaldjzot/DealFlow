@@ -226,8 +226,8 @@ export default function NewContractPage() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-12 bg-white rounded-2xl animate-pulse" />
-        <div className="h-64 bg-white rounded-2xl animate-pulse" />
+        <div className="h-12 bg-white rounded-xl animate-pulse" />
+        <div className="h-64 bg-white rounded-xl animate-pulse" />
       </div>
     );
   }
@@ -240,7 +240,7 @@ export default function NewContractPage() {
           <div className="text-center py-12">
             <p className="text-gray-500 mb-4">사용 가능한 템플릿이 없습니다.</p>
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => router.push(`/partner/events/${id}/templates/new`)}
             >
               템플릿 먼저 등록하기
@@ -269,7 +269,7 @@ export default function NewContractPage() {
             <div key={s} className="flex items-center flex-1">
               <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 isActive ? 'bg-blue-100 text-blue-700' :
-                isCompleted ? 'bg-green-50 text-green-600' :
+                isCompleted ? 'bg-success-light text-success' :
                 'bg-gray-50 text-gray-400'
               }`}>
                 <Icon className="w-3.5 h-3.5" />
@@ -277,7 +277,7 @@ export default function NewContractPage() {
                 <span className="sm:hidden">{i + 1}</span>
               </div>
               {i < STEPS.length - 1 && (
-                <ChevronRight className={`w-4 h-4 mx-1 shrink-0 ${isCompleted ? 'text-green-400' : 'text-gray-200'}`} />
+                <ChevronRight className={`w-4 h-4 mx-1 shrink-0 ${isCompleted ? 'text-success' : 'text-gray-200'}`} />
               )}
             </div>
           );
@@ -300,7 +300,7 @@ export default function NewContractPage() {
                     className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-colors ${
                       templateId === t.id
                         ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50'
+                        : 'border-gray-200 hover:border-gray-200 hover:bg-gray-50'
                     }`}
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -309,7 +309,7 @@ export default function NewContractPage() {
                       <FileText className={`w-5 h-5 ${templateId === t.id ? 'text-blue-600' : 'text-gray-400'}`} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${templateId === t.id ? 'text-blue-900' : 'text-gray-900'}`}>
+                      <p className={`text-sm font-medium ${templateId === t.id ? 'text-blue-900' : 'text-gray-800'}`}>
                         {t.name}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
@@ -326,7 +326,7 @@ export default function NewContractPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
               <Button variant="secondary" onClick={() => router.back()}>
                 취소
               </Button>
@@ -343,7 +343,7 @@ export default function NewContractPage() {
       {step === 'editor' && (
         <div className="space-y-4">
           {fieldsLoading ? (
-            <div className="h-96 bg-white rounded-2xl animate-pulse" />
+            <div className="h-96 bg-white rounded-xl animate-pulse" />
           ) : editMode ? (
             <>
               {/* Field Editor Mode */}
@@ -378,7 +378,7 @@ export default function NewContractPage() {
                   <h3 className="text-sm font-semibold text-gray-700">
                     {selectedTemplate?.name} - 사전 입력
                   </h3>
-                  <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
+                  <Button variant="secondary" size="sm" onClick={() => setEditMode(true)}>
                     <Edit3 className="w-3.5 h-3.5 mr-1" />
                     필드 편집
                   </Button>
@@ -397,7 +397,7 @@ export default function NewContractPage() {
                     }
                   />
                 ) : (
-                  <div className="relative bg-white border-2 border-gray-100 rounded-xl overflow-hidden">
+                  <div className="relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
                     <div className="flex items-center justify-center py-20 text-gray-300">
                       <div className="text-center">
                         <FileText className="w-12 h-12 mx-auto mb-2" />
@@ -424,12 +424,12 @@ export default function NewContractPage() {
                         <span
                           key={f.id}
                           className={`inline-flex items-center px-2 py-1 rounded-md text-xs ${
-                            partnerFieldValues[f.id] ? 'bg-green-50 text-green-700' :
+                            partnerFieldValues[f.id] ? 'bg-success-light text-success' :
                             f.isRequired ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-500'
                           }`}
                         >
                           {f.label}
-                          {f.isRequired && <span className="text-red-400 ml-0.5">*</span>}
+                          {f.isRequired && <span className="text-error ml-0.5">*</span>}
                           {partnerFieldValues[f.id] && <span className="ml-1">✓</span>}
                         </span>
                       ))}
@@ -440,7 +440,7 @@ export default function NewContractPage() {
                 <Card padding="sm">
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-gray-500">필드가 없습니다. 텍스트박스, 체크박스 등을 추가하세요.</p>
-                    <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
+                    <Button variant="secondary" size="sm" onClick={() => setEditMode(true)}>
                       <Plus className="w-3.5 h-3.5 mr-1" />
                       필드 추가
                     </Button>
@@ -466,31 +466,31 @@ export default function NewContractPage() {
       {step === 'info' && (
         <Card>
           <div className="space-y-6">
-            <div className="text-center pb-4 border-b border-gray-100">
+            <div className="text-center pb-4 border-b border-gray-200">
               <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
                 <User className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="font-semibold text-gray-900">고객 정보 입력</h3>
+              <h3 className="font-semibold text-gray-800">고객 정보 입력</h3>
               <p className="text-xs text-gray-400 mt-1">QR 코드 생성 전 고객 정보를 입력해주세요</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                고객명 <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                고객명 <span className="text-error">*</span>
               </label>
               <input
                 type="text"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="고객 이름을 입력하세요"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 autoFocus
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                계약 금액 <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                계약 금액 <span className="text-error">*</span>
               </label>
               <div className="relative">
                 <input
@@ -502,7 +502,7 @@ export default function NewContractPage() {
                     setTotalAmount(raw ? Number(raw).toLocaleString('ko-KR') : '');
                   }}
                   placeholder="금액을 입력하세요"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">원</span>
               </div>
@@ -512,23 +512,23 @@ export default function NewContractPage() {
             <div className="bg-gray-50 rounded-xl p-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">템플릿</span>
-                <span className="font-medium text-gray-900">{selectedTemplate?.name}</span>
+                <span className="font-medium text-gray-800">{selectedTemplate?.name}</span>
               </div>
               {customerName.trim() && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">고객명</span>
-                  <span className="font-medium text-gray-900">{customerName.trim()}</span>
+                  <span className="font-medium text-gray-800">{customerName.trim()}</span>
                 </div>
               )}
               {totalAmount && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">계약금액</span>
-                  <span className="font-bold text-gray-900">{totalAmount}원</span>
+                  <span className="font-bold text-gray-800">{totalAmount}원</span>
                 </div>
               )}
             </div>
 
-            <div className="flex justify-between gap-3 pt-4 border-t border-gray-100">
+            <div className="flex justify-between gap-3 pt-4 border-t border-gray-200">
               <Button variant="secondary" onClick={() => setStep('editor')}>
                 이전
               </Button>
@@ -549,10 +549,10 @@ export default function NewContractPage() {
       {step === 'qr' && createdContract && (
         <Card>
           <div className="flex flex-col items-center text-center py-8">
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 rounded-full bg-success-light flex items-center justify-center mb-4">
+              <CheckCircle2 className="w-8 h-8 text-success" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">계약이 생성되었습니다</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">계약이 생성되었습니다</h3>
             <p className="text-sm text-gray-500 mb-6">
               고객에게 QR 코드를 보여주거나 안내코드를 전달하세요.
             </p>
@@ -580,14 +580,14 @@ export default function NewContractPage() {
 
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <span className="text-sm text-gray-500">계약번호</span>
-                <span className="font-mono font-bold text-gray-900">
+                <span className="font-mono font-bold text-gray-800">
                   {createdContract.contractNumber}
                 </span>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <span className="text-sm text-gray-500">고객명</span>
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-gray-800">
                   {createdContract.customerName || customerName}
                 </span>
               </div>
@@ -595,7 +595,7 @@ export default function NewContractPage() {
               {createdContract.totalAmount && (
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                   <span className="text-sm text-gray-500">계약 금액</span>
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-gray-800">
                     {new Intl.NumberFormat('ko-KR', {
                       style: 'currency',
                       currency: 'KRW',
@@ -607,7 +607,7 @@ export default function NewContractPage() {
               {createdContract.qrCode && (
                 <div className="flex flex-col items-center p-6 bg-gray-50 rounded-xl">
                   <p className="text-xs text-gray-500 mb-3">QR 코드</p>
-                  <div className="p-3 bg-white rounded-xl border border-gray-100">
+                  <div className="p-3 bg-white rounded-xl border border-gray-200">
                     <QRCodeSVG
                       value={`${typeof window !== 'undefined' ? window.location.origin : ''}/contract/${createdContract.qrCode}`}
                       size={180}
@@ -630,7 +630,7 @@ export default function NewContractPage() {
                 </div>
               )}
 
-              <div className="bg-yellow-50 rounded-xl p-4 text-xs text-yellow-700">
+              <div className="bg-warning-light rounded-xl p-4 text-xs text-warning">
                 <p className="font-medium mb-1">고객 서명 프로세스</p>
                 <p>고객이 QR 코드를 스캔하면 본인 단말기에서 계약서를 확인하고 서명 및 본인인증을 진행합니다.</p>
               </div>
@@ -638,7 +638,7 @@ export default function NewContractPage() {
 
             <div className="flex gap-3 mt-8">
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={() => router.push(`/partner/events/${id}`)}
               >
                 행사로 돌아가기

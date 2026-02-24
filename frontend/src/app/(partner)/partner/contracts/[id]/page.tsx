@@ -79,7 +79,7 @@ export default function PartnerContractDetailPage() {
       <div>
         <PageHeader title="계약 상세" backHref="/partner/events" />
         <div className="space-y-4">
-          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-xl animate-pulse" />)}
         </div>
       </div>
     );
@@ -93,7 +93,7 @@ export default function PartnerContractDetailPage() {
           <div className="text-center py-8">
             <p className="text-gray-500 mb-3">{error || '계약서를 찾을 수 없습니다'}</p>
             {error && (
-              <Button variant="outline" size="sm" onClick={fetchContract}>다시 시도</Button>
+              <Button variant="secondary" size="sm" onClick={fetchContract}>다시 시도</Button>
             )}
           </div>
         </Card>
@@ -204,7 +204,7 @@ export default function PartnerContractDetailPage() {
               return (
                 <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
                   <span className="text-sm text-gray-500">{fieldDef?.label || fv.field?.label || '항목'}</span>
-                  <span className="text-sm font-medium text-gray-900">{fv.value}</span>
+                  <span className="text-sm font-medium text-gray-800">{fv.value}</span>
                 </div>
               );
             })}
@@ -236,11 +236,11 @@ export default function PartnerContractDetailPage() {
             placeholder="취소 사유를 입력하세요"
             value={cancelReason}
             onChange={(e) => setCancelReason(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={3}
           />
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => setCancelModal(false)}>닫기</Button>
+            <Button variant="secondary" onClick={() => setCancelModal(false)}>닫기</Button>
             <Button variant="danger" onClick={handleCancel} loading={cancelling} disabled={!cancelReason.trim()}>취소하기</Button>
           </div>
         </div>

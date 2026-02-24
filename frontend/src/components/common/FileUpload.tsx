@@ -125,7 +125,7 @@ export default function FileUpload({
           )}
         </div>
       )}
-      {error && <p className="mt-1.5 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-1.5 text-sm text-error">{error}</p>}
       {helperText && !error && (
         <p className="mt-1.5 text-sm text-gray-400">{helperText}</p>
       )}

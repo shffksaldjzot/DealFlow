@@ -74,7 +74,7 @@ export default function AdminUsersPage() {
     const colorMap: Record<string, string> = {
       admin: 'bg-purple-100 text-purple-800',
       organizer: 'bg-blue-100 text-blue-800',
-      partner: 'bg-green-100 text-green-800',
+      partner: 'bg-success-light text-success',
       customer: 'bg-gray-100 text-gray-600',
     };
     return (
@@ -114,7 +114,7 @@ export default function AdminUsersPage() {
         <select
           value={roleFilter}
           onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
-          className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">전체 역할</option>
           <option value="admin">관리자</option>
@@ -125,7 +125,7 @@ export default function AdminUsersPage() {
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">전체 상태</option>
           <option value="active">활성</option>
@@ -178,7 +178,7 @@ export default function AdminUsersPage() {
             <select
               value={createForm.role}
               onChange={(e) => setCreateForm({ ...createForm, role: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="customer">고객</option>
               <option value="partner">협력업체</option>
@@ -187,7 +187,7 @@ export default function AdminUsersPage() {
             </select>
           </div>
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => setCreateModal(false)}>취소</Button>
+            <Button variant="secondary" onClick={() => setCreateModal(false)}>취소</Button>
             <Button onClick={handleCreate} loading={creating}>생성</Button>
           </div>
         </div>

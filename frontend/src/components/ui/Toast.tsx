@@ -36,7 +36,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] flex flex-col gap-2 pointer-events-none">
+      <div className="fixed top-6 right-6 z-[100] flex flex-col gap-2 pointer-events-none max-w-[400px]">
         {toasts.map((t) => (
           <ToastItem key={t.id} toast={t} onRemove={removeToast} />
         ))}
@@ -52,22 +52,22 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   }, [toast.id, onRemove]);
 
   const icons = {
-    success: <CheckCircle2 className="w-5 h-5 text-green-500" />,
-    error: <XCircle className="w-5 h-5 text-red-500" />,
-    info: <AlertCircle className="w-5 h-5 text-blue-500" />,
+    success: <CheckCircle2 className="w-5 h-5 text-teal-400" />,
+    error: <XCircle className="w-5 h-5 text-error" />,
+    info: <AlertCircle className="w-5 h-5 text-blue-300" />,
   };
 
   return (
     <div
       className={cn(
-        'flex items-center gap-3 px-5 py-4 bg-white rounded-2xl shadow-2xl border border-gray-200 pointer-events-auto',
-        'animate-in fade-in zoom-in-95 duration-300',
-        'min-w-[320px] max-w-[440px]',
+        'flex items-center gap-3 px-5 py-4 bg-gray-900 text-white rounded-xl pointer-events-auto',
+        'shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]',
+        'animate-in fade-in slide-in-from-right-5 duration-300',
       )}
     >
       {icons[toast.type]}
-      <p className="flex-1 text-sm text-gray-800">{toast.message}</p>
-      <button onClick={() => onRemove(toast.id)} className="p-0.5 hover:bg-gray-100 rounded">
+      <p className="flex-1 text-sm">{toast.message}</p>
+      <button onClick={() => onRemove(toast.id)} className="p-0.5 hover:bg-white/10 rounded">
         <X className="w-4 h-4 text-gray-400" />
       </button>
     </div>

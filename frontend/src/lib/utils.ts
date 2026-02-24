@@ -31,7 +31,7 @@ export function formatCurrency(amount: number): string {
 
 export function getStatusLabel(status: string): string {
   const map: Record<string, string> = {
-    pending: '승인대기',
+    pending: '대기',
     approved: '승인됨',
     rejected: '거절됨',
     suspended: '정지됨',
@@ -41,7 +41,7 @@ export function getStatusLabel(status: string): string {
     cancelled: '취소됨',
     in_progress: '진행 중',
     signed: '서명 완료',
-    completed: '완료',
+    completed: '계약 완료',
     withdrawn: '탈퇴',
   };
   return map[status] || status;
@@ -49,17 +49,17 @@ export function getStatusLabel(status: string): string {
 
 export function getStatusColor(status: string): string {
   const map: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    approved: 'bg-green-100 text-green-800',
-    active: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800',
-    suspended: 'bg-red-100 text-red-800',
-    cancelled: 'bg-gray-100 text-gray-800',
+    pending: 'bg-gray-100 text-gray-600',
+    approved: 'bg-success-light text-[#166534]',
+    active: 'bg-success-light text-[#166534]',
+    rejected: 'bg-error-light text-[#991B1B]',
+    suspended: 'bg-error-light text-[#991B1B]',
+    cancelled: 'bg-gray-100 text-gray-600',
     draft: 'bg-gray-100 text-gray-600',
     closed: 'bg-gray-100 text-gray-600',
-    in_progress: 'bg-blue-100 text-blue-800',
-    signed: 'bg-indigo-100 text-indigo-800',
-    completed: 'bg-green-100 text-green-800',
+    in_progress: 'bg-blue-100 text-blue-700',
+    signed: 'bg-warning-light text-[#92400E]',
+    completed: 'bg-success-light text-[#166534]',
   };
   return map[status] || 'bg-gray-100 text-gray-600';
 }

@@ -64,7 +64,7 @@ export default function EventJoinPage() {
   if (loading) {
     return (
       <div className="space-y-4 pt-8">
-        <div className="h-48 bg-white rounded-2xl animate-pulse" />
+        <div className="h-48 bg-white rounded-xl animate-pulse" />
       </div>
     );
   }
@@ -83,10 +83,10 @@ export default function EventJoinPage() {
     <div className="space-y-4 pt-4">
       <Card>
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center mx-auto mb-3">
+          <div className="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mx-auto mb-3">
             <Users className="w-7 h-7 text-purple-600" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900">{event.name}</h2>
+          <h2 className="text-xl font-bold text-gray-800">{event.name}</h2>
           {event.description && (
             <p className="text-sm text-gray-500 mt-2">{event.description}</p>
           )}
@@ -102,7 +102,7 @@ export default function EventJoinPage() {
           </div>
           {event.venue && (
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-              <MapPin className="w-5 h-5 text-green-500" />
+              <MapPin className="w-5 h-5 text-success" />
               <div>
                 <p className="text-xs text-gray-500">장소</p>
                 <p className="text-sm font-medium">{event.venue}</p>
@@ -122,7 +122,7 @@ export default function EventJoinPage() {
           user.role === 'partner' ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   취급 품목
                 </label>
                 <input
@@ -130,7 +130,7 @@ export default function EventJoinPage() {
                   placeholder="예: 줄눈, 탄성코트, 가구, 가전, 도어락"
                   value={items}
                   onChange={(e) => setItems(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-400 mt-1">쉼표(,)로 구분하여 입력하세요</p>
               </div>

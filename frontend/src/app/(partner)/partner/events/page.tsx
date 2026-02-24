@@ -69,7 +69,7 @@ export default function PartnerEventsPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
               activeTab === tab.key
-                ? 'bg-white text-gray-900 shadow-sm'
+                ? 'bg-white text-gray-800 shadow-sm'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -90,7 +90,7 @@ export default function PartnerEventsPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />
+            <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />
           ))}
         </div>
       ) : filteredEvents.length === 0 ? (
@@ -121,7 +121,7 @@ export default function PartnerEventsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-gray-900">{ep.event.name}</h3>
+                    <h3 className="font-bold text-gray-800">{ep.event.name}</h3>
                     <Badge status={ep.status} />
                   </div>
                   <p className="text-sm text-gray-500 flex items-center gap-1">

@@ -53,7 +53,7 @@ export default function PeriodSelector({ value, onChange }: PeriodSelectorProps)
         <button
           key={p.label}
           onClick={() => handlePreset(p)}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors min-h-[32px] ${
             value.label === p.label
               ? 'bg-blue-600 text-white'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -64,7 +64,7 @@ export default function PeriodSelector({ value, onChange }: PeriodSelectorProps)
       ))}
       <button
         onClick={handleCustomToggle}
-        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors min-h-[32px] ${
           value.label === '기간지정'
             ? 'bg-blue-600 text-white'
             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -78,14 +78,14 @@ export default function PeriodSelector({ value, onChange }: PeriodSelectorProps)
             type="date"
             value={value.from || ''}
             onChange={(e) => onChange({ ...value, from: e.target.value || null, label: '기간지정' })}
-            className="px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <span className="text-xs text-gray-400">~</span>
           <input
             type="date"
             value={value.to || ''}
             onChange={(e) => onChange({ ...value, to: e.target.value || null, label: '기간지정' })}
-            className="px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       )}

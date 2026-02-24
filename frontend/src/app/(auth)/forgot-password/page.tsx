@@ -40,10 +40,10 @@ export default function ForgotPasswordPage() {
           <p className="text-gray-500 text-sm">비밀번호 찾기</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {!submitted ? (
             <>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">비밀번호 초기화 요청</h2>
+              <h2 className="text-lg font-bold text-gray-800 mb-1">비밀번호 초기화 요청</h2>
               <p className="text-sm text-gray-500 mb-6">
                 가입 시 등록한 이메일과 전화번호를 입력하시면, 임시 비밀번호를 이메일로 발송해드립니다.
               </p>
@@ -91,12 +91,12 @@ export default function ForgotPasswordPage() {
             </>
           ) : (
             <div className="text-center py-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-success-light rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">임시 비밀번호 발송 완료</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">임시 비밀번호 발송 완료</h3>
               <p className="text-sm text-gray-500 mb-6">
                 임시 비밀번호가 이메일로 발송되었습니다.<br />
                 로그인 후 반드시 비밀번호를 변경해주세요.

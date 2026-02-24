@@ -141,7 +141,7 @@ export default function BusinessRegistration() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">업체 등록</h1>
+          <h1 className="text-2xl font-bold text-gray-800">업체 등록</h1>
           <p className="text-sm text-gray-500 mt-1">사업자 정보를 입력해주세요</p>
         </div>
 
@@ -156,7 +156,7 @@ export default function BusinessRegistration() {
 
             {/* 사업자등록번호 - 3-2-5 분리 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 사업자등록번호 *
               </label>
               <div className="grid grid-cols-[3fr_auto_2fr_auto_5fr] items-center gap-1">
@@ -167,7 +167,7 @@ export default function BusinessRegistration() {
                   placeholder="000"
                   value={form.bizNum1}
                   onChange={(e) => handleBizNumChange('bizNum1', e.target.value, 3, 'biz2')}
-                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={3}
                 />
                 <span className="text-gray-400 font-bold">-</span>
@@ -178,7 +178,7 @@ export default function BusinessRegistration() {
                   placeholder="00"
                   value={form.bizNum2}
                   onChange={(e) => handleBizNumChange('bizNum2', e.target.value, 2, 'biz3')}
-                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={2}
                 />
                 <span className="text-gray-400 font-bold">-</span>
@@ -189,7 +189,7 @@ export default function BusinessRegistration() {
                   placeholder="00000"
                   value={form.bizNum3}
                   onChange={(e) => handleBizNumChange('bizNum3', e.target.value, 5)}
-                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={5}
                 />
               </div>
@@ -204,7 +204,7 @@ export default function BusinessRegistration() {
 
             {/* 연락처 - 3-4-4 분리 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 연락처
               </label>
               <div className="grid grid-cols-[3fr_auto_4fr_auto_4fr] items-center gap-1">
@@ -215,7 +215,7 @@ export default function BusinessRegistration() {
                   placeholder="010"
                   value={form.phone1}
                   onChange={(e) => handlePhoneChange('phone1', e.target.value, 3, 'ph2')}
-                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={3}
                 />
                 <span className="text-gray-400 font-bold">-</span>
@@ -226,7 +226,7 @@ export default function BusinessRegistration() {
                   placeholder="0000"
                   value={form.phone2}
                   onChange={(e) => handlePhoneChange('phone2', e.target.value, 4, 'ph3')}
-                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={4}
                 />
                 <span className="text-gray-400 font-bold">-</span>
@@ -237,7 +237,7 @@ export default function BusinessRegistration() {
                   placeholder="0000"
                   value={form.phone3}
                   onChange={(e) => handlePhoneChange('phone3', e.target.value, 4)}
-                  className="w-full min-w-0 px-1 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full min-w-0 px-1 py-2.5 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   maxLength={4}
                 />
               </div>
@@ -253,7 +253,7 @@ export default function BusinessRegistration() {
 
             {/* 주소 - 다음 우편번호 API */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 주소
               </label>
               <div className="flex gap-2 mb-2">
@@ -262,13 +262,13 @@ export default function BusinessRegistration() {
                   readOnly
                   placeholder="주소 검색을 클릭하세요"
                   value={form.address}
-                  className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:outline-none cursor-pointer"
+                  className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:outline-none cursor-pointer"
                   onClick={openAddressSearch}
                 />
                 <button
                   type="button"
                   onClick={openAddressSearch}
-                  className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-800 text-white text-sm font-medium rounded-xl hover:bg-gray-700 transition-colors shrink-0"
+                  className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shrink-0"
                 >
                   <MapPin className="w-4 h-4" />
                   검색
@@ -279,14 +279,14 @@ export default function BusinessRegistration() {
                 placeholder="상세 주소 입력"
                 value={form.addressDetail}
                 onChange={(e) => setForm({ ...form, addressDetail: e.target.value })}
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             {/* 취급 품목 (협력업체만) */}
             {user?.role === 'partner' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   취급 품목
                 </label>
                 <input
@@ -294,7 +294,7 @@ export default function BusinessRegistration() {
                   placeholder="예: 줄눈, 탄성코트, 가구, 가전, 도어락"
                   value={form.items}
                   onChange={(e) => setForm({ ...form, items: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-400 mt-1">쉼표(,)로 구분하여 입력하세요</p>
               </div>
@@ -317,7 +317,7 @@ export default function BusinessRegistration() {
               helperText="PDF, JPG, PNG 형식 / 최대 10MB"
             />
             {previewUrl && (
-              <div className="relative rounded-xl border border-gray-200 overflow-hidden bg-gray-50">
+              <div className="relative rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 border-b border-gray-200">
                   <Eye className="w-3.5 h-3.5 text-gray-500" />
                   <span className="text-xs text-gray-500 font-medium">미리보기</span>

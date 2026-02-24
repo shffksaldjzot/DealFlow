@@ -45,9 +45,9 @@ export default function PartnerDashboard() {
   const activeEvents = filteredEvents.filter((e) => e.status === 'approved');
 
   const eventStats = [
-    { label: '승인완료', value: approvedEvents, icon: CheckCircle, color: 'text-green-600 bg-green-50' },
-    { label: '승인대기', value: pendingEvents, icon: Clock, color: 'text-yellow-600 bg-yellow-50' },
-    { label: '거절', value: rejectedEvents, icon: XCircle, color: 'text-red-600 bg-red-50' },
+    { label: '승인완료', value: approvedEvents, icon: CheckCircle, color: 'text-success bg-success-light' },
+    { label: '승인대기', value: pendingEvents, icon: Clock, color: 'text-warning bg-warning-light' },
+    { label: '거절', value: rejectedEvents, icon: XCircle, color: 'text-error bg-error-light' },
   ];
 
   const contractStats = [
@@ -86,7 +86,7 @@ export default function PartnerDashboard() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">{s.label}</p>
-                  <p className="text-xl font-bold text-gray-900">{loading ? '-' : s.value}</p>
+                  <p className="text-xl font-bold text-gray-800">{loading ? '-' : s.value}</p>
                 </div>
               </div>
             </Card>
@@ -107,7 +107,7 @@ export default function PartnerDashboard() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">{s.label}</p>
-                  <p className="text-xl font-bold text-gray-900">{loading ? '-' : s.value}</p>
+                  <p className="text-xl font-bold text-gray-800">{loading ? '-' : s.value}</p>
                 </div>
               </div>
             </Card>
@@ -134,7 +134,7 @@ export default function PartnerDashboard() {
               <Card key={ep.id}>
                 <div className="space-y-3">
                   <div>
-                    <h4 className="font-bold text-gray-900">{ep.event.name}</h4>
+                    <h4 className="font-bold text-gray-800">{ep.event.name}</h4>
                     <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -158,7 +158,7 @@ export default function PartnerDashboard() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="secondary"
                       onClick={() => router.push(`/partner/events/${ep.eventId}`)}
                     >
                       <Eye className="w-3.5 h-3.5 mr-1" />
@@ -176,7 +176,7 @@ export default function PartnerDashboard() {
       <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 계약</h3>
       {loading ? (
         <div className="space-y-3">
-          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />)}
         </div>
       ) : contracts.length === 0 ? (
         <Card>
@@ -195,7 +195,7 @@ export default function PartnerDashboard() {
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-gray-900 truncate">{c.event?.name || '계약서'}</p>
+                    <p className="font-semibold text-gray-800 truncate">{c.event?.name || '계약서'}</p>
                     <Badge status={c.status} />
                   </div>
                   <div className="flex items-center gap-3 text-xs text-gray-400">

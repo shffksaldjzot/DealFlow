@@ -89,7 +89,7 @@ function SortableRow({
     opacity: isDragging ? 0.5 : 1,
   };
   return (
-    <tr ref={setNodeRef} style={style} className="border-b border-gray-100 hover:bg-gray-50/50">
+    <tr ref={setNodeRef} style={style} className="border-b border-gray-200 hover:bg-gray-50/50">
       {children({ listeners, attributes })}
     </tr>
   );
@@ -393,7 +393,7 @@ export default function SheetEditor({
       {/* Full-screen saving overlay */}
       {saving && (
         <div className="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center">
-          <div className="bg-white rounded-2xl px-8 py-6 shadow-2xl flex items-center gap-4">
+          <div className="bg-white rounded-xl px-8 py-6 shadow-2xl flex items-center gap-4">
             <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
             <span className="text-base font-medium text-gray-800">저장 중...</span>
           </div>
@@ -432,7 +432,7 @@ export default function SheetEditor({
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <div className="border border-gray-200 rounded-xl overflow-x-auto">
+        <div className="border border-gray-200 rounded-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
@@ -478,7 +478,7 @@ export default function SheetEditor({
                                 </select>
                                 <button
                                   onClick={() => removeColumn(ci)}
-                                  className="p-0.5 text-gray-300 hover:text-red-500"
+                                  className="p-0.5 text-gray-300 hover:text-error"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </button>
@@ -537,7 +537,7 @@ export default function SheetEditor({
                           )}
                           <td className="px-3 py-1.5 sticky left-0 bg-white z-10">
                             {disabled ? (
-                              <span className="text-gray-900">{row.optionName}</span>
+                              <span className="text-gray-800">{row.optionName}</span>
                             ) : (
                               <input
                                 type="text"
@@ -595,7 +595,7 @@ export default function SheetEditor({
                             <td className="px-2 py-1.5">
                               <button
                                 onClick={() => removeRow(ri)}
-                                className="p-1 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50"
+                                className="p-1 rounded-lg text-gray-300 hover:text-error hover:bg-error-light"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>

@@ -75,7 +75,7 @@ export default function PartnerIcContractsPage() {
     return (
       <div className="space-y-4">
         {[1, 2].map((i) => (
-          <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+          <div key={i} className="h-24 bg-white rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -91,7 +91,7 @@ export default function PartnerIcContractsPage() {
       key: 'shortCode',
       header: '계약번호',
       render: (item: IcContract) => (
-        <span className="font-mono font-medium text-gray-900 text-xs">{item.shortCode}</span>
+        <span className="font-mono font-medium text-gray-800 text-xs">{item.shortCode}</span>
       ),
     },
     {
@@ -105,7 +105,7 @@ export default function PartnerIcContractsPage() {
       key: 'myRevenue',
       header: '내 매출',
       render: (item: IcContract) => (
-        <span className="font-medium text-gray-900">{formatCurrency(getMyRevenue(item))}</span>
+        <span className="font-medium text-gray-800">{formatCurrency(getMyRevenue(item))}</span>
       ),
     },
     {
@@ -114,7 +114,7 @@ export default function PartnerIcContractsPage() {
       render: (item: IcContract) => {
         const commission = getMyCommission(item);
         return commission > 0
-          ? <span className="text-red-600 font-medium">{formatCurrency(Math.round(commission))}</span>
+          ? <span className="text-error font-medium">{formatCurrency(Math.round(commission))}</span>
           : <span className="text-gray-400">-</span>;
       },
     },
@@ -141,7 +141,7 @@ export default function PartnerIcContractsPage() {
         <div className="grid grid-cols-3 gap-3 mb-6">
           <Card>
             <p className="text-xs text-gray-500">총 계약</p>
-            <p className="text-xl font-bold text-gray-900">{contracts.length}건</p>
+            <p className="text-xl font-bold text-gray-800">{contracts.length}건</p>
           </Card>
           <Card>
             <p className="text-xs text-gray-500">내 매출 합계</p>
@@ -149,7 +149,7 @@ export default function PartnerIcContractsPage() {
           </Card>
           <Card>
             <p className="text-xs text-gray-500">수수료 합계</p>
-            <p className="text-xl font-bold text-red-600">{formatCurrency(Math.round(totalCommission))}</p>
+            <p className="text-xl font-bold text-error">{formatCurrency(Math.round(totalCommission))}</p>
           </Card>
         </div>
       )}

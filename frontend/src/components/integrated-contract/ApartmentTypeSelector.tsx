@@ -22,7 +22,7 @@ export default function ApartmentTypeSelector({
           <button
             key={type.id}
             onClick={() => onSelect(type)}
-            className={`relative p-4 rounded-2xl border-2 text-left transition-all ${
+            className={`relative p-4 rounded-xl border-2 text-left transition-all ${
               isSelected
                 ? 'border-blue-500 bg-blue-50 shadow-md'
                 : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
@@ -33,7 +33,7 @@ export default function ApartmentTypeSelector({
             }`}>
               <Home className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-400'}`} />
             </div>
-            <p className={`font-bold text-sm ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}>
+            <p className={`font-bold text-sm ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}>
               {type.name}
             </p>
             {isSelected && (

@@ -29,7 +29,7 @@ export default function CustomerIntegratedContractsPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />
+            <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />
           ))}
         </div>
       ) : contracts.length === 0 ? (
@@ -52,7 +52,7 @@ export default function CustomerIntegratedContractsPage() {
                     <Badge status={c.status} />
                     <span className="text-xs font-mono text-gray-400">{c.shortCode}</span>
                   </div>
-                  <p className="font-medium text-gray-900 truncate">
+                  <p className="font-medium text-gray-800 truncate">
                     {c.config?.event?.name || '행사'}
                   </p>
                   <p className="text-xs text-gray-500">

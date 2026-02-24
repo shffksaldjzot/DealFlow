@@ -160,7 +160,7 @@ export default function EventContractsPage() {
           <Card padding="sm">
             <div className="text-center">
               <p className="text-xs text-gray-500 mb-1">총 계약건수</p>
-              <p className="text-xl font-bold text-gray-900">{settlement.totals.contractCount}건</p>
+              <p className="text-xl font-bold text-gray-800">{settlement.totals.contractCount}건</p>
             </div>
           </Card>
           <Card padding="sm">
@@ -178,7 +178,7 @@ export default function EventContractsPage() {
           <Card padding="sm">
             <div className="text-center">
               <p className="text-xs text-gray-500 mb-1">총 수수료</p>
-              <p className="text-xl font-bold text-green-600">{formatCurrency(settlement.totals.totalCommission)}</p>
+              <p className="text-xl font-bold text-success">{formatCurrency(settlement.totals.totalCommission)}</p>
             </div>
           </Card>
         </div>
@@ -195,7 +195,7 @@ export default function EventContractsPage() {
             key={tab.key}
             onClick={() => setMainTab(tab.key)}
             className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-              mainTab === tab.key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              mainTab === tab.key ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             {tab.label}
@@ -205,7 +205,7 @@ export default function EventContractsPage() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-white rounded-xl animate-pulse" />)}
         </div>
       ) : !settlement ? (
         <EmptyState title="데이터를 불러올 수 없습니다" />
@@ -222,7 +222,7 @@ export default function EventContractsPage() {
                     onClick={() => setStatusFilter(tab.key)}
                     className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                       statusFilter === tab.key
-                        ? 'bg-white text-gray-900 shadow-sm'
+                        ? 'bg-white text-gray-800 shadow-sm'
                         : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
@@ -244,7 +244,7 @@ export default function EventContractsPage() {
                   <select
                     value={partnerFilter}
                     onChange={(e) => setPartnerFilter(e.target.value)}
-                    className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="all">전체 업체</option>
                     {partnerNames.map((name) => (
@@ -283,7 +283,7 @@ export default function EventContractsPage() {
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-gray-900">{p.partnerName}</h3>
+                            <h3 className="font-bold text-gray-800">{p.partnerName}</h3>
                             <span className="text-xs text-gray-400">{p.contractCount.total}건</span>
                           </div>
                           {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
@@ -300,7 +300,7 @@ export default function EventContractsPage() {
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
                           <div>
                             <p className="text-xs text-gray-500">총 매출</p>
-                            <p className="font-semibold text-gray-900">{formatCurrency(p.totalAmount)}</p>
+                            <p className="font-semibold text-gray-800">{formatCurrency(p.totalAmount)}</p>
                           </div>
                           <div>
                             <p className="text-xs text-gray-500">정산 대상</p>
@@ -321,18 +321,18 @@ export default function EventContractsPage() {
                           </div>
                           <div>
                             <p className="text-xs text-gray-500">수수료액</p>
-                            <p className="font-semibold text-green-600">{formatCurrency(p.commissionAmount)}</p>
+                            <p className="font-semibold text-success">{formatCurrency(p.commissionAmount)}</p>
                           </div>
                           <div>
                             <p className="text-xs text-gray-500">지급액</p>
-                            <p className="font-semibold text-gray-900">{formatCurrency(p.payoutAmount)}</p>
+                            <p className="font-semibold text-gray-800">{formatCurrency(p.payoutAmount)}</p>
                           </div>
                         </div>
                       </div>
 
                       {/* Expanded: contract list */}
                       {isExpanded && p.contracts.length > 0 && (
-                        <div className="border-t border-gray-100">
+                        <div className="border-t border-gray-200">
                           <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                               <thead>
@@ -350,7 +350,7 @@ export default function EventContractsPage() {
                                     className="border-t border-gray-50 hover:bg-blue-50 cursor-pointer"
                                     onClick={(e) => { e.stopPropagation(); router.push(`/organizer/events/${id}/contracts/${c.id}`); }}
                                   >
-                                    <td className="px-4 py-2 text-gray-900">{c.customerName || c.customer?.name || '-'}</td>
+                                    <td className="px-4 py-2 text-gray-800">{c.customerName || c.customer?.name || '-'}</td>
                                     <td className="px-4 py-2 text-right text-gray-700">{c.totalAmount ? formatCurrency(c.totalAmount) : '-'}</td>
                                     <td className="px-4 py-2 text-center"><Badge status={c.status} /></td>
                                     <td className="px-4 py-2 text-right text-xs text-gray-500 font-mono">{c.contractNumber}</td>
@@ -371,7 +371,7 @@ export default function EventContractsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                   <div>
                     <p className="text-xs text-gray-500">합계 매출</p>
-                    <p className="font-bold text-gray-900">{formatCurrency(settlement.totals.totalAmount)}</p>
+                    <p className="font-bold text-gray-800">{formatCurrency(settlement.totals.totalAmount)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">합계 정산 대상</p>
@@ -379,11 +379,11 @@ export default function EventContractsPage() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">합계 수수료</p>
-                    <p className="font-bold text-green-600">{formatCurrency(settlement.totals.totalCommission)}</p>
+                    <p className="font-bold text-success">{formatCurrency(settlement.totals.totalCommission)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">합계 지급액</p>
-                    <p className="font-bold text-gray-900">{formatCurrency(settlement.totals.totalPayout)}</p>
+                    <p className="font-bold text-gray-800">{formatCurrency(settlement.totals.totalPayout)}</p>
                   </div>
                 </div>
               </Card>
@@ -395,15 +395,15 @@ export default function EventContractsPage() {
             <div>
               {/* Overall Summary Table */}
               <Card padding="none" className="mb-6">
-                <div className="p-4 border-b border-gray-100">
-                  <h3 className="font-bold text-gray-900">전체 정산 요약</h3>
+                <div className="p-4 border-b border-gray-200">
+                  <h3 className="font-bold text-gray-800">전체 정산 요약</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <tbody>
                       <tr className="border-b border-gray-50">
                         <td className="px-4 py-3 text-gray-500 font-medium">총 매출</td>
-                        <td className="px-4 py-3 text-right font-bold text-gray-900">{formatCurrency(settlement.totals.totalAmount)}</td>
+                        <td className="px-4 py-3 text-right font-bold text-gray-800">{formatCurrency(settlement.totals.totalAmount)}</td>
                       </tr>
                       <tr className="border-b border-gray-50">
                         <td className="px-4 py-3 text-gray-500 font-medium">정산 대상 (서명+완료)</td>
@@ -411,11 +411,11 @@ export default function EventContractsPage() {
                       </tr>
                       <tr className="border-b border-gray-50">
                         <td className="px-4 py-3 text-gray-500 font-medium">총 수수료</td>
-                        <td className="px-4 py-3 text-right font-bold text-green-600">{formatCurrency(settlement.totals.totalCommission)}</td>
+                        <td className="px-4 py-3 text-right font-bold text-success">{formatCurrency(settlement.totals.totalCommission)}</td>
                       </tr>
                       <tr>
                         <td className="px-4 py-3 text-gray-500 font-medium">업체 지급 합계</td>
-                        <td className="px-4 py-3 text-right font-bold text-gray-900">{formatCurrency(settlement.totals.totalPayout)}</td>
+                        <td className="px-4 py-3 text-right font-bold text-gray-800">{formatCurrency(settlement.totals.totalPayout)}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -434,7 +434,7 @@ export default function EventContractsPage() {
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-3">
                         <div
-                          className="bg-green-500 h-3 rounded-full transition-all"
+                          className="bg-success-light0 h-3 rounded-full transition-all"
                           style={{ width: `${settlement.totals.settledAmount > 0 ? (settlement.totals.totalCommission / settlement.totals.settledAmount * 100) : 0}%` }}
                         />
                       </div>
@@ -457,13 +457,13 @@ export default function EventContractsPage() {
 
               {/* Per-Partner Summary Table */}
               <Card padding="none">
-                <div className="p-4 border-b border-gray-100">
-                  <h3 className="font-bold text-gray-900">업체별 정산</h3>
+                <div className="p-4 border-b border-gray-200">
+                  <h3 className="font-bold text-gray-800">업체별 정산</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-gray-100 bg-gray-50">
+                      <tr className="border-b border-gray-200 bg-gray-50">
                         <th className="text-left px-4 py-3 font-semibold text-gray-700">업체명</th>
                         <th className="text-left px-4 py-3 font-semibold text-gray-700">품목</th>
                         <th className="text-right px-4 py-3 font-semibold text-gray-700">정산 대상</th>
@@ -475,12 +475,12 @@ export default function EventContractsPage() {
                     <tbody>
                       {settlement.partners.map((p) => (
                         <tr key={p.partnerId} className="border-b border-gray-50 hover:bg-gray-50">
-                          <td className="px-4 py-3 font-medium text-gray-900">{p.partnerName}</td>
+                          <td className="px-4 py-3 font-medium text-gray-800">{p.partnerName}</td>
                           <td className="px-4 py-3 text-xs text-gray-500">{p.items || '-'}</td>
                           <td className="px-4 py-3 text-right text-indigo-600 font-medium">{formatCurrency(p.settledAmount)}</td>
                           <td className="px-4 py-3 text-right text-gray-600">{p.commissionRate}%</td>
-                          <td className="px-4 py-3 text-right text-green-600 font-medium">{formatCurrency(p.commissionAmount)}</td>
-                          <td className="px-4 py-3 text-right font-bold text-gray-900">{formatCurrency(p.payoutAmount)}</td>
+                          <td className="px-4 py-3 text-right text-success font-medium">{formatCurrency(p.commissionAmount)}</td>
+                          <td className="px-4 py-3 text-right font-bold text-gray-800">{formatCurrency(p.payoutAmount)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -490,8 +490,8 @@ export default function EventContractsPage() {
                         <td className="px-4 py-3"></td>
                         <td className="px-4 py-3 text-right text-indigo-600">{formatCurrency(settlement.totals.settledAmount)}</td>
                         <td className="px-4 py-3 text-right text-gray-500">-</td>
-                        <td className="px-4 py-3 text-right text-green-700">{formatCurrency(settlement.totals.totalCommission)}</td>
-                        <td className="px-4 py-3 text-right text-gray-900">{formatCurrency(settlement.totals.totalPayout)}</td>
+                        <td className="px-4 py-3 text-right text-success">{formatCurrency(settlement.totals.totalCommission)}</td>
+                        <td className="px-4 py-3 text-right text-gray-800">{formatCurrency(settlement.totals.totalPayout)}</td>
                       </tr>
                     </tfoot>
                   </table>
@@ -505,10 +505,10 @@ export default function EventContractsPage() {
       {/* Commission Edit Dialog */}
       {editCommission && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">수수료율 변경</h3>
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-lg font-bold text-gray-800">수수료율 변경</h3>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">수수료율 (%)</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">수수료율 (%)</label>
               <input
                 type="number"
                 min="0"
@@ -516,7 +516,7 @@ export default function EventContractsPage() {
                 step="0.1"
                 value={editCommission.rate}
                 onChange={(e) => setEditCommission({ ...editCommission, rate: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex gap-3 justify-end">

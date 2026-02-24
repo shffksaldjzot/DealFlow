@@ -29,14 +29,14 @@ export default function CustomerSheetView({
           {partner.categories.map((cat) => (
             <div key={cat.sheetId} className="mb-6">
               <div className="mb-2">
-                <h4 className="text-lg font-bold text-gray-900">
+                <h4 className="text-lg font-bold text-gray-800">
                   {partner.partnerItems || cat.categoryName}
                 </h4>
                 <p className="text-xs text-gray-400 mt-0.5">{partner.partnerName}</p>
               </div>
 
               {/* Spreadsheet table */}
-              <div className="relative border border-gray-200 rounded-xl overflow-x-auto -mx-1 px-1">
+              <div className="relative border border-gray-200 rounded-lg overflow-x-auto -mx-1 px-1">
                 <table className="w-full text-sm min-w-0">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
@@ -67,7 +67,7 @@ export default function CustomerSheetView({
                             cat.categoryName,
                             partner.partnerName,
                           )}
-                          className={`border-b border-gray-100 cursor-pointer transition-colors ${
+                          className={`border-b border-gray-200 cursor-pointer transition-colors ${
                             selected ? 'bg-blue-50' : 'hover:bg-gray-50'
                           }`}
                         >
@@ -81,12 +81,12 @@ export default function CustomerSheetView({
                           </td>
                           {/* Option name */}
                           <td className={`px-3 py-2 sticky left-0 z-10 ${selected ? 'bg-blue-50' : 'bg-white'}`}>
-                            <span className={`text-sm font-medium ${selected ? 'text-blue-700' : 'text-gray-900'}`}>
+                            <span className={`text-sm font-medium ${selected ? 'text-blue-700' : 'text-gray-800'}`}>
                               {opt.optionName}
                             </span>
                           </td>
                           {/* Popup */}
-                          <td className="px-1 py-2 text-center">
+                          <td className="px-1 py-2 text-center" onClick={(e) => e.stopPropagation()}>
                             {opt.popupContent && (
                               <PopupViewer content={opt.popupContent} optionName={opt.optionName} />
                             )}

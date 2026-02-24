@@ -117,7 +117,7 @@ export default function PartnerSettingsPage() {
     return (
       <div>
         <PageHeader title="업체 정보 관리" />
-        <div className="h-64 bg-white rounded-2xl animate-pulse" />
+        <div className="h-64 bg-white rounded-xl animate-pulse" />
       </div>
     );
   }
@@ -172,15 +172,15 @@ export default function PartnerSettingsPage() {
 
           {/* Business License Upload + Preview */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
               사업자등록증
             </label>
             {form.businessLicenseFileId ? (
               <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-                  <FileCheck className="w-5 h-5 text-green-600" />
+                <div className="flex items-center gap-3 p-3 bg-success-light rounded-xl">
+                  <FileCheck className="w-5 h-5 text-success" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-green-800">
+                    <p className="text-sm font-medium text-success">
                       {licenseFileName || '사업자등록증 업로드 완료'}
                     </p>
                   </div>
@@ -201,7 +201,7 @@ export default function PartnerSettingsPage() {
                         setLicenseFileName('');
                         setLicensePreviewUrl(null);
                       }}
-                      className="text-xs text-red-500 hover:text-red-700"
+                      className="text-xs text-error hover:text-error"
                     >
                       삭제
                     </button>
@@ -271,7 +271,7 @@ export default function PartnerSettingsPage() {
               placeholder="8자 이상 입력하세요"
             />
             {newPassword.length > 0 && newPassword.length < 8 && (
-              <p className="text-xs text-red-500 mt-1">비밀번호는 8자 이상이어야 합니다</p>
+              <p className="text-xs text-error mt-1">비밀번호는 8자 이상이어야 합니다</p>
             )}
           </div>
           <div>
@@ -283,13 +283,13 @@ export default function PartnerSettingsPage() {
               placeholder="새 비밀번호를 다시 입력하세요"
             />
             {passwordMismatch && (
-              <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+              <p className="text-xs text-error mt-1">비밀번호가 일치하지 않습니다</p>
             )}
           </div>
         </div>
         <div className="mt-4">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleChangePassword}
             disabled={changingPassword || !currentPassword || !newPassword || !newPasswordConfirm || passwordMismatch}
           >

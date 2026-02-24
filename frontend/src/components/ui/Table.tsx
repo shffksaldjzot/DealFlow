@@ -23,10 +23,10 @@ export default function Table<T extends Record<string, any>>({
   emptyMessage = '데이터가 없습니다.',
 }: TableProps<T>) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-100">
+    <div className="overflow-x-auto rounded-xl border border-gray-200">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-gray-50 border-b border-gray-100">
+          <tr className="bg-gray-50 border-b border-gray-200">
             {columns.map((col) => (
               <th
                 key={col.key}

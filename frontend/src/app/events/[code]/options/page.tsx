@@ -277,7 +277,7 @@ export default function OptionsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="w-full max-w-2xl mx-auto p-4 space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+            <div key={i} className="h-24 bg-white rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -289,7 +289,7 @@ export default function OptionsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <Card className="max-w-sm w-full text-center">
           <Home className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="font-bold text-gray-900">통합 계약 설정을 찾을 수 없습니다</p>
+          <p className="font-bold text-gray-800">통합 계약 설정을 찾을 수 없습니다</p>
           <p className="text-sm text-gray-500 mt-1">행사 정보를 확인해주세요.</p>
         </Card>
       </div>
@@ -313,7 +313,7 @@ export default function OptionsPage() {
         {step === 'select' && (
           <>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">옵션 선택</h1>
+              <h1 className="text-xl font-bold text-gray-800">옵션 선택</h1>
               <p className="text-sm text-gray-500 mt-1">전체 가격표에서 원하시는 품목을 선택해주세요</p>
             </div>
 
@@ -347,14 +347,14 @@ export default function OptionsPage() {
         {step === 'sign' && (
           <>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">계약 서명</h1>
+              <h1 className="text-xl font-bold text-gray-800">계약 서명</h1>
               <p className="text-sm text-gray-500 mt-1">타입을 선택하고, 내용을 확인한 후 서명해주세요</p>
             </div>
 
             {/* Apartment Type Selection */}
             {flow.apartmentTypes.length > 0 && (
               <Card>
-                <h3 className="font-bold text-gray-900 mb-3">타입 선택</h3>
+                <h3 className="font-bold text-gray-800 mb-3">타입 선택</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {flow.apartmentTypes.map((type) => (
                     <button
@@ -386,30 +386,30 @@ export default function OptionsPage() {
             )}
 
             {!selectedTypeId && flow.apartmentTypes.length > 1 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-center">
-                <p className="text-sm text-yellow-700">타입을 선택하면 가격이 표시됩니다.</p>
+              <div className="bg-warning-light border border-amber-200 rounded-xl p-3 text-center">
+                <p className="text-sm text-warning">타입을 선택하면 가격이 표시됩니다.</p>
               </div>
             )}
 
             {/* Customer Info */}
             <Card>
-              <h3 className="font-bold text-gray-900 mb-3">계약자 정보</h3>
+              <h3 className="font-bold text-gray-800 mb-3">계약자 정보</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    이름 <span className="text-red-500">*</span>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    이름 <span className="text-error">*</span>
                   </label>
                   <input
                     type="text"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="이름을 입력해주세요"
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    연락처 <span className="text-red-500">*</span>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    연락처 <span className="text-error">*</span>
                   </label>
                   <input
                     type="tel"
@@ -417,19 +417,19 @@ export default function OptionsPage() {
                     onChange={handlePhoneChange}
                     placeholder="010-0000-0000"
                     maxLength={13}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    동호수 <span className="text-red-500">*</span>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    동호수 <span className="text-error">*</span>
                   </label>
                   <input
                     type="text"
                     value={unitNumber}
                     onChange={(e) => setUnitNumber(e.target.value)}
                     placeholder="예: 101동 1201호"
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -438,7 +438,7 @@ export default function OptionsPage() {
             {/* Legal Terms */}
             {flow.config.legalTerms?.trim() && (
               <Card>
-                <h3 className="font-bold text-gray-900 mb-2">약관</h3>
+                <h3 className="font-bold text-gray-800 mb-2">약관</h3>
                 <div className="max-h-32 overflow-y-auto text-xs text-gray-500 bg-gray-50 rounded-lg p-3 mb-3 whitespace-pre-wrap">
                   {flow.config.legalTerms}
                 </div>
@@ -456,22 +456,22 @@ export default function OptionsPage() {
 
             {/* Special Notes */}
             <Card>
-              <h3 className="font-bold text-gray-900 mb-2">특이사항</h3>
+              <h3 className="font-bold text-gray-800 mb-2">특이사항</h3>
               <textarea
                 value={specialNotes}
                 onChange={(e) => setSpecialNotes(e.target.value)}
                 placeholder="특이사항이 있으면 입력해주세요 (선택)"
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
             </Card>
 
             {/* Signature */}
             <Card>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-gray-900">서명</h3>
+                <h3 className="font-bold text-gray-800">서명</h3>
                 {hasSignature && (
-                  <button onClick={clearSignature} className="text-xs text-red-500 hover:text-red-700">
+                  <button onClick={clearSignature} className="text-xs text-error hover:text-error">
                     지우기
                   </button>
                 )}

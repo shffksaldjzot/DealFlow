@@ -199,7 +199,7 @@ export default function AdminUserDetailPage() {
       <div>
         <PageHeader title="사용자 상세" backHref="/admin/users" />
         <div className="space-y-4">
-          {[1, 2].map((i) => <div key={i} className="h-40 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2].map((i) => <div key={i} className="h-40 bg-white rounded-xl animate-pulse" />)}
         </div>
       </div>
     );
@@ -229,7 +229,7 @@ export default function AdminUserDetailPage() {
             )}
             {(user.role === 'partner' || user.role === 'organizer') &&
               !user.organizationMemberships?.length && user.status === 'active' && (
-              <span className="text-xs text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-lg">업체 등록 미완료</span>
+              <span className="text-xs text-warning bg-warning-light px-3 py-1.5 rounded-lg">업체 등록 미완료</span>
             )}
             {user.status === 'active' && user.role !== 'admin' && (
               <Button variant="danger" size="sm" onClick={() => handleStatusToggle('suspended')}>정지</Button>
@@ -259,7 +259,7 @@ export default function AdminUserDetailPage() {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {roleOptions.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -272,7 +272,7 @@ export default function AdminUserDetailPage() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {statusOptions.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -287,21 +287,21 @@ export default function AdminUserDetailPage() {
                 type="text" inputMode="numeric" placeholder="010" maxLength={3}
                 value={phone1}
                 onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 3); setPhone1(v); if (v.length === 3) document.getElementById('adm-ph2')?.focus(); }}
-                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <span className="text-gray-400 font-bold">-</span>
               <input
                 id="adm-ph2" type="text" inputMode="numeric" placeholder="0000" maxLength={4}
                 value={phone2}
                 onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 4); setPhone2(v); if (v.length === 4) document.getElementById('adm-ph3')?.focus(); }}
-                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <span className="text-gray-400 font-bold">-</span>
               <input
                 id="adm-ph3" type="text" inputMode="numeric" placeholder="0000" maxLength={4}
                 value={phone3}
                 onChange={(e) => { setPhone3(e.target.value.replace(/\D/g, '').slice(0, 4)); }}
-                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -338,7 +338,7 @@ export default function AdminUserDetailPage() {
           {user.organizationMemberships.map((m: any) => (
             <div key={m.id}>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-gray-900">{m.organization?.name || '-'}</p>
+                <p className="text-sm font-medium text-gray-800">{m.organization?.name || '-'}</p>
                 <Badge status={m.organization?.status || ''} />
               </div>
               <p className="text-xs text-gray-400 mb-3">{m.organization?.type} / {m.role}</p>
@@ -352,21 +352,21 @@ export default function AdminUserDetailPage() {
                       type="text" inputMode="numeric" placeholder="000" maxLength={3}
                       value={bizNum1}
                       onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 3); setBizNum1(v); if (v.length === 3) document.getElementById('adm-biz2')?.focus(); }}
-                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-gray-400 font-bold">-</span>
                     <input
                       id="adm-biz2" type="text" inputMode="numeric" placeholder="00" maxLength={2}
                       value={bizNum2}
                       onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 2); setBizNum2(v); if (v.length === 2) document.getElementById('adm-biz3')?.focus(); }}
-                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-gray-400 font-bold">-</span>
                     <input
                       id="adm-biz3" type="text" inputMode="numeric" placeholder="00000" maxLength={5}
                       value={bizNum3}
                       onChange={(e) => { setBizNum3(e.target.value.replace(/\D/g, '').slice(0, 5)); }}
-                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -379,21 +379,21 @@ export default function AdminUserDetailPage() {
                       type="text" inputMode="numeric" placeholder="010" maxLength={3}
                       value={orgPhone1}
                       onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 3); setOrgPhone1(v); if (v.length === 3) document.getElementById('adm-oph2')?.focus(); }}
-                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-gray-400 font-bold">-</span>
                     <input
                       id="adm-oph2" type="text" inputMode="numeric" placeholder="0000" maxLength={4}
                       value={orgPhone2}
                       onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 4); setOrgPhone2(v); if (v.length === 4) document.getElementById('adm-oph3')?.focus(); }}
-                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-gray-400 font-bold">-</span>
                     <input
                       id="adm-oph3" type="text" inputMode="numeric" placeholder="0000" maxLength={4}
                       value={orgPhone3}
                       onChange={(e) => { setOrgPhone3(e.target.value.replace(/\D/g, '').slice(0, 4)); }}
-                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full min-w-0 px-2 py-2.5 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -431,8 +431,8 @@ export default function AdminUserDetailPage() {
 
       {/* Danger Zone */}
       {user.role !== 'admin' && (
-        <Card className="border-red-200">
-          <h3 className="text-sm font-semibold text-red-600 mb-3">위험 영역</h3>
+        <Card className="border-error">
+          <h3 className="text-sm font-semibold text-error mb-3">위험 영역</h3>
           <p className="text-sm text-gray-500 mb-3">이 사용자 계정을 삭제합니다. 이 작업은 되돌릴 수 없습니다.</p>
           <Button variant="danger" onClick={() => setDeleteModal(true)}>계정 삭제</Button>
         </Card>
@@ -443,7 +443,7 @@ export default function AdminUserDetailPage() {
           정말로 <strong>{user.name}</strong> 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
         </p>
         <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={() => setDeleteModal(false)}>취소</Button>
+          <Button variant="secondary" onClick={() => setDeleteModal(false)}>취소</Button>
           <Button variant="danger" onClick={handleDelete}>삭제</Button>
         </div>
       </Modal>
@@ -477,7 +477,7 @@ export default function AdminUserDetailPage() {
               임시 비밀번호가 자동 생성됩니다.
             </p>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setResetModal(false)}>취소</Button>
+              <Button variant="secondary" onClick={() => setResetModal(false)}>취소</Button>
               <Button onClick={handleResetPassword} loading={resetting}>초기화</Button>
             </div>
           </div>

@@ -159,7 +159,7 @@ export default function OrganizerSettingsPage() {
     return (
       <div>
         <PageHeader title="마이페이지" />
-        <div className="h-64 bg-white rounded-2xl animate-pulse" />
+        <div className="h-64 bg-white rounded-xl animate-pulse" />
       </div>
     );
   }
@@ -210,15 +210,15 @@ export default function OrganizerSettingsPage() {
 
           {/* Business License Upload + Preview */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
               사업자등록증
             </label>
             {form.businessLicenseFileId ? (
               <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-                  <FileCheck className="w-5 h-5 text-green-600" />
+                <div className="flex items-center gap-3 p-3 bg-success-light rounded-xl">
+                  <FileCheck className="w-5 h-5 text-success" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-green-800">
+                    <p className="text-sm font-medium text-success">
                       {licenseFileName || '사업자등록증 업로드 완료'}
                     </p>
                   </div>
@@ -239,7 +239,7 @@ export default function OrganizerSettingsPage() {
                         setLicenseFileName('');
                         setLicensePreviewUrl(null);
                       }}
-                      className="text-xs text-red-500 hover:text-red-700"
+                      className="text-xs text-error hover:text-error"
                     >
                       변경
                     </button>
@@ -295,7 +295,7 @@ export default function OrganizerSettingsPage() {
 
           {/* Login email - read-only */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
               로그인 이메일
             </label>
             <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-xl border border-gray-200">
@@ -325,7 +325,7 @@ export default function OrganizerSettingsPage() {
 
           {/* Address with Daum Postcode */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
               주소
             </label>
             <div className="flex gap-2 mb-2">
@@ -334,7 +334,7 @@ export default function OrganizerSettingsPage() {
                 readOnly
                 placeholder="주소 검색을 클릭하세요"
                 value={form.address}
-                className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:outline-none cursor-pointer"
+                className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none cursor-pointer"
                 onClick={openAddressSearch}
               />
               <button
@@ -351,7 +351,7 @@ export default function OrganizerSettingsPage() {
               placeholder="상세 주소 입력"
               value={form.addressDetail}
               onChange={(e) => setForm({ ...form, addressDetail: e.target.value })}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -387,7 +387,7 @@ export default function OrganizerSettingsPage() {
               placeholder="8자 이상 입력하세요"
             />
             {newPassword.length > 0 && newPassword.length < 8 && (
-              <p className="text-xs text-red-500 mt-1">비밀번호는 8자 이상이어야 합니다</p>
+              <p className="text-xs text-error mt-1">비밀번호는 8자 이상이어야 합니다</p>
             )}
           </div>
           <div>
@@ -399,13 +399,13 @@ export default function OrganizerSettingsPage() {
               placeholder="새 비밀번호를 다시 입력하세요"
             />
             {passwordMismatch && (
-              <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+              <p className="text-xs text-error mt-1">비밀번호가 일치하지 않습니다</p>
             )}
           </div>
         </div>
         <div className="mt-4">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleChangePassword}
             disabled={changingPassword || !currentPassword || !newPassword || !newPasswordConfirm || passwordMismatch}
           >

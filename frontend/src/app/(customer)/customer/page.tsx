@@ -173,7 +173,7 @@ export default function CustomerHome() {
             </div>
             <div className="flex-1 flex items-center justify-center px-4">
               <div className="w-full max-w-sm">
-                <div id="qr-reader" className="rounded-2xl overflow-hidden" />
+                <div id="qr-reader" className="rounded-xl overflow-hidden" />
                 <p className="text-white/70 text-sm text-center mt-4">
                   계약서 QR 코드 또는 방문예약 QR 코드를 스캔하세요
                 </p>
@@ -192,8 +192,8 @@ export default function CustomerHome() {
       )}
 
       {/* Greeting */}
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">
+      <div className="mb-5">
+        <h2 className="text-xl font-bold text-gray-800">
           안녕하세요, {user?.name || '고객'}님
         </h2>
         <p className="text-sm text-gray-500 mt-1">
@@ -204,10 +204,10 @@ export default function CustomerHome() {
       {/* QR Scan Button - prominent */}
       <button
         onClick={handleQrScan}
-        className="w-full mb-4 flex items-center justify-center gap-3 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-colors shadow-sm"
+        className="w-full mb-4 flex items-center justify-center gap-3 py-3.5 px-5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg transition-colors shadow-sm"
       >
-        <Camera className="w-6 h-6" />
-        <span className="text-lg font-bold">QR 코드 스캔</span>
+        <Camera className="w-5 h-5" />
+        <span className="text-base font-bold">QR 코드 스캔</span>
       </button>
 
       {/* Collapsible Contract Code Input */}
@@ -223,10 +223,10 @@ export default function CustomerHome() {
           </button>
         ) : (
           <Card>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Search className="w-5 h-5 text-gray-400 shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900 mb-2">계약 코드 입력</p>
+                <p className="text-sm font-semibold text-gray-800 mb-2">계약 코드 입력</p>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -239,7 +239,7 @@ export default function CustomerHome() {
                     autoCorrect="off"
                     autoCapitalize="characters"
                     spellCheck={false}
-                    className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono tracking-widest"
+                    className="flex-1 px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono tracking-widest"
                     autoFocus
                   />
                   <Button onClick={handleContractCodeSubmit} disabled={!contractCode.trim()}>
@@ -259,80 +259,64 @@ export default function CustomerHome() {
 
       {/* Pending Signing Alert */}
       {!loading && pendingContracts.length > 0 && (
-        <Card className="mb-6 border-2 border-orange-200 bg-orange-50">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
-              <AlertCircle className="w-5 h-5 text-orange-600" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-orange-800">
-                서명 대기 중인 계약 {pendingContracts.length}건
-              </p>
-              <p className="text-sm text-orange-600 mt-0.5">
-                아래 계약서를 확인하고 서명해주세요
-              </p>
-            </div>
+        <div className="mb-6 flex items-start gap-3 px-4 py-4 bg-warning-light border border-amber-200 rounded-xl">
+          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-900">
+              서명 대기 중인 계약 {pendingContracts.length}건
+            </p>
+            <p className="text-[13px] text-amber-700 mt-0.5">
+              아래 계약서를 확인하고 서명해주세요
+            </p>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        <Card>
-          <div className="text-center">
-            <FileText className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-            <p className="text-xl font-bold text-gray-900">{loading ? '-' : filteredContracts.length}</p>
-            <p className="text-xs text-gray-500">개별계약</p>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <Layers className="w-5 h-5 text-purple-400 mx-auto mb-1" />
-            <p className="text-xl font-bold text-purple-600">{loading ? '-' : filteredIcContracts.length}</p>
-            <p className="text-xs text-gray-500">통합계약</p>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <Clock className="w-5 h-5 text-orange-400 mx-auto mb-1" />
-            <p className="text-xl font-bold text-orange-600">{loading ? '-' : pendingContracts.length}</p>
-            <p className="text-xs text-gray-500">대기중</p>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <CheckCircle className="w-5 h-5 text-green-400 mx-auto mb-1" />
-            <p className="text-xl font-bold text-green-600">{loading ? '-' : signedContracts.length + signedIcContracts.length}</p>
-            <p className="text-xs text-gray-500">완료</p>
-          </div>
-        </Card>
+      <div className="grid grid-cols-4 gap-2.5 mb-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-3 text-center">
+          <p className="text-[13px] font-medium text-gray-500 mb-1">개별계약</p>
+          <p className="text-2xl font-extrabold text-gray-800 tracking-tight">{loading ? '-' : filteredContracts.length}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-3 text-center">
+          <p className="text-[13px] font-medium text-gray-500 mb-1">통합계약</p>
+          <p className="text-2xl font-extrabold text-blue-600 tracking-tight">{loading ? '-' : filteredIcContracts.length}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-3 text-center">
+          <p className="text-[13px] font-medium text-gray-500 mb-1">대기중</p>
+          <p className="text-2xl font-extrabold text-warning tracking-tight">{loading ? '-' : pendingContracts.length}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-3 text-center">
+          <p className="text-[13px] font-medium text-gray-500 mb-1">완료</p>
+          <p className="text-2xl font-extrabold text-success tracking-tight">{loading ? '-' : signedContracts.length + signedIcContracts.length}</p>
+        </div>
       </div>
 
       {/* Pending Contracts - highlighted */}
       {!loading && pendingContracts.length > 0 && (
         <>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">서명 대기 계약</h3>
-          <div className="space-y-2 mb-6">
+          <h3 className="text-base font-semibold text-gray-800 mb-3">서명 대기 계약</h3>
+          <div className="space-y-2.5 mb-6">
             {pendingContracts.map((c) => (
-              <Card key={c.id} hoverable onClick={() => router.push(`/customer/contracts/${c.id}`)} className="border-l-4 border-l-orange-400">
+              <Card key={c.id} hoverable onClick={() => router.push(`/customer/contracts/${c.id}`)} className="border-l-[3px] border-l-warning">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900 text-sm">{c.event?.name || '계약서'}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-800 text-sm">{c.event?.name || '계약서'}</p>
                     <p className="text-xs text-blue-600 mt-0.5">
                       {c.partner?.name}
                       {(c.partner as any)?.items && (
                         <span className="text-gray-400 ml-1">· {(c.partner as any).items.split(',').map((s: string) => s.trim()).join(', ')}</span>
                       )}
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-1.5">
                       <Badge status={c.status} />
                       <span className="text-xs text-gray-400">{formatDateTime(c.createdAt)}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0 ml-2">
                     <button
                       onClick={(e) => handleCancelContract(c.id, e)}
-                      className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                      className="p-2 rounded-lg hover:bg-error-light text-gray-400 hover:text-error transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                       title="취소"
                     >
                       <XCircle className="w-4 h-4" />
@@ -351,13 +335,13 @@ export default function CustomerHome() {
       {/* Visit Reservations */}
       {!loading && activeVisits.length > 0 && (
         <>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">방문 예약</h3>
-          <div className="space-y-2 mb-6">
+          <h3 className="text-base font-semibold text-gray-800 mb-3">방문 예약</h3>
+          <div className="space-y-2.5 mb-6">
             {activeVisits.map((v) => (
               <Card key={v.id}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gray-900 text-sm">{v.event?.name || '행사'}</p>
+                    <p className="font-medium text-gray-800 text-sm">{v.event?.name || '행사'}</p>
                     <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                       <Ticket className="w-3 h-3" />
                       <span>{formatDate(v.visitDate)}</span>
@@ -373,15 +357,15 @@ export default function CustomerHome() {
       )}
 
       {/* Quick Actions */}
-      <Card hoverable onClick={() => router.push('/customer/contracts')} className="mb-4">
+      <Card hoverable onClick={() => router.push('/customer/contracts')} className="mb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">내 계약</p>
-              <p className="text-sm text-gray-500">전체 계약 내역 보기</p>
+              <p className="font-semibold text-gray-800">내 계약</p>
+              <p className="text-[13px] text-gray-500">전체 계약 내역 보기</p>
             </div>
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -389,15 +373,15 @@ export default function CustomerHome() {
       </Card>
 
       {visits.length > 0 && (
-        <Card hoverable onClick={() => router.push('/customer/reservations')} className="mb-4">
+        <Card hoverable onClick={() => router.push('/customer/reservations')} className="mb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-                <Ticket className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+                <Ticket className="w-5 h-5 text-teal-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">방문 예약</p>
-                <p className="text-sm text-gray-500">예약 내역 확인</p>
+                <p className="font-semibold text-gray-800">방문 예약</p>
+                <p className="text-[13px] text-gray-500">예약 내역 확인</p>
               </div>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -408,26 +392,26 @@ export default function CustomerHome() {
       {/* Recent Signed Contracts */}
       {!loading && signedContracts.length > 0 && (
         <>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3 mt-6">완료된 계약</h3>
-          <div className="space-y-2">
+          <h3 className="text-base font-semibold text-gray-800 mb-3 mt-6">완료된 계약</h3>
+          <div className="space-y-2.5">
             {signedContracts.slice(0, 3).map((c) => (
               <Card key={c.id} hoverable onClick={() => router.push(`/customer/contracts/${c.id}`)}>
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-xs text-gray-400 font-mono">{c.contractNumber}</p>
-                    <p className="font-medium text-gray-900 text-sm mt-0.5">{c.event?.name || '계약서'}</p>
+                    <p className="font-medium text-gray-800 text-sm mt-0.5">{c.event?.name || '계약서'}</p>
                     <p className="text-xs text-blue-600 mt-0.5">
                       {c.partner?.name}
                       {(c.partner as any)?.items && (
                         <span className="text-gray-400 ml-1">· {(c.partner as any).items.split(',').map((s: string) => s.trim()).join(', ')}</span>
                       )}
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-1.5">
                       <Badge status={c.status} />
                       <span className="text-xs text-gray-400">{formatDateTime(c.createdAt)}</span>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-300 shrink-0" />
                 </div>
               </Card>
             ))}
@@ -438,8 +422,8 @@ export default function CustomerHome() {
       {/* Integrated Contracts */}
       {!loading && filteredIcContracts.length > 0 && (
         <>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3 mt-6">통합 계약</h3>
-          <div className="space-y-2">
+          <h3 className="text-base font-semibold text-gray-800 mb-3 mt-6">통합 계약</h3>
+          <div className="space-y-2.5">
             {filteredIcContracts.slice(0, 5).map((ic) => (
               <Card key={ic.id} hoverable onClick={() => router.push(`/customer/integrated-contracts/${ic.id}`)}>
                 <div className="flex items-center justify-between">
@@ -448,7 +432,7 @@ export default function CustomerHome() {
                       <Badge status={ic.status} />
                       <span className="text-xs font-mono text-gray-400">{ic.shortCode}</span>
                     </div>
-                    <p className="font-medium text-gray-900 text-sm mt-0.5 truncate">
+                    <p className="font-medium text-gray-800 text-sm mt-0.5 truncate">
                       {(ic as any).config?.event?.name || '통합계약서'}
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -456,8 +440,8 @@ export default function CustomerHome() {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0 ml-3">
-                    <p className="font-bold text-purple-600 text-sm">{formatCurrency(ic.totalAmount)}</p>
-                    <ChevronRight className="w-4 h-4 text-gray-400 ml-auto mt-1" />
+                    <p className="font-bold text-blue-600 text-sm">{formatCurrency(ic.totalAmount)}</p>
+                    <ChevronRight className="w-4 h-4 text-gray-300 ml-auto mt-1" />
                   </div>
                 </div>
               </Card>
@@ -467,9 +451,9 @@ export default function CustomerHome() {
       )}
 
       {/* Info */}
-      <div className="bg-blue-50 rounded-2xl p-5 mt-6">
-        <p className="text-sm font-medium text-blue-800 mb-1">QR 코드로 계약하기</p>
-        <p className="text-sm text-blue-600">
+      <div className="bg-info-light border border-blue-200 rounded-xl p-4 mt-6">
+        <p className="text-sm font-semibold text-blue-800 mb-1">QR 코드로 계약하기</p>
+        <p className="text-[13px] text-blue-700 leading-relaxed">
           QR 코드 스캔 버튼을 누르면 카메라가 실행됩니다. 계약서 QR 코드 또는 방문예약 QR 코드를 스캔하세요.
         </p>
       </div>

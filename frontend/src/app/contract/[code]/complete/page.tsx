@@ -23,18 +23,18 @@ export default function ContractCompletePage() {
       <div className="max-w-lg mx-auto p-4">
         {/* Progress */}
         <div className="flex items-center gap-2 text-xs font-medium mt-4 mb-8">
-          <span className="text-green-600">1. 내용 확인 &#10003;</span>
-          <div className="flex-1 h-0.5 bg-green-500" />
-          <span className="text-green-600">2. 서명 &#10003;</span>
-          <div className="flex-1 h-0.5 bg-green-500" />
-          <span className="text-green-600">3. 완료 &#10003;</span>
+          <span className="text-success">1. 내용 확인 &#10003;</span>
+          <div className="flex-1 h-0.5 bg-success-light0" />
+          <span className="text-success">2. 서명 &#10003;</span>
+          <div className="flex-1 h-0.5 bg-success-light0" />
+          <span className="text-success">3. 완료 &#10003;</span>
         </div>
 
         <div className="text-center py-8">
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-10 h-10 text-green-600" />
+          <div className="w-20 h-20 rounded-full bg-success-light flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 className="w-10 h-10 text-success" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
             계약이 완료되었습니다
           </h1>
           <p className="text-gray-500 mb-8">

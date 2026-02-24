@@ -101,7 +101,7 @@ export default function EventPartnersPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
               activeTab === tab.key
-                ? 'bg-white text-gray-900 shadow-sm'
+                ? 'bg-white text-gray-800 shadow-sm'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -121,7 +121,7 @@ export default function EventPartnersPage() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />)}
         </div>
       ) : filteredPartners.length === 0 ? (
         <EmptyState
@@ -135,7 +135,7 @@ export default function EventPartnersPage() {
               <div className="space-y-3">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-bold text-gray-900">{ep.partner?.name || '업체'}</h3>
+                    <h3 className="font-bold text-gray-800">{ep.partner?.name || '업체'}</h3>
                     <div className="flex items-center gap-2 mt-0.5">
                       <Badge status={ep.status} />
                       {eventName && (
@@ -156,7 +156,7 @@ export default function EventPartnersPage() {
                     </div>
                   )}
                   {ep.status === 'approved' && (
-                    <Button size="sm" variant="outline" onClick={() => setCancelTarget(ep)}>
+                    <Button size="sm" variant="secondary" onClick={() => setCancelTarget(ep)}>
                       <Ban className="w-4 h-4 mr-1" /> 승인 취소
                     </Button>
                   )}
@@ -167,7 +167,7 @@ export default function EventPartnersPage() {
                   </span>
                   {ep.approvedAt && (
                     <span className="flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-green-500" /> 승인일: {formatDate(ep.approvedAt)}
+                      <CheckCircle2 className="w-3 h-3 text-success" /> 승인일: {formatDate(ep.approvedAt)}
                     </span>
                   )}
                   {ep.partner?.contactPhone && (
@@ -192,7 +192,7 @@ export default function EventPartnersPage() {
                   </div>
                 )}
                 {ep.cancelReason && (
-                  <p className="text-xs text-red-500">취소 사유: {ep.cancelReason}</p>
+                  <p className="text-xs text-error">취소 사유: {ep.cancelReason}</p>
                 )}
               </div>
             </Card>
@@ -203,19 +203,19 @@ export default function EventPartnersPage() {
       {/* Cancel Confirmation Dialog */}
       {cancelTarget && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">승인 취소</h3>
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-lg font-bold text-gray-800">승인 취소</h3>
             <p className="text-sm text-gray-500">
               <strong>{cancelTarget.partner?.name}</strong>의 참여 승인을 취소하시겠습니까?
             </p>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">취소 사유 (선택)</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">취소 사유 (선택)</label>
               <input
                 type="text"
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
                 placeholder="취소 사유를 입력하세요"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex gap-3 justify-end">

@@ -63,7 +63,7 @@ export default function PaymentStageEditor({
                 onChange={(e) => updateStageName(index, e.target.value)}
                 placeholder={`${index + 1}차`}
                 disabled={disabled}
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
               />
               <div className="flex items-center gap-1">
                 <input
@@ -73,14 +73,14 @@ export default function PaymentStageEditor({
                   min={0}
                   max={100}
                   disabled={disabled}
-                  className="w-20 px-3 py-2 border border-gray-200 rounded-xl text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                  className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                 />
                 <span className="text-sm text-gray-500">%</span>
               </div>
               {!disabled && (
                 <button
                   onClick={() => removeStage(index)}
-                  className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-error-light text-gray-400 hover:text-error transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -91,7 +91,7 @@ export default function PaymentStageEditor({
       )}
 
       {stages.length > 0 && (
-        <div className={`flex items-center gap-2 text-sm ${isValid ? 'text-green-600' : 'text-red-500'}`}>
+        <div className={`flex items-center gap-2 text-sm ${isValid ? 'text-success' : 'text-error'}`}>
           {!isValid && <AlertCircle className="w-4 h-4" />}
           <span>합계: {totalRatio}% {!isValid && '(100%가 되어야 합니다)'}</span>
         </div>

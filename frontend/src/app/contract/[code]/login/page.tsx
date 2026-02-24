@@ -51,7 +51,7 @@ export default function ContractLoginPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {mode === 'login' ? (
             <>
               <div className="space-y-4 mb-6">
@@ -62,7 +62,7 @@ export default function ContractLoginPage() {
               <Button
                 fullWidth
                 size="lg"
-                variant="outline"
+                variant="secondary"
                 className="mt-2 bg-[#FEE500] border-[#FEE500] text-[#191919] hover:bg-[#FDD800]"
                 onClick={() => toast('카카오 OAuth 설정 후 사용 가능합니다.', 'info')}
               >

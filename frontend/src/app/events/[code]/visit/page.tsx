@@ -75,7 +75,7 @@ export default function EventVisitPage() {
   if (loading) {
     return (
       <div className="space-y-4 pt-8">
-        <div className="h-48 bg-white rounded-2xl animate-pulse" />
+        <div className="h-48 bg-white rounded-xl animate-pulse" />
       </div>
     );
   }
@@ -95,10 +95,10 @@ export default function EventVisitPage() {
       <div className="space-y-4 pt-4">
         <Card>
           <div className="text-center py-8">
-            <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-3">
-              <Ticket className="w-7 h-7 text-green-600" />
+            <div className="w-14 h-14 rounded-xl bg-success-light flex items-center justify-center mx-auto mb-3">
+              <Ticket className="w-7 h-7 text-success" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">예약 완료</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">예약 완료</h2>
             <p className="text-sm text-gray-500 mb-6">
               {event.name} 방문예약이 완료되었습니다.
             </p>
@@ -115,10 +115,10 @@ export default function EventVisitPage() {
     <div className="space-y-4 pt-4">
       <Card>
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-3">
-            <Ticket className="w-7 h-7 text-green-600" />
+          <div className="w-14 h-14 rounded-xl bg-success-light flex items-center justify-center mx-auto mb-3">
+            <Ticket className="w-7 h-7 text-success" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900">{event.name}</h2>
+          <h2 className="text-xl font-bold text-gray-800">{event.name}</h2>
           <p className="text-sm text-gray-500 mt-1">방문예약</p>
         </div>
 
@@ -132,7 +132,7 @@ export default function EventVisitPage() {
           </div>
           {event.venue && (
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-              <MapPin className="w-5 h-5 text-green-500" />
+              <MapPin className="w-5 h-5 text-success" />
               <div>
                 <p className="text-xs text-gray-500">장소</p>
                 <p className="text-sm font-medium">{event.venue}</p>
@@ -165,13 +165,13 @@ export default function EventVisitPage() {
                 onChange={(e) => setGuestCount(e.target.value)}
               />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">메모 (선택)</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">메모 (선택)</label>
                 <textarea
                   value={memo}
                   onChange={(e) => setMemo(e.target.value)}
                   placeholder="요청사항이나 메모를 입력하세요"
                   rows={3}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
               <Button fullWidth size="xl" type="submit" loading={submitting} disabled={!visitDate}>

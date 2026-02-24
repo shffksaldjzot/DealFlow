@@ -125,11 +125,11 @@ export default function ContractViewPage() {
                   }}
                 >
                   {field.fieldType === 'checkbox' ? (
-                    <span className="text-gray-900" style={{ fontSize: 'clamp(10px, 1.2vw, 16px)' }}>
+                    <span className="text-gray-800" style={{ fontSize: 'clamp(10px, 1.2vw, 16px)' }}>
                       {value === 'true' ? '☑' : '☐'}
                     </span>
                   ) : (
-                    <span className={`text-gray-900 font-medium truncate ${isLightbox ? 'text-sm' : 'text-xs'}`}>
+                    <span className={`text-gray-800 font-medium truncate ${isLightbox ? 'text-sm' : 'text-xs'}`}>
                       {(field.fieldType === 'number' || field.fieldType === 'amount') && !isNaN(Number(value))
                         ? Number(value).toLocaleString('ko-KR')
                         : value}
@@ -160,7 +160,7 @@ export default function ContractViewPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 px-4 py-3 sticky top-0 z-30">
+      <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-30">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-500">계약번호</p>
@@ -187,7 +187,7 @@ export default function ContractViewPage() {
         {templateFileUrl && !imgError && (
           <Card padding="lg">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-gray-900">계약서 확인</h3>
+              <h3 className="font-bold text-gray-800">계약서 확인</h3>
               {!isPdf && (
                 <button
                   onClick={() => setLightboxOpen(true)}
@@ -210,14 +210,14 @@ export default function ContractViewPage() {
         {/* Read-only field values list (for PDFs or non-positioned fields) */}
         {fieldListToShow.length > 0 && (
           <Card padding="lg">
-            <h3 className="font-bold text-gray-900 mb-4">계약 정보</h3>
+            <h3 className="font-bold text-gray-800 mb-4">계약 정보</h3>
             <div className="space-y-3">
               {fieldListToShow.map((field) => {
                 const value = fieldValues[field.id];
                 return (
                   <div key={field.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
                     <span className="text-sm text-gray-500">{field.label}</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-gray-800">
                       {field.fieldType === 'checkbox'
                         ? (value === 'true' ? '✓' : '-')
                         : (field.fieldType === 'number' || field.fieldType === 'amount') && !isNaN(Number(value))
@@ -241,8 +241,8 @@ export default function ContractViewPage() {
               className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-0.5"
             />
             <div>
-              <p className="text-sm font-semibold text-gray-900">
-                계약 내용에 동의합니다 <span className="text-red-500">*</span>
+              <p className="text-sm font-semibold text-gray-800">
+                계약 내용에 동의합니다 <span className="text-error">*</span>
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 위 계약 내용을 확인하였으며, 이에 동의합니다.

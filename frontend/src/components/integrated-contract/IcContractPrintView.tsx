@@ -63,33 +63,60 @@ export default function IcContractPrintView({ contract, flow, partnerFilter }: I
       {flow && !partnerFilter ? (
         // Full flow: show ALL options with checkmarks for selected ones
         flow.partners.map((partner) =>
-          partner.categories.map((cat) => (
-            <div key={cat.sheetId} style={{ marginBottom: '16px' }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{partner.partnerItems || cat.categoryName}</p>
-              <p style={{ fontSize: '10px', color: '#999', marginBottom: '6px' }}>{partner.partnerName}</p>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
-                <tbody>
-                  {cat.options.map((opt) => {
-                    const isSelected = selectedRowIds.has(opt.rowId);
-                    const selectedItem = selectedMap.get(opt.rowId);
-                    return (
-                      <tr key={opt.rowId} style={{ background: '#fff' }}>
-                        <td style={{ padding: '4px 8px', border: '1px solid #ddd', width: '24px', textAlign: 'center' }}>
-                          {isSelected ? '✓' : ''}
-                        </td>
-                        <td style={{ padding: '4px 8px', border: '1px solid #ddd', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#111' : '#999' }}>
-                          {opt.optionName}
-                        </td>
-                        <td style={{ padding: '4px 8px', border: '1px solid #ddd', textAlign: 'right', width: '100px', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#111' : '#999' }}>
-                          {isSelected && selectedItem ? `${Number(selectedItem.unitPrice).toLocaleString()}원` : ''}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ))
+          partner.categories.map((cat) => {
+            const typeCol = contract.apartmentType?.id
+              ? cat.columns.find((c: any) => c.apartmentTypeId === contract.apartmentType?.id)
+              : null;
+
+            const parsePrice = (val: any): number => {
+              if (val === undefined || val === null || val === '') return 0;
+              if (typeof val === 'number') return val;
+              return Number(String(val).replace(/,/g, '')) || 0;
+            };
+
+            return (
+              <div key={cat.sheetId} style={{ marginBottom: '16px' }}>
+                <p style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{partner.partnerItems || cat.categoryName}</p>
+                <p style={{ fontSize: '10px', color: '#999', marginBottom: '6px' }}>{partner.partnerName}</p>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                  <tbody>
+                    {cat.options.map((opt: any) => {
+                      const isSelected = selectedRowIds.has(opt.rowId);
+                      const selectedItem = selectedMap.get(opt.rowId);
+
+                      let price = 0;
+                      if (isSelected && selectedItem) {
+                        price = Number(selectedItem.unitPrice) || 0;
+                      } else if (typeCol) {
+                        price = parsePrice(opt.cellValues?.[typeCol.id]) || parsePrice(opt.prices?.[typeCol.id]);
+                      }
+                      if (price === 0) {
+                        const amtCols = cat.columns.filter((c: any) => c.columnType === 'amount' || !c.columnType);
+                        for (const col of amtCols) {
+                          const p = parsePrice(opt.cellValues?.[col.id]) || parsePrice(opt.prices?.[col.id]);
+                          if (p > 0) { price = p; break; }
+                        }
+                      }
+
+                      return (
+                        <tr key={opt.rowId} style={{ background: '#fff' }}>
+                          <td style={{ padding: '4px 8px', border: '1px solid #ddd', width: '24px', textAlign: 'center' }}>
+                            {isSelected ? '✓' : ''}
+                          </td>
+                          <td style={{ padding: '4px 8px', border: '1px solid #ddd', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#111' : '#999' }}>
+                            {opt.optionName}
+                          </td>
+                          <td style={{ padding: '4px 8px', border: '1px solid #ddd', textAlign: 'right', width: '100px', fontWeight: isSelected ? 600 : 400, color: isSelected ? '#111' : '#999' }}>
+                            {price > 0 ? `${price.toLocaleString()}원` : '-'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })
         )
       ) : (
         // Fallback: show only selected items (or partner-filtered)

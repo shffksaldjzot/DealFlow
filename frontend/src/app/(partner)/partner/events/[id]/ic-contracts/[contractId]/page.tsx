@@ -44,7 +44,7 @@ export default function PartnerIcContractDetailPage() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+          <div key={i} className="h-24 bg-white rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -104,7 +104,7 @@ export default function PartnerIcContractDetailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-500">내 매출</p>
-                <p className="text-lg font-bold text-gray-900">{formatCurrency(myRevenue)}</p>
+                <p className="text-lg font-bold text-gray-800">{formatCurrency(myRevenue)}</p>
               </div>
               <div className="text-center">
                 <p className="text-xs text-gray-500">수수료율</p>
@@ -114,7 +114,7 @@ export default function PartnerIcContractDetailPage() {
               </div>
               <div className="text-right">
                 <p className="text-xs text-gray-500">수수료</p>
-                <p className="text-lg font-bold text-red-600">{formatCurrency(Math.round(myCommission))}</p>
+                <p className="text-lg font-bold text-error">{formatCurrency(Math.round(myCommission))}</p>
               </div>
             </div>
           </Card>

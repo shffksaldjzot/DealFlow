@@ -58,8 +58,8 @@ export default function OrganizerDashboard() {
   ).sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
 
   const stats = [
-    { label: '진행 중', value: String(activeEvents.length), icon: Calendar, color: 'text-green-600 bg-green-50' },
-    { label: '준비 중', value: String(draftEvents.length), icon: FileText, color: 'text-yellow-600 bg-yellow-50' },
+    { label: '진행 중', value: String(activeEvents.length), icon: Calendar, color: 'text-success bg-success-light' },
+    { label: '준비 중', value: String(draftEvents.length), icon: FileText, color: 'text-warning bg-warning-light' },
     { label: '전체 행사', value: String(events.length), icon: ClipboardList, color: 'text-blue-600 bg-blue-50' },
     { label: '승인 협력업체', value: `${approvedPartners}/${totalPartners}`, icon: Users, color: 'text-purple-600 bg-purple-50' },
   ];
@@ -94,7 +94,7 @@ export default function OrganizerDashboard() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">{s.label}</p>
-                  <p className="text-xl font-bold text-gray-900">{loading ? '-' : s.value}</p>
+                  <p className="text-xl font-bold text-gray-800">{loading ? '-' : s.value}</p>
                 </div>
               </div>
             </Card>
@@ -111,18 +111,18 @@ export default function OrganizerDashboard() {
               <Plus className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900">새 행사 만들기</p>
+              <p className="text-sm font-semibold text-gray-800">새 행사 만들기</p>
               <p className="text-xs text-gray-400">행사를 생성하세요</p>
             </div>
           </div>
         </Card>
         <Card hoverable onClick={() => router.push('/organizer/events')}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-              <Settings className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 rounded-xl bg-success-light flex items-center justify-center">
+              <Settings className="w-5 h-5 text-success" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900">행사 관리</p>
+              <p className="text-sm font-semibold text-gray-800">행사 관리</p>
               <p className="text-xs text-gray-400">행사를 관리하세요</p>
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function OrganizerDashboard() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <Clock className="w-4 h-4 text-orange-500 shrink-0" />
-                      <p className="text-sm font-semibold text-gray-900 truncate">{req.partnerName}</p>
+                      <p className="text-sm font-semibold text-gray-800 truncate">{req.partnerName}</p>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-400 ml-6">
                       <span>{req.eventName}</span>
@@ -168,7 +168,7 @@ export default function OrganizerDashboard() {
       <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 행사</h3>
       {loading ? (
         <div className="space-y-3">
-          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />)}
         </div>
       ) : filtered.length === 0 ? (
         <Card>
@@ -190,7 +190,7 @@ export default function OrganizerDashboard() {
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <p className="font-semibold text-gray-900 truncate">{event.name}</p>
+                      <p className="font-semibold text-gray-800 truncate">{event.name}</p>
                       <Badge status={event.status} />
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-400">

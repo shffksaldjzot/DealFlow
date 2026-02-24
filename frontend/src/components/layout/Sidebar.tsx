@@ -82,10 +82,10 @@ function NavList({ items, role, badges, onNavigate }: { items: NavItem[]; role: 
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
+              'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
               isActive
                 ? 'bg-blue-50 text-blue-700'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800',
             )}
           >
             <span className={isActive ? 'text-blue-600' : 'text-gray-400'}>
@@ -93,7 +93,7 @@ function NavList({ items, role, badges, onNavigate }: { items: NavItem[]; role: 
             </span>
             <span className="flex-1">{item.label}</span>
             {badgeCount > 0 && (
-              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
+              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-error rounded-full">
                 {badgeCount}
               </span>
             )}
@@ -152,7 +152,7 @@ export default function Sidebar({ role }: SidebarProps) {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="w-60 h-[calc(100vh-64px)] bg-white border-r border-gray-100 py-4 hidden lg:block sticky top-16">
+      <aside className="w-60 h-[calc(100vh-64px)] bg-white border-r border-gray-200 py-4 hidden lg:block sticky top-16">
         <NavList items={items} role={role} badges={badges} />
       </aside>
     </>

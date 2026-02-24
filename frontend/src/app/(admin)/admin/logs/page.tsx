@@ -59,24 +59,24 @@ export default function AdminLogsPage() {
   };
 
   const actionIcons: Record<string, string> = {
-    approve_organizer: 'bg-green-400',
-    reject_organizer: 'bg-red-400',
+    approve_organizer: 'bg-success',
+    reject_organizer: 'bg-error',
     create_user: 'bg-blue-400',
     update_user: 'bg-yellow-400',
-    delete_user: 'bg-red-400',
+    delete_user: 'bg-error',
     change_user_status: 'bg-orange-400',
     create_event: 'bg-blue-400',
     update_event: 'bg-purple-400',
     update_event_status: 'bg-purple-400',
-    delete_event: 'bg-red-400',
-    approve_partner: 'bg-green-400',
-    reject_partner: 'bg-red-400',
+    delete_event: 'bg-error',
+    approve_partner: 'bg-success',
+    reject_partner: 'bg-error',
     cancel_partner: 'bg-orange-400',
     partner_join_request: 'bg-cyan-400',
     partner_cancel_participation: 'bg-orange-400',
     create_contract: 'bg-blue-400',
-    contract_signed: 'bg-green-400',
-    cancel_contract: 'bg-red-400',
+    contract_signed: 'bg-success',
+    cancel_contract: 'bg-error',
     update_contract_status: 'bg-indigo-400',
     register_organization: 'bg-teal-400',
     create_organization: 'bg-teal-400',
@@ -111,14 +111,14 @@ export default function AdminLogsPage() {
           </p>
         </Card>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50">
+        <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
           {logs.map((log) => {
             const link = getTargetLink(log);
             const dotColor = actionIcons[log.action] || 'bg-gray-400';
             return (
               <div key={log.id} className="flex items-center gap-3 px-4 py-2">
                 <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor}`} />
-                <p className="text-sm text-gray-900 flex-1 min-w-0 truncate">{log.description}</p>
+                <p className="text-sm text-gray-800 flex-1 min-w-0 truncate">{log.description}</p>
                 {log.userName && (
                   <span className="text-xs text-blue-600 font-medium whitespace-nowrap">{log.userName}</span>
                 )}
@@ -141,7 +141,7 @@ export default function AdminLogsPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 mt-6">
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             disabled={page <= 1}
             onClick={() => setPage(page - 1)}
@@ -152,7 +152,7 @@ export default function AdminLogsPage() {
             {page} / {totalPages}
           </span>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             disabled={page >= totalPages}
             onClick={() => setPage(page + 1)}

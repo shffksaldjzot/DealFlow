@@ -83,7 +83,7 @@ export default function TemplateFieldEditorPage() {
     return (
       <div>
         <PageHeader title="필드 편집" backHref={`/partner/events/${eventId}`} />
-        <div className="h-96 bg-white rounded-2xl animate-pulse" />
+        <div className="h-96 bg-white rounded-xl animate-pulse" />
       </div>
     );
   }

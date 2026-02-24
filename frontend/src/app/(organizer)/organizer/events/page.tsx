@@ -39,7 +39,7 @@ export default function OrganizerEventsPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+            <div key={i} className="h-24 bg-white rounded-xl animate-pulse" />
           ))}
         </div>
       ) : events.length === 0 ? (
@@ -63,7 +63,7 @@ export default function OrganizerEventsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-gray-900">{event.name}</h3>
+                    <h3 className="font-bold text-gray-800">{event.name}</h3>
                     <Badge status={event.status} />
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-500">

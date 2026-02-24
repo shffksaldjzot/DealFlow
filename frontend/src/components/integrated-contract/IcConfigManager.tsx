@@ -195,9 +195,9 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
       });
       setApartmentTypes(prev => [...prev, res.data.data]);
       setNewTypeName('');
-      toast('타입이 추가되었습니다.', 'success');
+      toast('행사제목이 추가되었습니다.', 'success');
     } catch {
-      toast('타입 추가에 실패했습니다.', 'error');
+      toast('행사제목 추가에 실패했습니다.', 'error');
     }
   };
 
@@ -211,9 +211,9 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         prev.map(t => t.id === editingType.id ? { ...t, name: editingType.name } : t),
       );
       setEditingType(null);
-      toast('타입이 수정되었습니다.', 'success');
+      toast('행사제목이 수정되었습니다.', 'success');
     } catch {
-      toast('타입 수정에 실패했습니다.', 'error');
+      toast('행사제목 수정에 실패했습니다.', 'error');
     }
   };
 
@@ -222,9 +222,9 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
     try {
       await api.delete(`/ic/configs/${config.id}/apartment-types/${typeId}`);
       setApartmentTypes(prev => prev.filter(t => t.id !== typeId));
-      toast('타입이 삭제되었습니다.', 'success');
+      toast('행사제목이 삭제되었습니다.', 'success');
     } catch {
-      toast('타입 삭제에 실패했습니다.', 'error');
+      toast('행사제목 삭제에 실패했습니다.', 'error');
     }
   };
 
@@ -280,14 +280,24 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
     return res.data?.data || [];
   };
 
-  const updateSheetCommission = async (sheetId: string, rate: number) => {
-    if (!config) return;
+  const [savingCommissions, setSavingCommissions] = useState(false);
+
+  const saveAllCommissions = async () => {
+    if (!config || sheets.length === 0) return;
+    setSavingCommissions(true);
     try {
-      await api.patch(`/ic/configs/${config.id}/sheets/${sheetId}/commission`, { commissionRate: rate });
-      setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, commissionRate: rate } : s));
-      toast('수수료율이 저장되었습니다.', 'success');
+      await Promise.all(
+        sheets.map(sheet =>
+          api.patch(`/ic/configs/${config.id}/sheets/${sheet.id}/commission`, {
+            commissionRate: sheet.commissionRate || 0,
+          })
+        )
+      );
+      toast('모든 수수료율이 저장되었습니다.', 'success');
     } catch {
       toast('수수료율 저장에 실패했습니다.', 'error');
+    } finally {
+      setSavingCommissions(false);
     }
   };
 
@@ -318,7 +328,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         <PageHeader title="통합 계약 설정" backHref={backHref} />
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="animate-pulse h-24 bg-white rounded-2xl" />
+            <div key={i} className="animate-pulse h-24 bg-white rounded-xl" />
           ))}
         </div>
       </div>
@@ -352,7 +362,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
       {/* Full-screen saving overlay */}
       {saving && (
         <div className="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center">
-          <div className="bg-white rounded-2xl px-8 py-6 shadow-2xl flex items-center gap-4">
+          <div className="bg-white rounded-xl px-8 py-6 shadow-2xl flex items-center gap-4">
             <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
             <span className="text-base font-medium text-gray-800">저장 중...</span>
           </div>
@@ -425,7 +435,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         >
           <div className="flex items-center gap-2">
             <Building2 className="w-5 h-5 text-indigo-500" />
-            <h3 className="font-semibold text-gray-900">아파트 타입</h3>
+            <h3 className="font-semibold text-gray-800">행사제목</h3>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
               {apartmentTypes.length}개
             </span>
@@ -436,13 +446,13 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         {sections.types && (
           <div className="mt-4 space-y-3">
             {apartmentTypes.length === 0 ? (
-              <p className="text-sm text-gray-400">등록된 타입이 없습니다.</p>
+              <p className="text-sm text-gray-400">등록된 행사제목이 없습니다.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {apartmentTypes.map((type) => (
                   <div
                     key={type.id}
-                    className="border border-gray-200 rounded-xl p-3 flex items-center justify-between"
+                    className="border border-gray-200 rounded-lg p-3 flex items-center justify-between"
                   >
                     {editingType?.id === type.id ? (
                       <div className="flex items-center gap-2 flex-1">
@@ -462,9 +472,9 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                           <span className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
                             {type.sortOrder + 1}
                           </span>
-                          <span className="font-medium text-gray-900">{type.name}</span>
+                          <span className="font-medium text-gray-800">{type.name}</span>
                           {type.floorPlanFileId && (
-                            <span className="text-[10px] bg-green-100 text-green-600 px-1.5 py-0.5 rounded-full">평면도</span>
+                            <span className="text-[10px] bg-success-light text-success px-1.5 py-0.5 rounded-full">평면도</span>
                           )}
                         </div>
                         <div className="flex items-center gap-1">
@@ -476,7 +486,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                           </button>
                           <button
                             onClick={() => deleteApartmentType(type.id)}
-                            className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500"
+                            className="p-1.5 rounded-lg hover:bg-error-light text-gray-400 hover:text-error"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -493,8 +503,8 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                 type="text"
                 value={newTypeName}
                 onChange={(e) => setNewTypeName(e.target.value)}
-                placeholder="예: 래미안 59A, 힐스테이트 84B"
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 래미안 옵션계약, 힐스테이트 인테리어"
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onKeyDown={(e) => e.key === 'Enter' && addApartmentType()}
               />
               <Button size="sm" onClick={addApartmentType} disabled={!newTypeName.trim()}>
@@ -513,8 +523,8 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
           onClick={() => toggleSection('stages')}
         >
           <div className="flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-green-500" />
-            <h3 className="font-semibold text-gray-900">결제 단계</h3>
+            <FileSpreadsheet className="w-5 h-5 text-success" />
+            <h3 className="font-semibold text-gray-800">결제 단계</h3>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
               {paymentStages.length === 0 ? '일시불' : `${paymentStages.length}단계`}
             </span>
@@ -538,7 +548,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
           className="w-full flex items-center justify-between"
           onClick={() => toggleSection('terms')}
         >
-          <h3 className="font-semibold text-gray-900">약관 · 특약사항</h3>
+          <h3 className="font-semibold text-gray-800">약관 · 특약사항</h3>
           {sections.terms ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
         </button>
 
@@ -550,7 +560,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                 value={legalTerms}
                 onChange={(e) => setLegalTerms(e.target.value)}
                 rows={5}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
                 placeholder="고객이 계약 시 동의할 약관 내용을 입력하세요."
               />
             </div>
@@ -560,7 +570,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                 value={specialNotes}
                 onChange={(e) => setSpecialNotes(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
                 placeholder="추가 특약사항이 있으면 입력하세요."
               />
             </div>
@@ -582,7 +592,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         >
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5 text-amber-500" />
-            <h3 className="font-semibold text-gray-900">협력업체 시트</h3>
+            <h3 className="font-semibold text-gray-800">협력업체 시트</h3>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
               {sheets.length}개
             </span>
@@ -603,11 +613,11 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
               );
               if (missingPartners.length === 0) return null;
               return (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
-                  <p className="text-xs font-semibold text-yellow-800 mb-1">시트 미제출 업체 ({missingPartners.length})</p>
+                <div className="bg-warning-light border border-amber-200 rounded-xl p-3">
+                  <p className="text-xs font-semibold text-warning mb-1">시트 미제출 업체 ({missingPartners.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {missingPartners.map((p: any) => (
-                      <span key={p.id} className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+                      <span key={p.id} className="text-xs bg-yellow-100 text-warning px-2 py-0.5 rounded-full">
                         {p.organization?.name || '업체'}
                       </span>
                     ))}
@@ -626,7 +636,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                     value={newSheetName}
                     onChange={(e) => setNewSheetName(e.target.value)}
                     placeholder="카테고리명 (예: 마감재, 가전, 가구)"
-                    className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onKeyDown={(e) => e.key === 'Enter' && createSheet()}
                     autoFocus
                   />
@@ -655,13 +665,13 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
               </p>
             ) : (
               sheets.map((sheet) => (
-                <div key={sheet.id} className="border border-gray-200 rounded-xl overflow-hidden">
+                <div key={sheet.id} className="border border-gray-200 rounded-lg overflow-hidden">
                   {/* Sheet Header */}
                   <div className="px-4 py-3 flex items-center justify-between bg-gray-50/50">
                     <div className="flex items-center gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">{sheet.categoryName}</span>
+                          <span className="font-medium text-gray-800">{sheet.categoryName}</span>
                           <Badge status={sheet.status} />
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5">
@@ -687,7 +697,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                       )}
                       <button
                         onClick={() => setDeleteSheetTarget(sheet)}
-                        className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500"
+                        className="p-2 rounded-lg hover:bg-error-light text-gray-400 hover:text-error"
                         title="시트 삭제"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -705,7 +715,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                   </div>
 
                   {/* Commission Rate */}
-                  <div className="px-4 py-2 border-t border-gray-100 bg-white flex items-center gap-3">
+                  <div className="px-4 py-2 border-t border-gray-200 bg-white flex items-center gap-3">
                     <span className="text-xs text-gray-500 whitespace-nowrap">수수료율</span>
                     <input
                       type="number"
@@ -720,18 +730,11 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                       className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-xs text-gray-400">%</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => updateSheetCommission(sheet.id, sheet.commissionRate || 0)}
-                    >
-                      저장
-                    </Button>
                   </div>
 
                   {/* Sheet Editor (expanded) */}
                   {expandedSheet === sheet.id && (
-                    <div className="p-4 border-t border-gray-100">
+                    <div className="p-4 border-t border-gray-200">
                       <SheetEditor
                         apartmentTypes={apartmentTypes}
                         initialColumns={sheet.columns || []}
@@ -744,6 +747,20 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                   )}
                 </div>
               ))
+            )}
+            {/* Batch commission save button */}
+            {sheets.length > 0 && (
+              <Button
+                fullWidth
+                size="lg"
+                variant="outline"
+                onClick={saveAllCommissions}
+                loading={savingCommissions}
+                className="mt-2"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                수수료율 일괄 저장
+              </Button>
             )}
           </div>
         )}

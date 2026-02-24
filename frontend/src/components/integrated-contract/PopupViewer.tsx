@@ -31,11 +31,17 @@ export default function PopupViewer({ content, optionName }: PopupViewerProps) {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full max-w-sm sm:mx-4 space-y-3 animate-in slide-in-from-bottom duration-200 max-h-[80vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+        >
+          <div
+            className="bg-white rounded-xl p-6 w-full max-w-lg space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-gray-900">{optionName}</h3>
-              <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+              <h3 className="text-lg font-bold text-gray-800">{optionName}</h3>
+              <button onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} className="p-1.5 hover:bg-gray-100 rounded-lg">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
@@ -48,7 +54,7 @@ export default function PopupViewer({ content, optionName }: PopupViewerProps) {
               <img
                 src={image}
                 alt={optionName}
-                className="w-full rounded-lg border border-gray-100"
+                className="w-full rounded-xl border border-gray-200"
               />
             )}
           </div>

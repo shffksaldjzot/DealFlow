@@ -40,7 +40,7 @@ export default function OrganizerContractDetailPage() {
       <div>
         <PageHeader title="계약 상세" backHref={`/organizer/events/${id}/contracts`} />
         <div className="space-y-4">
-          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-xl animate-pulse" />)}
         </div>
       </div>
     );
@@ -77,7 +77,7 @@ export default function OrganizerContractDetailPage() {
           <Badge status={contract.status} />
           <span className="text-xs text-gray-400 font-mono">{contract.contractNumber}</span>
         </div>
-        <h2 className="text-lg font-bold text-gray-900">
+        <h2 className="text-lg font-bold text-gray-800">
           {contract.event?.name || '계약서'}
         </h2>
         <p className="text-sm text-gray-500 mt-1">
@@ -96,7 +96,7 @@ export default function OrganizerContractDetailPage() {
             <Building2 className="w-4 h-4 text-gray-400" />
             <div>
               <p className="text-xs text-gray-400">협력업체</p>
-              <p className="text-sm font-medium text-gray-900">{contract.partner?.name || '-'}</p>
+              <p className="text-sm font-medium text-gray-800">{contract.partner?.name || '-'}</p>
             </div>
           </div>
           {(contract.customer || contract.customerName) && (
@@ -104,7 +104,7 @@ export default function OrganizerContractDetailPage() {
               <User className="w-4 h-4 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-400">고객</p>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-gray-800">
                   {contract.customer ? `${contract.customer.name} (${contract.customer.email})` : contract.customerName}
                 </p>
               </div>
@@ -114,7 +114,7 @@ export default function OrganizerContractDetailPage() {
             <Calendar className="w-4 h-4 text-gray-400" />
             <div>
               <p className="text-xs text-gray-400">이벤트</p>
-              <p className="text-sm font-medium text-gray-900">{contract.event?.name || '-'}</p>
+              <p className="text-sm font-medium text-gray-800">{contract.event?.name || '-'}</p>
             </div>
           </div>
           {contract.totalAmount && (
@@ -137,7 +137,7 @@ export default function OrganizerContractDetailPage() {
             {contract.fieldValues.map((fv: any) => (
               <div key={fv.id} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
                 <span className="text-sm text-gray-500">{fv.field?.label || '항목'}</span>
-                <span className="text-sm font-medium text-gray-900">{fv.value}</span>
+                <span className="text-sm font-medium text-gray-800">{fv.value}</span>
               </div>
             ))}
           </div>

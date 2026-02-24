@@ -47,10 +47,10 @@ export default function JoinEventPage() {
 
       <Card padding="lg" className="max-w-md">
         <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
             <QrCode className="w-8 h-8 text-blue-600" />
           </div>
-          <h3 className="font-bold text-gray-900 mb-1">초대코드 입력</h3>
+          <h3 className="font-bold text-gray-800 mb-1">초대코드 입력</h3>
           <p className="text-sm text-gray-500">
             주관사에서 발급한 8자리 초대코드를 입력하세요
           </p>
@@ -64,7 +64,7 @@ export default function JoinEventPage() {
         />
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
             취급 품목
           </label>
           <input
@@ -72,7 +72,7 @@ export default function JoinEventPage() {
             placeholder="예: 줄눈, 탄성코트, 가구, 가전, 도어락"
             value={items}
             onChange={(e) => setItems(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <p className="text-xs text-gray-400 mt-1">이 행사에서 취급할 품목을 쉼표(,)로 구분하여 입력하세요</p>
         </div>

@@ -32,7 +32,7 @@ export default function OptionsList({
           </h3>
           {partner.categories.map((cat) => (
             <div key={cat.sheetId} className="mb-4">
-              <h4 className="text-base font-bold text-gray-900 mb-2">{cat.categoryName}</h4>
+              <h4 className="text-base font-bold text-gray-800 mb-2">{cat.categoryName}</h4>
               <div className="space-y-2">
                 {cat.options.map((opt) => {
                   const price = opt.unitPrice ?? 0;
@@ -64,7 +64,7 @@ export default function OptionsList({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1">
-                          <span className={`text-sm font-medium ${selected ? 'text-blue-700' : 'text-gray-900'}`}>
+                          <span className={`text-sm font-medium ${selected ? 'text-blue-700' : 'text-gray-800'}`}>
                             {opt.optionName}
                           </span>
                           {opt.popupContent && (

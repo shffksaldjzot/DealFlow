@@ -77,7 +77,7 @@ export default function AdminOrganizersPage() {
 
   const getTypeBadge = (type: string) => {
     if (type === 'organizer') return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">주관사</span>;
-    if (type === 'partner') return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">협력업체</span>;
+    if (type === 'partner') return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-success-light text-success">협력업체</span>;
     return <span className="text-xs text-gray-500">{type}</span>;
   };
 
@@ -274,7 +274,7 @@ export default function AdminOrganizersPage() {
             {detailOrg.businessLicenseFileId && (
               <Button
                 fullWidth
-                variant="outline"
+                variant="secondary"
                 onClick={() => handleLicenseDownload(detailOrg.businessLicenseFileId!, detailOrg.name)}
               >
                 <Download className="w-4 h-4 mr-2" />
@@ -284,7 +284,7 @@ export default function AdminOrganizersPage() {
 
             {/* Actions for pending */}
             {detailOrg.status === 'pending' && (
-              <div className="flex gap-2 pt-2 border-t border-gray-100">
+              <div className="flex gap-2 pt-2 border-t border-gray-200">
                 <Button className="flex-1" onClick={() => { handleApprove(detailOrg.id); setDetailOrg(null); }}>
                   <CheckCircle2 className="w-4 h-4 mr-1" />
                   승인

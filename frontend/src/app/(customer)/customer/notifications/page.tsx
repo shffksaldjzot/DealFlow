@@ -51,13 +51,13 @@ export default function CustomerNotifications() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">알림</h2>
+          <h2 className="text-xl font-bold text-gray-800">알림</h2>
           <p className="text-sm text-gray-500 mt-1">
             {unread > 0 ? `읽지 않은 알림 ${unread}개` : '모든 알림을 확인했습니다'}
           </p>
         </div>
         {unread > 0 && (
-          <Button variant="outline" size="sm" onClick={handleMarkAllRead}>
+          <Button variant="secondary" size="sm" onClick={handleMarkAllRead}>
             <CheckCheck className="w-4 h-4 mr-1" /> 모두 읽음
           </Button>
         )}
@@ -65,7 +65,7 @@ export default function CustomerNotifications() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />)}
         </div>
       ) : notifications.length === 0 ? (
         <Card>
@@ -75,11 +75,11 @@ export default function CustomerNotifications() {
           </div>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {notifications.map((n) => (
             <Card
               key={n.id}
-              className={`cursor-pointer ${!n.isRead ? 'border-l-4 border-l-blue-500' : ''}`}
+              className={`cursor-pointer ${!n.isRead ? 'border-l-[3px] border-l-blue-500 bg-blue-50/30' : ''}`}
               hoverable
               onClick={() => handleNotificationClick(n)}
             >
@@ -87,15 +87,15 @@ export default function CustomerNotifications() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     {!n.isRead && <div className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />}
-                    <p className="text-sm font-semibold text-gray-900">{n.title}</p>
+                    <p className="text-sm font-semibold text-gray-800">{n.title}</p>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">{n.message}</p>
-                  <p className="text-xs text-gray-300 mt-2">{formatDateTime(n.createdAt)}</p>
+                  <p className="text-[13px] text-gray-500 mt-1 leading-relaxed">{n.message}</p>
+                  <p className="text-xs text-gray-400 mt-2">{formatDateTime(n.createdAt)}</p>
                 </div>
                 {!n.isRead ? (
                   <button
                     onClick={(e) => { e.stopPropagation(); handleMarkRead(n.id); }}
-                    className="p-2 rounded-lg hover:bg-gray-100 shrink-0"
+                    className="p-2 rounded-lg hover:bg-gray-100 shrink-0 min-w-[36px] min-h-[36px] flex items-center justify-center transition-colors"
                     title="읽음 처리"
                   >
                     <Check className="w-4 h-4 text-gray-400" />

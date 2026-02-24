@@ -41,7 +41,7 @@ export default function ReservationsPage() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2].map((i) => <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />)}
         </div>
       ) : visits.length === 0 ? (
         <EmptyState
@@ -55,11 +55,11 @@ export default function ReservationsPage() {
               <div className="space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-bold text-gray-900">{v.event?.name || '행사'}</h3>
+                    <h3 className="font-bold text-gray-800">{v.event?.name || '행사'}</h3>
                     <Badge status={v.status === 'reserved' ? 'approved' : 'cancelled'} />
                   </div>
                   {v.status === 'reserved' && (
-                    <Button size="sm" variant="outline" onClick={() => handleCancel(v.id)}>
+                    <Button size="sm" variant="secondary" onClick={() => handleCancel(v.id)}>
                       취소
                     </Button>
                   )}

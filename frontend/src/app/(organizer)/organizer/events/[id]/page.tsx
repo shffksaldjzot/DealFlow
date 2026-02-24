@@ -59,7 +59,7 @@ export default function EventDetailPage() {
     }
   };
 
-  if (loading) return <div className="animate-pulse h-64 bg-white rounded-2xl" />;
+  if (loading) return <div className="animate-pulse h-64 bg-white rounded-xl" />;
   if (!event) return null;
 
   const partnerLink = `${origin}/events/${event.inviteCode}/join`;
@@ -92,7 +92,7 @@ export default function EventDetailPage() {
         </Card>
         <Card>
           <div className="flex items-center gap-3">
-            <MapPin className="w-5 h-5 text-green-500" />
+            <MapPin className="w-5 h-5 text-success" />
             <div>
               <p className="text-xs text-gray-500">장소</p>
               <p className="text-sm font-medium">{event.venue || '-'}</p>
@@ -125,19 +125,19 @@ export default function EventDetailPage() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Link2 className="w-4 h-4 text-purple-500" />
-              <p className="text-sm font-semibold text-gray-900">협력업체 초대 링크</p>
+              <p className="text-sm font-semibold text-gray-800">협력업체 초대 링크</p>
             </div>
             <p className="text-xs text-gray-500 break-all font-mono bg-gray-50 p-2 rounded-lg">{partnerLink}</p>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => copyLink(partnerLink, 'partner')}>
+              <Button size="sm" variant="secondary" onClick={() => copyLink(partnerLink, 'partner')}>
                 {copiedLink === 'partner' ? <><Check className="w-3.5 h-3.5 mr-1" /> 복사됨</> : <><Copy className="w-3.5 h-3.5 mr-1" /> 링크 복사</>}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => setShowQr(showQr === 'partner' ? null : 'partner')}>
+              <Button size="sm" variant="secondary" onClick={() => setShowQr(showQr === 'partner' ? null : 'partner')}>
                 <QrCode className="w-3.5 h-3.5 mr-1" /> QR
               </Button>
             </div>
             {showQr === 'partner' && (
-              <div className="flex justify-center p-4 bg-white rounded-xl border border-gray-100">
+              <div className="flex justify-center p-4 bg-white rounded-xl border border-gray-200">
                 <QRCodeSVG value={partnerLink} size={160} level="H" includeMargin fgColor="#1a1a1a" />
               </div>
             )}
@@ -146,20 +146,20 @@ export default function EventDetailPage() {
         <Card>
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Link2 className="w-4 h-4 text-green-500" />
-              <p className="text-sm font-semibold text-gray-900">고객 방문예약 링크</p>
+              <Link2 className="w-4 h-4 text-success" />
+              <p className="text-sm font-semibold text-gray-800">고객 방문예약 링크</p>
             </div>
             <p className="text-xs text-gray-500 break-all font-mono bg-gray-50 p-2 rounded-lg">{visitLink}</p>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => copyLink(visitLink, 'visit')}>
+              <Button size="sm" variant="secondary" onClick={() => copyLink(visitLink, 'visit')}>
                 {copiedLink === 'visit' ? <><Check className="w-3.5 h-3.5 mr-1" /> 복사됨</> : <><Copy className="w-3.5 h-3.5 mr-1" /> 링크 복사</>}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => setShowQr(showQr === 'visit' ? null : 'visit')}>
+              <Button size="sm" variant="secondary" onClick={() => setShowQr(showQr === 'visit' ? null : 'visit')}>
                 <QrCode className="w-3.5 h-3.5 mr-1" /> QR
               </Button>
             </div>
             {showQr === 'visit' && (
-              <div className="flex justify-center p-4 bg-white rounded-xl border border-gray-100">
+              <div className="flex justify-center p-4 bg-white rounded-xl border border-gray-200">
                 <QRCodeSVG value={visitLink} size={160} level="H" includeMargin fgColor="#1a1a1a" />
               </div>
             )}
@@ -178,7 +178,7 @@ export default function EventDetailPage() {
               <Users className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">협력업체 관리</p>
+              <p className="font-semibold text-gray-800">협력업체 관리</p>
               <p className="text-sm text-gray-500">참여 업체 승인/관리</p>
             </div>
           </div>
@@ -188,11 +188,11 @@ export default function EventDetailPage() {
           onClick={() => router.push(`/organizer/events/${id}/contracts`)}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 rounded-xl bg-success-light flex items-center justify-center">
+              <FileText className="w-5 h-5 text-success" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">계약 / 정산</p>
+              <p className="font-semibold text-gray-800">계약 / 정산</p>
               <p className="text-sm text-gray-500">계약 현황 및 정산 관리</p>
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function EventDetailPage() {
               <Settings className="w-5 h-5 text-indigo-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">통합 계약 설정</p>
+              <p className="font-semibold text-gray-800">통합 계약 설정</p>
               <p className="text-sm text-gray-500">타입·결제단계·약관</p>
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function EventDetailPage() {
               <ClipboardList className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">통합 계약 현황</p>
+              <p className="font-semibold text-gray-800">통합 계약 현황</p>
               <p className="text-sm text-gray-500">고객 통합 계약 조회</p>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function EventDetailPage() {
 
       {/* Delete Section */}
       {event.status !== 'cancelled' && (
-        <div className="mt-8 pt-6 border-t border-gray-100">
+        <div className="mt-8 pt-6 border-t border-gray-200">
           <Button variant="danger" onClick={() => setDeleteModal(true)}>
             <Trash2 className="w-4 h-4 mr-1" /> 행사 삭제
           </Button>
@@ -248,7 +248,7 @@ export default function EventDetailPage() {
           정말로 <strong>{event.name}</strong> 행사를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
         </p>
         <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={() => setDeleteModal(false)}>취소</Button>
+          <Button variant="secondary" onClick={() => setDeleteModal(false)}>취소</Button>
           <Button variant="danger" onClick={handleDeleteEvent}>삭제</Button>
         </div>
       </Modal>

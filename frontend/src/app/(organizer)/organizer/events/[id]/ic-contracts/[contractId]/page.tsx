@@ -37,7 +37,7 @@ export default function OrganizerIcContractDetailPage() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+          <div key={i} className="h-24 bg-white rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -102,8 +102,8 @@ export default function OrganizerIcContractDetailPage() {
                   </div>
                 </div>
               ))}
-              <div className="border-t border-gray-100 pt-2 flex items-center justify-between text-sm font-semibold">
-                <span className="text-gray-900">합계</span>
+              <div className="border-t border-gray-200 pt-2 flex items-center justify-between text-sm font-semibold">
+                <span className="text-gray-800">합계</span>
                 <span className="text-orange-600">{formatCurrency(Math.round(totalCommission))}</span>
               </div>
             </div>

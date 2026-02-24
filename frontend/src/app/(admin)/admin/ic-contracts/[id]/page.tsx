@@ -73,7 +73,7 @@ export default function AdminIcContractDetailPage() {
               <button
                 disabled={updating}
                 onClick={() => updateStatus('completed')}
-                className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-success rounded-lg hover:bg-success disabled:opacity-50"
               >
                 확인 (완료)
               </button>
@@ -82,7 +82,7 @@ export default function AdminIcContractDetailPage() {
               <button
                 disabled={updating}
                 onClick={() => updateStatus('cancelled')}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-error rounded-lg hover:bg-error disabled:opacity-50"
               >
                 취소
               </button>
@@ -92,7 +92,7 @@ export default function AdminIcContractDetailPage() {
       />
 
       {/* Contract Info */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
         <h3 className="text-sm font-semibold text-gray-500 mb-4">계약 정보</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
           <div>
@@ -140,12 +140,12 @@ export default function AdminIcContractDetailPage() {
 
       {/* Selected Items */}
       {contract.selectedItems?.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
           <h3 className="text-sm font-semibold text-gray-500 mb-4">선택 항목</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
+                <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="px-4 py-2 text-left font-semibold text-gray-600">파트너</th>
                   <th className="px-4 py-2 text-left font-semibold text-gray-600">카테고리</th>
                   <th className="px-4 py-2 text-left font-semibold text-gray-600">옵션</th>
@@ -169,12 +169,12 @@ export default function AdminIcContractDetailPage() {
 
       {/* Payment Schedule */}
       {contract.paymentSchedule?.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
           <h3 className="text-sm font-semibold text-gray-500 mb-4">납부 일정</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
+                <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="px-4 py-2 text-left font-semibold text-gray-600">구분</th>
                   <th className="px-4 py-2 text-right font-semibold text-gray-600">비율</th>
                   <th className="px-4 py-2 text-right font-semibold text-gray-600">금액</th>
@@ -196,7 +196,7 @@ export default function AdminIcContractDetailPage() {
 
       {/* Signature */}
       {contract.signatureData && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
           <h3 className="text-sm font-semibold text-gray-500 mb-4">서명</h3>
           <img
             src={contract.signatureData}
@@ -208,7 +208,7 @@ export default function AdminIcContractDetailPage() {
 
       {/* Special Notes */}
       {contract.specialNotes && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
           <h3 className="text-sm font-semibold text-gray-500 mb-4">특이사항</h3>
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{contract.specialNotes}</p>
         </div>

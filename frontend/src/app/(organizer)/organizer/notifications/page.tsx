@@ -57,7 +57,7 @@ export default function OrganizerNotifications() {
         subtitle={unread > 0 ? `읽지 않은 알림 ${unread}개` : '모든 알림을 확인했습니다'}
         actions={
           unread > 0 ? (
-            <Button variant="outline" size="sm" onClick={handleMarkAllRead}>
+            <Button variant="secondary" size="sm" onClick={handleMarkAllRead}>
               <CheckCheck className="w-4 h-4 mr-1" /> 모두 읽음
             </Button>
           ) : undefined
@@ -66,7 +66,7 @@ export default function OrganizerNotifications() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />)}
         </div>
       ) : notifications.length === 0 ? (
         <Card>
@@ -88,7 +88,7 @@ export default function OrganizerNotifications() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     {!n.isRead && <div className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />}
-                    <p className="text-sm font-semibold text-gray-900">{n.title}</p>
+                    <p className="text-sm font-semibold text-gray-800">{n.title}</p>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">{n.message}</p>
                   <p className="text-xs text-gray-300 mt-2">{formatDateTime(n.createdAt)}</p>

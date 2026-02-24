@@ -69,7 +69,7 @@ export default function AdminEventDetailPage() {
       <div>
         <PageHeader title="행사 상세" backHref="/admin/events" />
         <div className="space-y-4">
-          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-xl animate-pulse" />)}
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ export default function AdminEventDetailPage() {
         backHref="/admin/events"
         actions={
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setEditModal(true)}>수정</Button>
+            <Button size="sm" variant="secondary" onClick={() => setEditModal(true)}>수정</Button>
             <Button size="sm" variant="danger" onClick={() => setDeleteModal(true)}>삭제</Button>
           </div>
         }
@@ -141,7 +141,7 @@ export default function AdminEventDetailPage() {
             <h3 className="text-sm font-semibold text-gray-700">통합 계약 설정</h3>
             <p className="text-xs text-gray-400 mt-0.5">행사의 통합 계약(IC) 설정을 관리합니다</p>
           </div>
-          <Button size="sm" variant="outline" onClick={() => router.push(`/admin/events/${id}/ic-config`)}>
+          <Button size="sm" variant="secondary" onClick={() => router.push(`/admin/events/${id}/ic-config`)}>
             설정 관리
           </Button>
         </div>
@@ -151,11 +151,11 @@ export default function AdminEventDetailPage() {
       {event.partners && event.partners.length > 0 && (
         <Card className="mb-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">참여 협력업체 ({event.partners.length})</h3>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-100">
             {event.partners.map((ep: any) => (
               <div key={ep.id} className="flex items-center justify-between py-2">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{ep.partner?.name || '-'}</p>
+                  <p className="text-sm font-medium text-gray-800">{ep.partner?.name || '-'}</p>
                   <p className="text-xs text-gray-400">{formatDateTime(ep.createdAt)}</p>
                 </div>
                 <Badge status={ep.status} />
@@ -169,7 +169,7 @@ export default function AdminEventDetailPage() {
       {event.contracts && event.contracts.length > 0 && (
         <Card className="mb-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">계약 목록 ({event.contracts.length})</h3>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-100">
             {event.contracts.map((c: any) => (
               <div
                 key={c.id}
@@ -177,7 +177,7 @@ export default function AdminEventDetailPage() {
                 onClick={() => router.push(`/admin/contracts/${c.id}`)}
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900 font-mono">{c.contractNumber}</p>
+                  <p className="text-sm font-medium text-gray-800 font-mono">{c.contractNumber}</p>
                   <p className="text-xs text-gray-400">{c.customer?.name || '미지정'} / {c.partner?.name || '-'}</p>
                 </div>
                 <div className="text-right">
@@ -204,7 +204,7 @@ export default function AdminEventDetailPage() {
             <textarea
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={3}
             />
           </div>
@@ -213,7 +213,7 @@ export default function AdminEventDetailPage() {
             <select
               value={editStatus}
               onChange={(e) => setEditStatus(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="draft">초안</option>
               <option value="active">진행중</option>
@@ -222,7 +222,7 @@ export default function AdminEventDetailPage() {
             </select>
           </div>
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => setEditModal(false)}>취소</Button>
+            <Button variant="secondary" onClick={() => setEditModal(false)}>취소</Button>
             <Button onClick={handleSave} loading={saving}>저장</Button>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function AdminEventDetailPage() {
           정말로 <strong>{event.name}</strong> 행사를 삭제하시겠습니까?
         </p>
         <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={() => setDeleteModal(false)}>취소</Button>
+          <Button variant="secondary" onClick={() => setDeleteModal(false)}>취소</Button>
           <Button variant="danger" onClick={handleDelete}>삭제</Button>
         </div>
       </Modal>

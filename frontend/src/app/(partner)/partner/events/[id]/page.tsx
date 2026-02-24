@@ -79,7 +79,7 @@ export default function PartnerEventDetailPage() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+          <div key={i} className="h-24 bg-white rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -92,7 +92,7 @@ export default function PartnerEventDetailPage() {
       key: 'name',
       header: '템플릿명',
       render: (item: ContractTemplate) => (
-        <span className="font-medium text-gray-900">{item.name}</span>
+        <span className="font-medium text-gray-800">{item.name}</span>
       ),
     },
     {
@@ -147,7 +147,7 @@ export default function PartnerEventDetailPage() {
       header: '계약번호',
       className: 'hidden sm:table-cell',
       render: (item: Contract) => (
-        <span className="font-mono font-medium text-gray-900 text-xs">{item.contractNumber}</span>
+        <span className="font-mono font-medium text-gray-800 text-xs">{item.contractNumber}</span>
       ),
     },
     {
@@ -172,7 +172,7 @@ export default function PartnerEventDetailPage() {
         item.status !== 'completed' && item.status !== 'cancelled' ? (
           <button
             onClick={(e) => { e.stopPropagation(); setCancelContractId(item.id); }}
-            className="p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+            className="p-1 rounded hover:bg-error-light text-gray-400 hover:text-error transition-colors"
             title="파기"
           >
             <XCircle className="w-4 h-4" />
@@ -209,7 +209,7 @@ export default function PartnerEventDetailPage() {
         </Card>
         <Card>
           <div className="flex items-center gap-3">
-            <MapPin className="w-5 h-5 text-green-500" />
+            <MapPin className="w-5 h-5 text-success" />
             <div>
               <p className="text-xs text-gray-500">장소</p>
               <p className="text-sm font-medium">{event.venue || '-'}</p>
@@ -239,7 +239,7 @@ export default function PartnerEventDetailPage() {
               <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
             </div>
             <div className="flex-1">
-              <p className="font-bold text-gray-900">통합 계약 시트</p>
+              <p className="font-bold text-gray-800">통합 계약 시트</p>
               <p className="text-sm text-gray-500">품목별 옵션 + 가격 시트를 편집합니다</p>
             </div>
             <span className="text-gray-400">→</span>
@@ -250,12 +250,12 @@ export default function PartnerEventDetailPage() {
       {/* Contract Templates Section */}
       <div className="mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
             <FileText className="w-5 h-5 text-gray-600" />
             계약서 템플릿
           </h3>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => router.push(`/partner/events/${id}/templates/new`)}
           >
@@ -293,12 +293,12 @@ export default function PartnerEventDetailPage() {
       {/* Contracts Section */}
       <div className="mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
             <QrCode className="w-5 h-5 text-gray-600" />
             계약 현황
           </h3>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => router.push(`/partner/events/${id}/contracts/new`)}
           >
@@ -347,10 +347,10 @@ export default function PartnerEventDetailPage() {
       </div>
 
       {/* Cancel Participation - at the bottom */}
-      <div className="mt-12 pt-6 border-t border-gray-100">
+      <div className="mt-12 pt-6 border-t border-gray-200">
         <button
           onClick={() => setShowCancelDialog(true)}
-          className="text-sm text-red-500 hover:text-red-700 underline"
+          className="text-sm text-error hover:text-error underline"
         >
           참여 취소
         </button>
@@ -359,16 +359,16 @@ export default function PartnerEventDetailPage() {
       {/* Contract Cancel Dialog */}
       {cancelContractId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">계약 파기</h3>
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-lg font-bold text-gray-800">계약 파기</h3>
             <p className="text-sm text-gray-500">이 계약을 파기하시겠습니까?</p>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">파기 사유</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">파기 사유</label>
               <textarea
                 value={contractCancelReason}
                 onChange={(e) => setContractCancelReason(e.target.value)}
                 placeholder="파기 사유를 입력하세요"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={3}
               />
             </div>
@@ -387,19 +387,19 @@ export default function PartnerEventDetailPage() {
       {/* Cancel Confirmation Dialog */}
       {showCancelDialog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">참여 취소</h3>
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-lg font-bold text-gray-800">참여 취소</h3>
             <p className="text-sm text-gray-500">
               <strong>{event.name}</strong> 행사 참여를 취소하시겠습니까?
             </p>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">취소 사유 (선택)</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">취소 사유 (선택)</label>
               <input
                 type="text"
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
                 placeholder="취소 사유를 입력하세요"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex gap-3 justify-end">
