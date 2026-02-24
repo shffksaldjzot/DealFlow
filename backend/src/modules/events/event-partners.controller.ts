@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, ParseUUIDPipe } from '@nestjs/common';
 import { EventPartnersService } from './event-partners.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -33,5 +33,14 @@ export class EventPartnersController {
     @Body() body: { reason?: string },
   ) {
     return this.eventPartnersService.cancelParticipation(userId, eventId, body.reason);
+  }
+
+  @Delete(':eventId')
+  @Roles('partner')
+  withdrawParticipation(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.eventPartnersService.withdrawParticipation(userId, eventId);
   }
 }

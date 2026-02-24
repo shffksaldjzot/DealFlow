@@ -61,9 +61,9 @@ export default function PartnerSheetPage() {
       const res = await api.put(`/ic/sheets/${sheet.id}/columns`, { columns });
       toast('열이 저장되었습니다.', 'success');
       return res.data?.data || [];
-    } catch {
+    } catch (err) {
       toast('열 저장에 실패했습니다.', 'error');
-      throw new Error();
+      throw err;
     }
   };
 
@@ -73,9 +73,9 @@ export default function PartnerSheetPage() {
       const res = await api.put(`/ic/sheets/${sheet.id}/rows`, { rows });
       toast('행이 저장되었습니다.', 'success');
       return res.data?.data || [];
-    } catch {
+    } catch (err) {
       toast('행 저장에 실패했습니다.', 'error');
-      throw new Error();
+      throw err;
     }
   };
 

@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -192,6 +193,40 @@ export class OrganizationsService {
       where: { id: saved.id },
       relations: ['user'],
     });
+  }
+
+  async deleteOrganization(orgId: string, userId: string): Promise<{ message: string }> {
+    const membership = await this.memberRepository.findOne({
+      where: { organizationId: orgId, userId },
+    });
+    if (!membership || membership.role !== MemberRole.OWNER) {
+      throw new ForbiddenException('조직 삭제는 대표자만 가능합니다.');
+    }
+
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    if (!org) {
+      throw new NotFoundException('조직을 찾을 수 없습니다.');
+    }
+
+    if (org.status === OrgStatus.APPROVED) {
+      throw new BadRequestException(
+        '승인된 조직은 바로 삭제할 수 없습니다. 관리자에게 문의해주세요.',
+      );
+    }
+
+    // Delete memberships first, then org
+    await this.memberRepository.delete({ organizationId: orgId });
+    await this.orgRepository.remove(org);
+
+    await this.activityLogService.log(
+      'delete_organization',
+      `업체 "${org.name}" 삭제`,
+      userId,
+      'organization',
+      orgId,
+    );
+
+    return { message: '조직이 삭제되었습니다.' };
   }
 
   async findById(orgId: string): Promise<Organization | null> {

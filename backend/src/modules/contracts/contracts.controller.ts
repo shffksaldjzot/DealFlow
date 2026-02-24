@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
   Query,
@@ -61,6 +62,14 @@ export class ContractsController {
     @Body() dto: FillContractDto,
   ) {
     return this.contractsService.prefillContract(id, userId, dto);
+  }
+
+  @Delete(':id')
+  deleteContract(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.contractsService.deleteContract(id, userId);
   }
 
   @Get(':id/qr')

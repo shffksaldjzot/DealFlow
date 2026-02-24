@@ -599,10 +599,8 @@ export class AdminService {
     return { temporaryPassword };
   }
 
-  private async sendKakaoAlimtalk(phone: string, message: string): Promise<void> {
+  private async sendKakaoAlimtalk(_phone: string, _message: string): Promise<void> {
     // TODO: Implement actual Kakao Alimtalk API integration
-    // For now, log the message that would be sent
-    console.log(`[KakaoAlimtalk] To: ${phone}, Message: ${message}`);
   }
 
   private generateTemporaryPassword(): string {

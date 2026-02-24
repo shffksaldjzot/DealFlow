@@ -142,7 +142,7 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<TokenResponseDto> {
     try {
       const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get('JWT_REFRESH_SECRET') || 'dealflow-jwt-refresh-secret-key',
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
       const user = await this.usersRepository.findOne({
         where: { id: payload.sub },
@@ -198,6 +198,9 @@ export class AuthService {
 
     if (newPassword.length < 8) {
       throw new BadRequestException('새 비밀번호는 8자 이상이어야 합니다.');
+    }
+    if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+      throw new BadRequestException('비밀번호는 대문자, 소문자, 숫자를 각각 1개 이상 포함해야 합니다.');
     }
 
     user.passwordHash = await bcrypt.hash(newPassword, 10);
@@ -279,24 +282,26 @@ export class AuthService {
   }
 
   private generateTemporaryPassword(): string {
+    const { randomBytes } = require('crypto');
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    const bytes = randomBytes(12);
     let password = '';
-    for (let i = 0; i < 10; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(bytes[i] % chars.length);
     }
-    return password + '!';
+    return password + '!A1';
   }
 
   private generateTokens(user: User): TokenResponseDto {
     const payload = { sub: user.id, role: user.role };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_SECRET') || 'dealflow-jwt-secret-key',
+      secret: this.configService.get<string>('JWT_SECRET'),
       expiresIn: this.configService.get('JWT_EXPIRES_IN') || '7d',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_REFRESH_SECRET') || 'dealflow-jwt-refresh-secret-key',
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN') || '30d',
     });
 
@@ -334,21 +339,8 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
-      // Fallback for dev environment
-      return {
-        id: `dev_${accessToken.substring(0, 8)}`,
-        email: `dev_${accessToken.substring(0, 8)}@dealflow.app`,
-        name: '개발용 사용자',
-      };
+      throw new UnauthorizedException('카카오 인증에 실패했습니다. 다시 시도해주세요.');
     }
   }
 
-  // TEMP: one-time admin password reset - REMOVE after use
-  async tempResetPassword(email: string, newPassword: string) {
-    const user = await this.usersRepository.findOne({ where: { email } });
-    if (!user) return { message: 'not found' };
-    user.passwordHash = await bcrypt.hash(newPassword, 10);
-    await this.usersRepository.save(user);
-    return { message: 'password reset done', email: user.email, role: user.role };
-  }
 }

@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
   Query,
@@ -49,6 +50,14 @@ export class ContractTemplatesController {
     @Body() dto: SaveFieldsDto,
   ) {
     return this.contractsService.saveFields(id, userId, dto);
+  }
+
+  @Delete(':id')
+  deleteTemplate(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.contractsService.deleteTemplate(id, userId);
   }
 
   @Get(':id/fields')

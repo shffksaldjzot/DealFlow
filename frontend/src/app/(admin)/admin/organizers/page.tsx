@@ -71,8 +71,18 @@ export default function AdminOrganizersPage() {
     }
   };
 
-  const handleLicenseDownload = (fileId: string, orgName: string) => {
-    window.open(`/api/files/${fileId}/download`, '_blank');
+  const handleLicenseDownload = async (fileId: string, orgName: string) => {
+    try {
+      const res = await api.get(`/files/${fileId}/download`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${orgName}_사업자등록증`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast('파일 다운로드에 실패했습니다.', 'error');
+    }
   };
 
   const getTypeBadge = (type: string) => {

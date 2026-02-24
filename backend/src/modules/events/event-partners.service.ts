@@ -174,6 +174,40 @@ export class EventPartnersService {
     return saved;
   }
 
+  async withdrawParticipation(userId: string, eventId: string): Promise<{ message: string }> {
+    const orgId = await this.getOrgIdForUser(userId);
+
+    const eventPartner = await this.eventPartnerRepository.findOne({
+      where: { eventId, partnerId: orgId },
+      relations: ['event', 'partner'],
+    });
+    if (!eventPartner) {
+      throw new NotFoundException('참가 정보를 찾을 수 없습니다.');
+    }
+
+    // Only pending or cancelled can be deleted
+    if (eventPartner.status === EventPartnerStatus.APPROVED) {
+      throw new ForbiddenException(
+        '승인된 참가는 삭제할 수 없습니다. 먼저 참가 취소를 진행해주세요.',
+      );
+    }
+
+    const partnerName = eventPartner.partner?.name || '협력업체';
+    const eventName = eventPartner.event?.name || '행사';
+
+    await this.eventPartnerRepository.remove(eventPartner);
+
+    await this.activityLogService.log(
+      'partner_withdraw',
+      `"${partnerName}"이(가) 행사 "${eventName}" 참가 신청 철회`,
+      userId,
+      'event_partner',
+      eventId,
+    );
+
+    return { message: '참가 신청이 철회되었습니다.' };
+  }
+
   async listMyParticipatedEvents(userId: string): Promise<EventPartner[]> {
     const orgId = await this.getOrgIdForUser(userId);
 

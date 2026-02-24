@@ -1,4 +1,5 @@
 import { Controller, Post, Get, Patch, Body } from '@nestjs/common';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import {
   SocialLoginDto,
@@ -16,24 +17,28 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @Throttle({ short: { ttl: 1000, limit: 1 }, medium: { ttl: 60000, limit: 5 } })
   @Post('login/social')
   socialLogin(@Body() dto: SocialLoginDto) {
     return this.authService.socialLogin(dto);
   }
 
   @Public()
+  @Throttle({ short: { ttl: 1000, limit: 1 }, medium: { ttl: 60000, limit: 5 } })
   @Post('login/email')
   emailLogin(@Body() dto: EmailLoginDto) {
     return this.authService.emailLogin(dto);
   }
 
   @Public()
+  @Throttle({ short: { ttl: 1000, limit: 1 }, medium: { ttl: 60000, limit: 3 } })
   @Post('signup')
   signup(@Body() dto: SignupDto) {
     return this.authService.signup(dto);
   }
 
   @Public()
+  @Throttle({ short: { ttl: 1000, limit: 1 }, medium: { ttl: 60000, limit: 3 } })
   @Post('forgot-password')
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto);
@@ -66,13 +71,4 @@ export class AuthController {
     return this.authService.changePassword(userId, dto.currentPassword, dto.newPassword);
   }
 
-  // TEMP: one-time admin password reset - REMOVE after use
-  @Public()
-  @Post('temp-reset')
-  tempReset(@Body() body: { email: string; password: string; secret: string }) {
-    if (body.secret !== 'dealflow-temp-reset-2026') {
-      return { message: 'unauthorized' };
-    }
-    return this.authService.tempResetPassword(body.email, body.password);
-  }
 }

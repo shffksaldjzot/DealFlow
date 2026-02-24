@@ -7,6 +7,7 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import PeriodSelector, { PeriodValue } from '@/components/ui/PeriodSelector';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import { FileText, ChevronRight, Clock, CheckCircle, AlertCircle, Ticket, Search, ChevronDown, Camera, X, XCircle, Layers } from 'lucide-react';
 import { formatDateTime, formatDate, formatCurrency } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
@@ -38,6 +39,8 @@ export default function CustomerHome() {
   const [showScanner, setShowScanner] = useState(false);
   const scannerRef = useRef<any>(null);
   const [period, setPeriod] = useState<PeriodValue>({ from: null, to: null, label: '전체' });
+  const [cancelTarget, setCancelTarget] = useState<{ id: string } | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   const fetchContracts = () => {
     api.get('/customer/contracts').then((res) => setContracts(extractData(res))).catch(() => {});
@@ -52,15 +55,23 @@ export default function CustomerHome() {
     ]).finally(() => setLoading(false));
   }, []);
 
-  const handleCancelContract = async (contractId: string, e: React.MouseEvent) => {
+  const handleCancelClick = (contractId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm('이 계약을 취소하시겠습니까?')) return;
+    setCancelTarget({ id: contractId });
+  };
+
+  const handleCancelConfirm = async () => {
+    if (!cancelTarget) return;
+    setCancelling(true);
     try {
-      await api.post(`/customer/contracts/${contractId}/cancel`);
+      await api.post(`/customer/contracts/${cancelTarget.id}/cancel`);
       toast('계약이 취소되었습니다.', 'success');
       fetchContracts();
     } catch {
       toast('취소에 실패했습니다.', 'error');
+    } finally {
+      setCancelling(false);
+      setCancelTarget(null);
     }
   };
 
@@ -141,7 +152,7 @@ export default function CustomerHome() {
       } catch {
         setShowScanner(false);
         // Fallback: try to open camera app via URL scheme
-        alert('카메라를 사용할 수 없습니다.\n카메라 권한을 확인하거나 아래 코드 입력란을 이용해주세요.');
+        toast('카메라를 사용할 수 없습니다. 카메라 권한을 확인하거나 아래 코드 입력란을 이용해주세요.', 'error');
         setShowCodeInput(true);
       }
     }, 100);
@@ -315,7 +326,7 @@ export default function CustomerHome() {
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-2">
                     <button
-                      onClick={(e) => handleCancelContract(c.id, e)}
+                      onClick={(e) => handleCancelClick(c.id, e)}
                       className="p-2 rounded-lg hover:bg-error-light text-gray-400 hover:text-error transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                       title="취소"
                     >
@@ -457,6 +468,17 @@ export default function CustomerHome() {
           QR 코드 스캔 버튼을 누르면 카메라가 실행됩니다. 계약서 QR 코드 또는 방문예약 QR 코드를 스캔하세요.
         </p>
       </div>
+
+      <ConfirmModal
+        isOpen={!!cancelTarget}
+        onClose={() => setCancelTarget(null)}
+        onConfirm={handleCancelConfirm}
+        title="계약 취소"
+        message="이 계약을 취소하시겠습니까? 취소 후에는 되돌릴 수 없습니다."
+        confirmText="계약 취소"
+        variant="danger"
+        loading={cancelling}
+      />
     </div>
   );
 }

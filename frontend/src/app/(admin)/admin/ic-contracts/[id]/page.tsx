@@ -5,6 +5,8 @@ import api, { extractData } from '@/lib/api';
 import Badge from '@/components/ui/Badge';
 import PageHeader from '@/components/layout/PageHeader';
 import IcContractPrintView from '@/components/integrated-contract/IcContractPrintView';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import { useToast } from '@/components/ui/Toast';
 import { formatDateTime, formatCurrency } from '@/lib/utils';
 import type { IcContract } from '@/types/integrated-contract';
 
@@ -14,6 +16,8 @@ export default function AdminIcContractDetailPage() {
   const [contract, setContract] = useState<IcContract | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [confirmStatus, setConfirmStatus] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const fetchContract = () => {
     setLoading(true);
@@ -25,13 +29,16 @@ export default function AdminIcContractDetailPage() {
 
   useEffect(() => { fetchContract(); }, [id]);
 
-  const updateStatus = (status: string) => {
-    if (!confirm(`상태를 "${status}"로 변경하시겠습니까?`)) return;
+  const handleStatusConfirm = () => {
+    if (!confirmStatus) return;
     setUpdating(true);
-    api.patch(`/admin/ic-contracts/${id}/status`, { status })
-      .then((res) => setContract(extractData<IcContract>(res)))
-      .catch(() => alert('상태 변경에 실패했습니다.'))
-      .finally(() => setUpdating(false));
+    api.patch(`/admin/ic-contracts/${id}/status`, { status: confirmStatus })
+      .then((res) => {
+        setContract(extractData<IcContract>(res));
+        toast('상태가 변경되었습니다.', 'success');
+      })
+      .catch(() => toast('상태 변경에 실패했습니다.', 'error'))
+      .finally(() => { setUpdating(false); setConfirmStatus(null); });
   };
 
   if (loading) {
@@ -72,7 +79,7 @@ export default function AdminIcContractDetailPage() {
             {contract.status === 'signed' && (
               <button
                 disabled={updating}
-                onClick={() => updateStatus('completed')}
+                onClick={() => setConfirmStatus('completed')}
                 className="px-4 py-2 text-sm font-medium text-white bg-success rounded-lg hover:bg-success disabled:opacity-50"
               >
                 확인 (완료)
@@ -81,7 +88,7 @@ export default function AdminIcContractDetailPage() {
             {contract.status !== 'cancelled' && (
               <button
                 disabled={updating}
-                onClick={() => updateStatus('cancelled')}
+                onClick={() => setConfirmStatus('cancelled')}
                 className="px-4 py-2 text-sm font-medium text-white bg-error rounded-lg hover:bg-error disabled:opacity-50"
               >
                 취소
@@ -221,6 +228,17 @@ export default function AdminIcContractDetailPage() {
         <IcContractPrintView contract={contract} />
       </div>
     </div>
+
+    <ConfirmModal
+      isOpen={!!confirmStatus}
+      onClose={() => setConfirmStatus(null)}
+      onConfirm={handleStatusConfirm}
+      title="상태 변경"
+      message={`이 통합 계약의 상태를 "${confirmStatus === 'completed' ? '완료' : '취소'}"로 변경하시겠습니까?`}
+      confirmText={confirmStatus === 'completed' ? '완료 처리' : '취소 처리'}
+      variant={confirmStatus === 'cancelled' ? 'danger' : 'primary'}
+      loading={updating}
+    />
     </>
   );
 }

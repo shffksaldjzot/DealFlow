@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { HelpCircle, X, ImagePlus, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
 
 interface PopupContentEditorProps {
   content: string;
@@ -31,6 +32,7 @@ export default function PopupContentEditor({
   const [draftText, setDraftText] = useState('');
   const [draftImage, setDraftImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleOpen = () => {
     const { text, image } = parseContent(content);
@@ -48,7 +50,7 @@ export default function PopupContentEditor({
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
-      alert('이미지는 2MB 이하만 가능합니다.');
+      toast('이미지는 2MB 이하만 가능합니다.', 'error');
       return;
     }
     const reader = new FileReader();

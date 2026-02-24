@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -6,6 +6,8 @@ import { User, UserRole, AuthProvider, UserStatus } from '../../modules/users/en
 
 @Injectable()
 export class SeedService implements OnModuleInit {
+  private readonly logger = new Logger(SeedService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -30,6 +32,6 @@ export class SeedService implements OnModuleInit {
       status: UserStatus.ACTIVE,
     });
     await this.userRepository.save(admin);
-    console.log('[Seed] Admin account created: admin@dealflow.com');
+    this.logger.log('Admin account created: admin@dealflow.com');
   }
 }

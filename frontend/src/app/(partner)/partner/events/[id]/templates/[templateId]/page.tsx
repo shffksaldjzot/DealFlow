@@ -72,7 +72,6 @@ export default function TemplateFieldEditorPage() {
       toast('필드가 저장되었습니다.', 'success');
     } catch (err: any) {
       const msg = err.response?.data?.message;
-      console.error('Field save error:', err.response?.status, msg);
       toast(Array.isArray(msg) ? msg[0] : '필드 저장에 실패했습니다.', 'error');
     } finally {
       setSaving(false);

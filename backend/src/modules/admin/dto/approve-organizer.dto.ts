@@ -6,7 +6,7 @@ export class RejectOrganizerDto {
 }
 
 export class ChangeUserStatusDto {
-  @IsString()
+  @IsIn(['pending', 'active', 'suspended', 'withdrawn'])
   status: string;
 
   @IsOptional()
@@ -20,11 +20,11 @@ export class UpdateUserDto {
   name?: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(['customer', 'organizer', 'partner', 'admin'])
   role?: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(['pending', 'active', 'suspended', 'withdrawn'])
   status?: string;
 
   @IsOptional()
@@ -43,7 +43,7 @@ export class CreateUserDto {
   @IsString()
   name: string;
 
-  @IsString()
+  @IsIn(['customer', 'organizer', 'partner', 'admin'])
   role: string;
 
   @IsOptional()
@@ -57,7 +57,7 @@ export class AdminUpdateEventDto {
   name?: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(['draft', 'active', 'closed', 'cancelled'])
   status?: string;
 
   @IsOptional()
@@ -66,7 +66,7 @@ export class AdminUpdateEventDto {
 }
 
 export class AdminUpdateContractStatusDto {
-  @IsString()
+  @IsIn(['pending', 'in_progress', 'signed', 'completed', 'cancelled'])
   status: string;
 
   @IsOptional()

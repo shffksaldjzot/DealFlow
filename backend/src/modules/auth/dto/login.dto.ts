@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional, IsEnum } from 'class-validator';
+import { IsEmail, IsString, IsOptional, IsEnum, MinLength, Matches } from 'class-validator';
 import { AuthProvider, UserRole } from '../../users/entities/user.entity';
 
 export class SocialLoginDto {
@@ -26,6 +26,10 @@ export class SignupDto {
   email: string;
 
   @IsString()
+  @MinLength(8, { message: '비밀번호는 8자 이상이어야 합니다.' })
+  @Matches(/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/, {
+    message: '비밀번호는 대문자, 소문자, 숫자를 각각 1개 이상 포함해야 합니다.',
+  })
   password: string;
 
   @IsString()

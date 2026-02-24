@@ -48,6 +48,26 @@ export class NotificationsService {
     );
   }
 
+  async deleteNotification(notificationId: string, userId: string): Promise<{ message: string }> {
+    const notification = await this.notificationRepository.findOne({
+      where: { id: notificationId, userId },
+    });
+    if (!notification) {
+      throw new NotFoundException('알림을 찾을 수 없습니다.');
+    }
+
+    await this.notificationRepository.remove(notification);
+    return { message: '알림이 삭제되었습니다.' };
+  }
+
+  async deleteAllRead(userId: string): Promise<{ message: string; deleted: number }> {
+    const result = await this.notificationRepository.delete({
+      userId,
+      status: NotificationStatus.SENT,
+    });
+    return { message: '읽은 알림이 삭제되었습니다.', deleted: result.affected || 0 };
+  }
+
   async createNotification(data: {
     userId: string;
     type: string;

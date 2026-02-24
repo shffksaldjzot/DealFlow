@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   ParseUUIDPipe,
@@ -54,5 +55,13 @@ export class OrganizationsController {
     @Body() dto: AddMemberDto,
   ) {
     return this.organizationsService.addMember(id, userId, dto);
+  }
+
+  @Delete(':id')
+  deleteOrganization(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.organizationsService.deleteOrganization(id, userId);
   }
 }

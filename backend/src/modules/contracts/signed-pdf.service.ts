@@ -114,7 +114,10 @@ export class SignedPdfService {
         font = await pdfDoc.embedFont(fontBuffer);
       } else {
         font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        this.logger.warn('Korean font not found, falling back to Helvetica');
+        this.logger.error(
+          'Korean font (NotoSansKR-Regular.ttf) not found. PDF will not render Korean text correctly. ' +
+          'Place the font file at: src/assets/fonts/NotoSansKR-Regular.ttf',
+        );
       }
 
       // Draw field values on each page

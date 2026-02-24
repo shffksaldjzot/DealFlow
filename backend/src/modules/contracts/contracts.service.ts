@@ -10,6 +10,7 @@ import { Contract, ContractStatus } from './entities/contract.entity';
 import { ContractTemplate } from './entities/contract-template.entity';
 import { ContractField } from './entities/contract-field.entity';
 import { ContractFieldValue } from './entities/contract-field-value.entity';
+import { ContractSignature } from './entities/contract-signature.entity';
 import { ContractHistory } from './entities/contract-history.entity';
 import { OrganizationMember } from '../organizations/entities/organization-member.entity';
 import { Organization, OrgStatus } from '../organizations/entities/organization.entity';
@@ -37,6 +38,8 @@ export class ContractsService {
     private readonly fieldRepository: Repository<ContractField>,
     @InjectRepository(ContractFieldValue)
     private readonly fieldValueRepository: Repository<ContractFieldValue>,
+    @InjectRepository(ContractSignature)
+    private readonly signatureRepository: Repository<ContractSignature>,
     @InjectRepository(ContractHistory)
     private readonly historyRepository: Repository<ContractHistory>,
     @InjectRepository(OrganizationMember)
@@ -278,6 +281,36 @@ export class ContractsService {
     return saved;
   }
 
+  async deleteContract(contractId: string, userId: string): Promise<{ message: string }> {
+    const orgId = await this.getOrgIdForUser(userId);
+    const contract = await this.contractRepository.findOne({
+      where: { id: contractId, partnerId: orgId },
+    });
+    if (!contract) {
+      throw new NotFoundException('계약서를 찾을 수 없습니다.');
+    }
+
+    if (contract.status === ContractStatus.SIGNED || contract.status === ContractStatus.COMPLETED) {
+      throw new BadRequestException('서명 완료되었거나 완료된 계약서는 삭제할 수 없습니다.');
+    }
+
+    // Delete related data first
+    await this.signatureRepository.delete({ contractId });
+    await this.fieldValueRepository.delete({ contractId });
+    await this.historyRepository.delete({ contractId });
+    await this.contractRepository.remove(contract);
+
+    await this.activityLogService.log(
+      'delete_contract',
+      `계약서 ${contract.contractNumber} 삭제`,
+      userId,
+      'contract',
+      contractId,
+    );
+
+    return { message: '계약서가 삭제되었습니다.' };
+  }
+
   async getQrInfo(
     contractId: string,
     userId: string,
@@ -405,6 +438,38 @@ export class ContractsService {
       relations: ['event', 'fields'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async deleteTemplate(templateId: string, userId: string): Promise<{ message: string }> {
+    const orgId = await this.getOrgIdForUser(userId);
+    const template = await this.templateRepository.findOne({
+      where: { id: templateId, partnerId: orgId },
+    });
+    if (!template) {
+      throw new NotFoundException('템플릿을 찾을 수 없습니다.');
+    }
+
+    // Check if any contracts use this template
+    const contractCount = await this.contractRepository.count({
+      where: { templateId },
+    });
+    if (contractCount > 0) {
+      throw new BadRequestException(
+        `이 템플릿을 사용하는 계약서가 ${contractCount}건 있어 삭제할 수 없습니다. 계약서를 먼저 삭제해주세요.`,
+      );
+    }
+
+    // Delete fields first
+    const fields = await this.fieldRepository.find({ where: { templateId } });
+    if (fields.length > 0) {
+      const fieldIds = fields.map((f) => f.id);
+      await this.fieldValueRepository.delete({ fieldId: In(fieldIds) });
+      await this.fieldRepository.delete({ templateId });
+    }
+
+    await this.templateRepository.remove(template);
+
+    return { message: '템플릿이 삭제되었습니다.' };
   }
 
   async getTemplateDetail(

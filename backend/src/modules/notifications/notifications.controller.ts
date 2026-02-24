@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, ParseUUIDPipe } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Notification, NotificationStatus } from './entities/notification.entity';
@@ -49,5 +49,18 @@ export class NotificationsController {
   ) {
     const n = await this.notificationsService.markAsRead(id, userId);
     return toDto(n);
+  }
+
+  @Delete(':id')
+  deleteNotification(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.notificationsService.deleteNotification(id, userId);
+  }
+
+  @Delete()
+  deleteAllRead(@CurrentUser('id') userId: string) {
+    return this.notificationsService.deleteAllRead(userId);
   }
 }
