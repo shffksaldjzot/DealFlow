@@ -11,6 +11,21 @@ import { Plus, Calendar, MapPin } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { Event } from '@/types/event';
 
+const EVENT_COLORS: Record<string, { bg: string; hover: string; title: string; sub: string; badge: string }> = {
+  blue: { bg: 'bg-blue-100', hover: 'hover:bg-blue-200', title: 'text-blue-900', sub: 'text-blue-600', badge: 'text-blue-700' },
+  purple: { bg: 'bg-purple-100', hover: 'hover:bg-purple-200', title: 'text-purple-900', sub: 'text-purple-600', badge: 'text-purple-700' },
+  green: { bg: 'bg-green-100', hover: 'hover:bg-green-200', title: 'text-green-900', sub: 'text-green-600', badge: 'text-green-700' },
+  orange: { bg: 'bg-orange-100', hover: 'hover:bg-orange-200', title: 'text-orange-900', sub: 'text-orange-600', badge: 'text-orange-700' },
+  red: { bg: 'bg-red-100', hover: 'hover:bg-red-200', title: 'text-red-900', sub: 'text-red-600', badge: 'text-red-700' },
+  pink: { bg: 'bg-pink-100', hover: 'hover:bg-pink-200', title: 'text-pink-900', sub: 'text-pink-600', badge: 'text-pink-700' },
+  teal: { bg: 'bg-teal-100', hover: 'hover:bg-teal-200', title: 'text-teal-900', sub: 'text-teal-600', badge: 'text-teal-700' },
+  indigo: { bg: 'bg-indigo-100', hover: 'hover:bg-indigo-200', title: 'text-indigo-900', sub: 'text-indigo-600', badge: 'text-indigo-700' },
+};
+
+function getEventColor(themeColor?: string) {
+  return EVENT_COLORS[themeColor || 'blue'] || EVENT_COLORS.blue;
+}
+
 export default function OrganizerEventsPage() {
   const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
@@ -61,18 +76,19 @@ export default function OrganizerEventsPage() {
               const daysLeft = Math.ceil(
                 (new Date(event.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
               );
+              const color = getEventColor(event.themeColor);
               return (
                 <button
                   key={event.id}
                   onClick={() => router.push(`/organizer/events/${event.id}`)}
-                  className="relative bg-blue-100 hover:bg-blue-200 rounded-xl p-4 text-left transition-all aspect-[3/2] flex flex-col justify-between"
+                  className={`relative ${color.bg} ${color.hover} rounded-xl p-4 text-left transition-all aspect-[3/2] flex flex-col justify-between`}
                 >
                   <div>
-                    <h3 className="font-bold text-blue-900 text-sm leading-tight line-clamp-2">
+                    <h3 className={`font-bold ${color.title} text-sm leading-tight line-clamp-2`}>
                       {event.name}
                     </h3>
                     {event.venue && (
-                      <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                      <p className={`text-xs ${color.sub} mt-1 flex items-center gap-1`}>
                         <MapPin className="w-3 h-3" />
                         {event.venue}
                       </p>
@@ -81,7 +97,7 @@ export default function OrganizerEventsPage() {
                   <div className="flex items-center justify-between">
                     <Badge status={event.status} />
                     {daysLeft > 0 && event.status !== 'cancelled' && (
-                      <span className="text-xs font-bold text-blue-700">D-{daysLeft}</span>
+                      <span className={`text-xs font-bold ${color.badge}`}>D-{daysLeft}</span>
                     )}
                   </div>
                 </button>

@@ -59,6 +59,9 @@ export class Event {
   @Column({ name: 'banner_image_url', type: 'text', nullable: true })
   bannerImageUrl: string;
 
+  @Column({ name: 'theme_color', length: 20, nullable: true, default: 'blue' })
+  themeColor: string;
+
   @Column({ type: 'varchar', length: 20, default: EventStatus.DRAFT })
   status: EventStatus;
 

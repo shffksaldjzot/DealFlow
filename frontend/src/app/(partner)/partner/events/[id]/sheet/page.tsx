@@ -38,6 +38,9 @@ export default function PartnerSheetPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
+  // Two-step flow: category must be saved before editing detailed items
+  const [categoryConfirmed, setCategoryConfirmed] = useState(false);
+
   // Form modal
   const [formOpen, setFormOpen] = useState(false);
   const [editingRowIndex, setEditingRowIndex] = useState<number | null>(null);
@@ -56,10 +59,13 @@ export default function PartnerSheetPage() {
         setColumns(sheetsData[0].columns || []);
         setRows((sheetsData[0].rows || []).map((r) => ({ ...r, _key: r.id || nextKey() })));
         setSelectedCategory(sheetsData[0].categoryName || '');
+        // If sheet already has rows, category was confirmed before
+        if ((sheetsData[0].rows || []).length > 0) {
+          setCategoryConfirmed(true);
+        }
       } else if (!autoCreated.current) {
         autoCreated.current = true;
         try {
-          // Default category from config categories or '품목'
           const defaultCat = (configData.categories && configData.categories.length > 0)
             ? configData.categories[0]
             : '품목';
@@ -71,6 +77,7 @@ export default function PartnerSheetPage() {
           setColumns(created.columns || []);
           setRows((created.rows || []).map((r) => ({ ...r, _key: r.id || nextKey() })));
           setSelectedCategory(created.categoryName || defaultCat);
+          setCategoryConfirmed(false);
         } catch {
           toast('시트 자동 생성에 실패했습니다.', 'error');
         }
@@ -87,16 +94,31 @@ export default function PartnerSheetPage() {
     loadData();
   }, [eventId]);
 
+  /* Step 1: Save category selection (claim the category) */
+  const handleSaveCategory = async () => {
+    if (!sheet || !selectedCategory) return;
+    setSaving(true);
+    try {
+      await api.patch(`/ic/sheets/${sheet.id}`, { categoryName: selectedCategory });
+      toast('품목이 저장되었습니다. 상세 품목을 편집할 수 있습니다.', 'success');
+      setCategoryConfirmed(true);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      toast(Array.isArray(msg) ? msg.join(', ') : msg || '품목 저장에 실패했습니다.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* Step 2: Save detailed items */
   const handleSave = async () => {
     if (!sheet) return;
     setSaving(true);
     try {
-      // Update category name if changed
       if (selectedCategory && selectedCategory !== sheet.categoryName) {
         await api.patch(`/ic/sheets/${sheet.id}`, { categoryName: selectedCategory });
       }
 
-      // Save columns first
       const colsToSave = columns.map((col, i) => ({
         id: col.id,
         apartmentTypeId: col.apartmentTypeId,
@@ -107,7 +129,6 @@ export default function PartnerSheetPage() {
       const savedColsRaw = await api.put(`/ic/sheets/${sheet.id}/columns`, { columns: colsToSave });
       const savedCols: any[] = savedColsRaw.data?.data || [];
 
-      // Build key remap
       const keyRemap = new Map<string, string>();
       if (savedCols.length === columns.length) {
         const sorted = [...savedCols].sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
@@ -121,25 +142,31 @@ export default function PartnerSheetPage() {
 
       const validColIds = new Set<string>(savedCols.map((c: any) => c.id).filter(Boolean));
 
-      // Save rows with remapped keys
-      const rowsToSave = rows.map(({ _key, ...rest }, i) => {
+      // Only send fields allowed by the DTO (exclude sheetId, createdAt, updatedAt; id only if valid UUID)
+      const rowsToSave = rows.map((row, i) => {
         const remappedPrices: Record<string, number> = {};
         const remappedCellValues: Record<string, string> = {};
-        for (const [key, val] of Object.entries(rest.prices || {})) {
+        for (const [key, val] of Object.entries(row.prices || {})) {
           const newKey = keyRemap.get(key) || key;
           if (validColIds.has(newKey)) remappedPrices[newKey] = val;
         }
-        for (const [key, val] of Object.entries(rest.cellValues || {})) {
+        for (const [key, val] of Object.entries(row.cellValues || {})) {
           const newKey = keyRemap.get(key) || key;
           if (validColIds.has(newKey)) remappedCellValues[newKey] = val;
         }
-        return { ...rest, sortOrder: i, prices: remappedPrices, cellValues: remappedCellValues };
+        return {
+          ...(row.id ? { id: row.id } : {}),
+          optionName: row.optionName,
+          popupContent: row.popupContent,
+          sortOrder: i,
+          prices: remappedPrices,
+          cellValues: remappedCellValues,
+        };
       });
 
       const savedRowsRaw = await api.put(`/ic/sheets/${sheet.id}/rows`, { rows: rowsToSave });
       const savedRows: any[] = savedRowsRaw.data?.data || [];
 
-      // Update local state
       if (savedCols.length > 0) {
         const sortedCols = [...savedCols].sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
         setColumns(sortedCols);
@@ -245,125 +272,139 @@ export default function PartnerSheetPage() {
         subtitle={sheet ? sheet.categoryName : '품목 시트를 편집하세요'}
         backHref={`/partner/events/${eventId}`}
         actions={
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => router.push(`/partner/events/${eventId}/sheet/preview`)}
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            미리보기
-          </Button>
+          categoryConfirmed ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => router.push(`/partner/events/${eventId}/sheet/preview`)}
+            >
+              <Eye className="w-4 h-4 mr-1" />
+              미리보기
+            </Button>
+          ) : undefined
         }
       />
 
       {sheet ? (
         <div className="space-y-4">
-          {/* Category dropdown + Status bar */}
-          <Card>
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <h3 className="font-bold text-gray-800">품목</h3>
-                <Badge status={sheet.status} />
-              </div>
-              <div className="flex items-center gap-2">
-                {sheet.status === 'draft' && (
-                  <Button variant="secondary" size="sm" onClick={() => handleUpdateSheetStatus('active')}>
-                    활성화
-                  </Button>
-                )}
-                {sheet.status === 'active' && (
-                  <Button variant="secondary" size="sm" onClick={() => handleUpdateSheetStatus('inactive')}>
-                    비활성화
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Category selector (와이어프레임 2-2: 품목 드롭다운) */}
-            {configCategories.length > 0 && (
-              <div className="relative">
-                <label className="block text-xs font-medium text-gray-500 mb-1">품목 카테고리</label>
-                <button
-                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white hover:border-gray-300 transition-colors"
-                >
-                  <span className={selectedCategory ? 'text-gray-800 font-medium' : 'text-gray-400'}>
-                    {selectedCategory || '품목을 선택하세요'}
-                  </span>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
-                </button>
-                {showCategoryDropdown && (
-                  <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                    {configCategories.map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => {
-                          setSelectedCategory(cat);
-                          setShowCategoryDropdown(false);
-                        }}
-                        className={`w-full text-left px-3 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
-                          selectedCategory === cat ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-
-          {/* Product list (와이어프레임 2-2, 2-4) */}
-          {rows.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                <FileSpreadsheet className="w-8 h-8 text-gray-300" />
-              </div>
-              <p className="text-sm text-gray-500 mb-1">상세 품목을 등록해주세요</p>
-              <p className="text-xs text-gray-400">아래 버튼을 눌러 품목을 추가하세요</p>
-              <button
-                onClick={() => { setEditingRowIndex(null); setFormOpen(true); }}
-                className="mt-4 w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto shadow-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="w-7 h-7" />
-              </button>
-            </div>
-          ) : (
+          {!categoryConfirmed ? (
+            /* ─── Step 1: 품목 선택 ─── */
             <>
-              <div className="overflow-x-auto -mx-4 px-4 pb-2">
-                <div className="flex gap-3" style={{ minWidth: 'min-content' }}>
-                  {rows.map((row, index) => (
-                    <div key={row._key} className="w-44 flex-shrink-0">
-                      <PartnerProductCard
-                        optionName={row.optionName}
-                        popupContent={row.popupContent}
-                        prices={row.prices || {}}
-                        cellValues={row.cellValues}
-                        columns={columns.map((c) => ({
-                          id: c.id,
-                          customName: c.customName,
-                          columnType: c.columnType,
-                          apartmentTypeId: c.apartmentTypeId,
-                        }))}
-                        apartmentTypes={config.apartmentTypes || []}
-                        onEdit={() => { setEditingRowIndex(index); setFormOpen(true); }}
-                        onDelete={() => setDeleteTarget(index)}
-                      />
-                    </div>
-                  ))}
-                  {/* Add button inline with cards */}
-                  <div className="w-44 flex-shrink-0">
+              <Card>
+                <h3 className="font-bold text-gray-800 mb-2">품목 선택</h3>
+                <p className="text-xs text-gray-500 mb-4">
+                  품목당 1개 업체만 선택 가능합니다. 저장하면 해당 품목이 선점됩니다.
+                </p>
+
+                {configCategories.length > 0 ? (
+                  <div className="relative">
+                    <label className="block text-xs font-medium text-gray-500 mb-1">품목 카테고리</label>
                     <button
-                      onClick={() => { setEditingRowIndex(null); setFormOpen(true); }}
-                      className="w-full h-full min-h-[160px] border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-colors"
+                      onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white hover:border-gray-300 transition-colors"
                     >
-                      <Plus className="w-6 h-6" />
-                      <span className="text-xs font-medium">품목 추가</span>
+                      <span className={selectedCategory ? 'text-gray-800 font-medium' : 'text-gray-400'}>
+                        {selectedCategory || '품목을 선택하세요'}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
                     </button>
+                    {showCategoryDropdown && (
+                      <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        {configCategories.map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => {
+                              setSelectedCategory(cat);
+                              setShowCategoryDropdown(false);
+                            }}
+                            className={`w-full text-left px-3 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                              selectedCategory === cat ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                            }`}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">설정된 카테고리가 없습니다.</p>
+                )}
+              </Card>
+
+              <Button fullWidth size="lg" onClick={handleSaveCategory} loading={saving} disabled={!selectedCategory}>
+                <Save className="w-5 h-5 mr-2" />
+                품목 저장
+              </Button>
+            </>
+          ) : (
+            /* ─── Step 2: 상세 품목 편집 ─── */
+            <>
+              {/* Selected category header */}
+              <Card>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-bold text-gray-800">품목</h3>
+                    <Badge status={sheet.status} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {sheet.status === 'draft' && (
+                      <Button variant="secondary" size="sm" onClick={() => handleUpdateSheetStatus('active')}>
+                        활성화
+                      </Button>
+                    )}
+                    {sheet.status === 'active' && (
+                      <Button variant="secondary" size="sm" onClick={() => handleUpdateSheetStatus('inactive')}>
+                        비활성화
+                      </Button>
+                    )}
                   </div>
                 </div>
-              </div>
+                <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                  선택된 품목: <span className="font-semibold text-gray-800">{selectedCategory}</span>
+                </div>
+              </Card>
+
+              {/* Product list - vertical layout (no horizontal scroll) */}
+              {rows.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <FileSpreadsheet className="w-8 h-8 text-gray-300" />
+                  </div>
+                  <p className="text-sm text-gray-500 mb-1">상세 품목을 등록해주세요</p>
+                  <p className="text-xs text-gray-400">아래 버튼을 눌러 품목을 추가하세요</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {rows.map((row, index) => (
+                    <PartnerProductCard
+                      key={row._key}
+                      optionName={row.optionName}
+                      popupContent={row.popupContent}
+                      prices={row.prices || {}}
+                      cellValues={row.cellValues}
+                      columns={columns.map((c) => ({
+                        id: c.id,
+                        customName: c.customName,
+                        columnType: c.columnType,
+                        apartmentTypeId: c.apartmentTypeId,
+                      }))}
+                      apartmentTypes={config.apartmentTypes || []}
+                      onEdit={() => { setEditingRowIndex(index); setFormOpen(true); }}
+                      onDelete={() => setDeleteTarget(index)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Add product button */}
+              <button
+                onClick={() => { setEditingRowIndex(null); setFormOpen(true); }}
+                className="w-full border-2 border-dashed border-gray-200 rounded-xl py-4 flex items-center justify-center gap-2 text-gray-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                <span className="text-sm font-medium">상세 품목 추가</span>
+              </button>
 
               {/* Save button */}
               <Button fullWidth size="lg" onClick={handleSave} loading={saving}>
@@ -371,14 +412,6 @@ export default function PartnerSheetPage() {
                 저장
               </Button>
             </>
-          )}
-
-          {/* Save button for empty state */}
-          {rows.length === 0 && (
-            <Button fullWidth size="lg" onClick={handleSave} loading={saving} disabled={rows.length === 0}>
-              <Save className="w-5 h-5 mr-2" />
-              저장
-            </Button>
           )}
         </div>
       ) : (

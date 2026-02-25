@@ -13,6 +13,7 @@ export interface Event {
   inviteCode: string;
   commissionRate: number;
   bannerImageUrl?: string;
+  themeColor?: string;
   status: EventStatus;
   createdAt: string;
   organizer?: { id: string; name: string };

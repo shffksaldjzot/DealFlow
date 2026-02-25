@@ -8,6 +8,17 @@ import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import PageHeader from '@/components/layout/PageHeader';
 
+const THEME_COLORS = [
+  { name: 'blue', label: '파랑', class: 'bg-blue-400' },
+  { name: 'purple', label: '보라', class: 'bg-purple-400' },
+  { name: 'green', label: '초록', class: 'bg-green-400' },
+  { name: 'orange', label: '주황', class: 'bg-orange-400' },
+  { name: 'red', label: '빨강', class: 'bg-red-400' },
+  { name: 'pink', label: '분홍', class: 'bg-pink-400' },
+  { name: 'teal', label: '청록', class: 'bg-teal-400' },
+  { name: 'indigo', label: '남색', class: 'bg-indigo-400' },
+];
+
 export default function CreateEventPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -19,6 +30,7 @@ export default function CreateEventPage() {
     startDate: '',
     endDate: '',
     commissionRate: '0',
+    themeColor: 'blue',
   });
 
   const handleSubmit = async () => {
@@ -103,6 +115,27 @@ export default function CreateEventPage() {
             onChange={(e) => setForm({ ...form, commissionRate: e.target.value })}
             helperText="협력업체에 적용할 기본 수수료율"
           />
+
+          {/* Theme Color Picker */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">카드 색상</label>
+            <div className="flex flex-wrap gap-2">
+              {THEME_COLORS.map((color) => (
+                <button
+                  key={color.name}
+                  type="button"
+                  onClick={() => setForm({ ...form, themeColor: color.name })}
+                  className={`w-10 h-10 rounded-xl ${color.class} transition-all ${
+                    form.themeColor === color.name
+                      ? 'ring-2 ring-offset-2 ring-gray-800 scale-110'
+                      : 'hover:scale-105'
+                  }`}
+                  title={color.label}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-gray-400 mt-1">행사 목록에서 카드 배경 색상으로 표시됩니다</p>
+          </div>
 
           <div className="bg-blue-50 rounded-xl p-4 text-sm">
             <p className="font-medium text-blue-800 mb-1">비공개 행사</p>

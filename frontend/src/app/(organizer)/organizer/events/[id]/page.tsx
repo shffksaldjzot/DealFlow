@@ -18,6 +18,17 @@ import {
   ChevronRight, BarChart3,
 } from 'lucide-react';
 
+const THEME_COLORS = [
+  { name: 'blue', class: 'bg-blue-400' },
+  { name: 'purple', class: 'bg-purple-400' },
+  { name: 'green', class: 'bg-green-400' },
+  { name: 'orange', class: 'bg-orange-400' },
+  { name: 'red', class: 'bg-red-400' },
+  { name: 'pink', class: 'bg-pink-400' },
+  { name: 'teal', class: 'bg-teal-400' },
+  { name: 'indigo', class: 'bg-indigo-400' },
+];
+
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -227,6 +238,32 @@ export default function EventDetailPage() {
           <Badge status={event.status} />
           <span className="text-xs text-blue-600">수수료율: {event.commissionRate}%</span>
         </div>
+
+        {/* Theme Color Picker */}
+        <div className="mt-3 pt-3 border-t border-blue-200">
+          <p className="text-xs text-blue-600 mb-2">카드 색상</p>
+          <div className="flex gap-1.5">
+            {THEME_COLORS.map((color) => (
+              <button
+                key={color.name}
+                onClick={async () => {
+                  try {
+                    await api.patch(`/events/${id}`, { themeColor: color.name });
+                    setEvent((prev) => prev ? { ...prev, themeColor: color.name } : null);
+                    toast('카드 색상이 변경되었습니다.', 'success');
+                  } catch {
+                    toast('색상 변경에 실패했습니다.', 'error');
+                  }
+                }}
+                className={`w-7 h-7 rounded-lg ${color.class} transition-all ${
+                  (event.themeColor || 'blue') === color.name
+                    ? 'ring-2 ring-offset-1 ring-gray-800 scale-110'
+                    : 'hover:scale-105'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* 초대코드 확인 버튼 */}
@@ -276,8 +313,20 @@ export default function EventDetailPage() {
                 {copiedLink === 'visit' ? <><Check className="w-3.5 h-3.5 mr-1" /> 복사됨</> : <><Copy className="w-3.5 h-3.5 mr-1" /> 복사</>}
               </Button>
             </div>
-            <div className="flex justify-center p-3 bg-gray-50 rounded-xl">
-              <QRCodeSVG value={partnerLink} size={140} level="H" includeMargin fgColor="#1a1a1a" />
+            {/* QR codes for both links */}
+            <div className="space-y-3">
+              <div className="bg-gray-50 rounded-xl p-3">
+                <p className="text-xs font-semibold text-gray-600 text-center mb-2">협력업체 초대 QR</p>
+                <div className="flex justify-center">
+                  <QRCodeSVG value={partnerLink} size={130} level="H" includeMargin fgColor="#1a1a1a" />
+                </div>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-3">
+                <p className="text-xs font-semibold text-gray-600 text-center mb-2">고객 방문예약 QR</p>
+                <div className="flex justify-center">
+                  <QRCodeSVG value={visitLink} size={130} level="H" includeMargin fgColor="#1B3460" />
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -45,4 +45,9 @@ export class UpdateEventDto {
   @IsOptional()
   @IsString()
   bannerImageUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 20)
+  themeColor?: string;
 }
