@@ -489,8 +489,8 @@ export default function EventDetailPage() {
                   <Settings className="w-5 h-5 text-indigo-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-gray-800">결제단계 · 약관 설정</p>
-                  <p className="text-sm text-gray-500">결제단계·약관·특이사항</p>
+                  <p className="font-semibold text-gray-800">품목관리 · 결제단계 · 약관설정</p>
+                  <p className="text-sm text-gray-500">품목관리·결제단계·약관·특이사항</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-400" />
               </div>

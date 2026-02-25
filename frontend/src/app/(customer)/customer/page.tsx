@@ -185,7 +185,7 @@ export default function CustomerHome() {
           <input
             type="text"
             value={visitCode}
-            onChange={(e) => setVisitCode(e.target.value.toUpperCase().replace(/\s/g, ''))}
+            onChange={(e) => setVisitCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
             onKeyDown={(e) => e.key === 'Enter' && handleVisitCodeSubmit()}
             placeholder="8자리 코드 입력"
             maxLength={20}

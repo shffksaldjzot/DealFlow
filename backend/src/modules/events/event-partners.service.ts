@@ -77,16 +77,19 @@ export class EventPartnersService {
     });
     if (existing) {
       // Allow re-request for cancelled or rejected partnerships
-      if (
+      const canRejoin =
         existing.status === EventPartnerStatus.CANCELLED ||
-        existing.status === EventPartnerStatus.REJECTED
-      ) {
-        existing.status = EventPartnerStatus.PENDING;
-        existing.cancelledAt = null;
-        existing.cancelledBy = null;
-        existing.cancelReason = null;
-        if (items) existing.items = items;
-        const saved = await this.eventPartnerRepository.save(existing);
+        existing.status === EventPartnerStatus.REJECTED;
+
+      if (canRejoin) {
+        await this.eventPartnerRepository.update(existing.id, {
+          status: EventPartnerStatus.PENDING,
+          cancelledAt: null as any,
+          cancelledBy: null as any,
+          cancelReason: null as any,
+          ...(items ? { items } : {}),
+        });
+        const saved = await this.eventPartnerRepository.findOne({ where: { id: existing.id } });
 
         const partnerOrg = await this.orgRepository.findOne({ where: { id: orgId } });
         const partnerName = partnerOrg?.name || '협력업체';

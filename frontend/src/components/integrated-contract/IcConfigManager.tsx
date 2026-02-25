@@ -13,8 +13,9 @@ import PartnerProductCard from '@/components/integrated-contract/PartnerProductC
 import {
   Save, Plus, Trash2, ChevronDown, ChevronUp,
   Copy, Check, Link2, Building2, FileSpreadsheet,
-  Eye, EyeOff, Pencil, ExternalLink, Loader2,
+  Eye, EyeOff, Pencil, ExternalLink, Loader2, QrCode,
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import type {
   IcConfig, IcApartmentType, IcPartnerSheet, PaymentStage, IcConfigStatus,
 } from '@/types/integrated-contract';
@@ -345,7 +346,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
   };
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       {/* Full-screen saving overlay */}
       {saving && (
         <div className="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center">
@@ -360,7 +361,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         title="통합 계약 설정"
         backHref={backHref}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <Badge status={config.status} />
             {statusActions[config.status]?.map((action) => (
               <Button
@@ -377,8 +378,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
               variant="danger"
               onClick={() => setDeleteConfigModal(true)}
             >
-              <Trash2 className="w-3.5 h-3.5 mr-1" />
-              삭제
+              <Trash2 className="w-3.5 h-3.5" />
             </Button>
           </div>
         }
@@ -387,14 +387,14 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
       {/* Public URL */}
       {publicUrl && (
         <Card className="mb-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 mb-2">
             <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-gray-500 mb-1">고객 옵션 선택 링크</p>
-              <p className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-1.5 rounded-lg truncate">
-                {publicUrl}
-              </p>
-            </div>
+            <p className="text-xs text-gray-500">고객 옵션 선택 링크</p>
+          </div>
+          <p className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-1.5 rounded-lg truncate mb-2 break-all">
+            {publicUrl}
+          </p>
+          <div className="flex items-center gap-2 flex-wrap">
             <Button size="sm" variant="outline" onClick={copyPublicUrl}>
               {copied
                 ? <><Check className="w-3.5 h-3.5 mr-1" /> 복사됨</>
@@ -403,13 +403,21 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
             </Button>
             <a href={publicUrl} target="_blank" rel="noopener noreferrer">
               <Button size="sm" variant="outline">
-                <ExternalLink className="w-3.5 h-3.5" />
+                <ExternalLink className="w-3.5 h-3.5 mr-1" /> 열기
               </Button>
             </a>
             <Button size="sm" variant="outline" onClick={() => setPreviewModal(true)}>
               <Eye className="w-3.5 h-3.5 mr-1" />
               미리보기
             </Button>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+              <QrCode className="w-3.5 h-3.5" /> 고객 옵션 선택 QR코드
+            </p>
+            <div className="flex justify-center bg-gray-50 rounded-lg p-3">
+              <QRCodeSVG value={publicUrl} size={160} level="H" includeMargin fgColor="#1B3460" />
+            </div>
           </div>
         </Card>
       )}

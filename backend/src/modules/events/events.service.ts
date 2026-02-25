@@ -158,6 +158,7 @@ export class EventsService {
     if (dto.endDate !== undefined) event.endDate = dto.endDate;
     if (dto.isPrivate !== undefined) event.isPrivate = dto.isPrivate;
     if (dto.commissionRate !== undefined) event.commissionRate = dto.commissionRate;
+    if (dto.themeColor !== undefined) event.themeColor = dto.themeColor;
 
     return this.eventRepository.save(event);
   }
