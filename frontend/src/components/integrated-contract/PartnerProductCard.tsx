@@ -6,6 +6,8 @@ import type { IcApartmentType } from '@/types/integrated-contract';
 interface PartnerProductCardProps {
   optionName: string;
   popupContent?: string;
+  apartmentTypeId?: string;
+  price?: number;
   prices: Record<string, number>;
   cellValues?: Record<string, string>;
   columns: { id: string; customName?: string; columnType: string; apartmentTypeId?: string }[];
@@ -17,6 +19,8 @@ interface PartnerProductCardProps {
 export default function PartnerProductCard({
   optionName,
   popupContent,
+  apartmentTypeId,
+  price,
   prices,
   cellValues,
   columns,
@@ -25,16 +29,9 @@ export default function PartnerProductCard({
   onDelete,
 }: PartnerProductCardProps) {
   const { image } = popupContent ? parsePopupContent(popupContent) : { image: null };
-
-  // Collect prices to display
-  const priceEntries: { label: string; value: string }[] = [];
-  for (const col of columns) {
-    if (col.columnType === 'amount' || !col.columnType) {
-      const label = col.customName || apartmentTypes.find(t => t.id === col.apartmentTypeId)?.name || '가격';
-      const numVal = prices?.[col.id] || (cellValues?.[col.id] ? Number(String(cellValues[col.id]).replace(/,/g, '')) : 0);
-      priceEntries.push({ label, value: formatPrice(numVal || 0) });
-    }
-  }
+  const typeName = apartmentTypeId
+    ? apartmentTypes.find(t => t.id === apartmentTypeId)?.name
+    : null;
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-sm transition-shadow">
@@ -48,7 +45,21 @@ export default function PartnerProductCard({
         {/* Content */}
         <div className="flex-1 p-3 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h4 className="text-sm font-semibold text-gray-800 truncate">{optionName}</h4>
+            <div className="min-w-0">
+              <h4 className="text-sm font-semibold text-gray-800 truncate">{optionName}</h4>
+              <div className="flex items-center gap-2 mt-1">
+                {typeName && (
+                  <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">
+                    {typeName}
+                  </span>
+                )}
+                {(price != null && price > 0) && (
+                  <span className="text-xs font-semibold text-gray-700">
+                    {formatPrice(price)}
+                  </span>
+                )}
+              </div>
+            </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               <button
                 onClick={onEdit}
@@ -64,16 +75,6 @@ export default function PartnerProductCard({
               </button>
             </div>
           </div>
-          {/* Price tags */}
-          {priceEntries.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {priceEntries.map((entry) => (
-                <span key={entry.label} className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
-                  {entry.label}: {entry.value}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>

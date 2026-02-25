@@ -62,7 +62,9 @@ export interface IcSheetColumn {
 export interface IcSheetRow {
   id: string;
   sheetId: string;
+  apartmentTypeId?: string;
   optionName: string;
+  price?: number;
   popupContent?: string;
   sortOrder: number;
   prices: Record<string, number>;

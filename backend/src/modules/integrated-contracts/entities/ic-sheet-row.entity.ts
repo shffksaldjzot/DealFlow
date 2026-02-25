@@ -18,8 +18,14 @@ export class IcSheetRow {
   @Column({ name: 'sheet_id' })
   sheetId: string;
 
+  @Column({ name: 'apartment_type_id', nullable: true })
+  apartmentTypeId: string;
+
   @Column({ name: 'option_name', length: 300 })
   optionName: string;
+
+  @Column({ type: 'decimal', precision: 12, scale: 0, nullable: true, default: 0 })
+  price: number;
 
   @Column({ name: 'popup_content', type: 'text', nullable: true })
   popupContent: string;

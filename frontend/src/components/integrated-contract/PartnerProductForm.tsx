@@ -11,6 +11,8 @@ interface PartnerProductFormProps {
   onSave: (data: {
     optionName: string;
     popupContent: string;
+    apartmentTypeId: string;
+    price: number;
     prices: Record<string, number>;
     cellValues: Record<string, string>;
   }) => void;
@@ -19,6 +21,8 @@ interface PartnerProductFormProps {
   initialData?: {
     optionName: string;
     popupContent?: string;
+    apartmentTypeId?: string;
+    price?: number;
     prices: Record<string, number>;
     cellValues?: Record<string, string>;
   };
@@ -44,63 +48,53 @@ export default function PartnerProductForm({
 }: PartnerProductFormProps) {
   const [optionName, setOptionName] = useState('');
   const [popupContent, setPopupContent] = useState('');
+  const [selectedTypeId, setSelectedTypeId] = useState<string>('');
+  const [price, setPrice] = useState<number>(0);
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [cellValues, setCellValues] = useState<Record<string, string>>({});
-
-  // Selected type for simplified single-type+price entry
-  const [selectedTypeId, setSelectedTypeId] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
         setOptionName(initialData.optionName);
         setPopupContent(initialData.popupContent || '');
+        setSelectedTypeId(initialData.apartmentTypeId || '');
+        setPrice(initialData.price || 0);
         setPrices(initialData.prices || {});
         setCellValues(initialData.cellValues || {});
-        // Try to detect selected type from existing prices
-        if (columns.length > 0 && apartmentTypes.length > 0) {
-          for (const col of columns) {
-            if (col.apartmentTypeId && (initialData.prices?.[col.id] || initialData.cellValues?.[col.id])) {
-              setSelectedTypeId(col.apartmentTypeId);
-              break;
-            }
-          }
-        }
       } else {
         setOptionName('');
         setPopupContent('');
+        setSelectedTypeId(apartmentTypes.length > 0 ? apartmentTypes[0].id : '');
+        setPrice(0);
         setPrices({});
         setCellValues({});
-        setSelectedTypeId(apartmentTypes.length > 0 ? apartmentTypes[0].id : '');
       }
     }
-  }, [isOpen, initialData, columns, apartmentTypes]);
+  }, [isOpen, initialData, apartmentTypes]);
 
   if (!isOpen) return null;
 
-  // Extract image from popupContent
   const imageMatch = popupContent.match(/---IMAGE---\n(https?:\/\/[^\n]+)/);
   const currentImage = imageMatch ? imageMatch[1] : null;
 
-  const handleAmountChange = (colId: string, value: string) => {
+  const handlePriceChange = (value: string) => {
     const raw = value.replace(/[^0-9]/g, '');
-    const num = raw === '' ? 0 : parseInt(raw, 10) || 0;
-    setPrices((prev) => ({ ...prev, [colId]: num }));
-    setCellValues((prev) => ({ ...prev, [colId]: String(num) }));
-  };
-
-  const handleTextChange = (colId: string, value: string) => {
-    setCellValues((prev) => ({ ...prev, [colId]: value }));
+    setPrice(raw === '' ? 0 : parseInt(raw, 10) || 0);
   };
 
   const handleSave = () => {
     if (!optionName.trim()) return;
-    onSave({ optionName: optionName.trim(), popupContent, prices, cellValues });
+    onSave({
+      optionName: optionName.trim(),
+      popupContent,
+      apartmentTypeId: selectedTypeId,
+      price,
+      prices,
+      cellValues,
+    });
     onClose();
   };
-
-  // Whether to show simplified form (single type+price) vs full column form
-  const showSimplifiedForm = apartmentTypes.length > 0 && columns.length > 0;
 
   return (
     <div
@@ -119,7 +113,7 @@ export default function PartnerProductForm({
         </div>
 
         <div className="p-5 space-y-4">
-          {/* Image upload area (와이어프레임 2-3) */}
+          {/* Image upload area */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">이미지</label>
             {currentImage ? (
@@ -143,10 +137,12 @@ export default function PartnerProductForm({
             )}
           </div>
 
-          {/* Type dropdown (와이어프레임 2-3) */}
-          {showSimplifiedForm && apartmentTypes.length > 1 && (
+          {/* Type dropdown - always show when types exist */}
+          {apartmentTypes.length > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">타입</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                타입 <span className="text-red-500">*</span>
+              </label>
               <select
                 value={selectedTypeId}
                 onChange={(e) => setSelectedTypeId(e.target.value)}
@@ -160,7 +156,7 @@ export default function PartnerProductForm({
             </div>
           )}
 
-          {/* Option Name (와이어프레임 2-3) */}
+          {/* Option Name */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               상세 품목 제목 <span className="text-red-500">*</span>
@@ -175,7 +171,7 @@ export default function PartnerProductForm({
             />
           </div>
 
-          {/* Description (popupContent text part) */}
+          {/* Description */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">상세 설명</label>
             <textarea
@@ -190,43 +186,19 @@ export default function PartnerProductForm({
             />
           </div>
 
-          {/* Price per column (와이어프레임 2-3: 비용) */}
+          {/* Single price input */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">비용</label>
-            <div className="space-y-2">
-              {columns.map((col) => {
-                const label = col.customName || apartmentTypes.find(t => t.id === col.apartmentTypeId)?.name || '열';
-                const isAmount = col.columnType === 'amount' || !col.columnType;
-                return (
-                  <div key={col.id} className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500 w-20 flex-shrink-0 truncate">{label}</span>
-                    {isAmount ? (
-                      <div className="flex-1 relative">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={prices[col.id] ? formatAmount(prices[col.id]) : ''}
-                          onChange={(e) => handleAmountChange(col.id, e.target.value)}
-                          placeholder="0"
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">원</span>
-                      </div>
-                    ) : (
-                      <input
-                        type="text"
-                        value={cellValues[col.id] || ''}
-                        onChange={(e) => handleTextChange(col.id, e.target.value)}
-                        placeholder="입력"
-                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    )}
-                  </div>
-                );
-              })}
-              {columns.length === 0 && (
-                <p className="text-xs text-gray-400">타입이 설정되면 가격 입력란이 표시됩니다.</p>
-              )}
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">가격</label>
+            <div className="relative">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={price ? formatAmount(price) : ''}
+                onChange={(e) => handlePriceChange(e.target.value)}
+                placeholder="0"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">원</span>
             </div>
           </div>
 
@@ -235,7 +207,11 @@ export default function PartnerProductForm({
             <Button variant="outline" fullWidth onClick={onClose}>
               취소
             </Button>
-            <Button fullWidth onClick={handleSave} disabled={!optionName.trim()}>
+            <Button
+              fullWidth
+              onClick={handleSave}
+              disabled={!optionName.trim() || (apartmentTypes.length > 0 && !selectedTypeId)}
+            >
               저장
             </Button>
           </div>

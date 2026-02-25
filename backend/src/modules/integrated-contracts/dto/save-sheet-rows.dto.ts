@@ -16,9 +16,18 @@ export class SheetRowItemDto {
   @IsUUID()
   id?: string;
 
+  @IsOptional()
+  @IsString()
+  apartmentTypeId?: string;
+
   @IsString()
   @Length(1, 300)
   optionName: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price?: number;
 
   @IsOptional()
   @IsString()
