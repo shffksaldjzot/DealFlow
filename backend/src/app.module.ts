@@ -25,17 +25,17 @@ import { MailModule } from './shared/mail/mail.module';
       {
         name: 'short',
         ttl: 1000,   // 1 second
-        limit: 3,    // 3 requests per second
+        limit: 20,   // 20 requests per second
       },
       {
         name: 'medium',
         ttl: 60000,  // 1 minute
-        limit: 60,   // 60 requests per minute
+        limit: 200,  // 200 requests per minute
       },
       {
         name: 'long',
         ttl: 3600000, // 1 hour
-        limit: 1000,  // 1000 requests per hour
+        limit: 5000,  // 5000 requests per hour
       },
     ]),
     ActivityLogModule,
