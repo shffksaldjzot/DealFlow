@@ -22,9 +22,14 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
-    .split(',')
-    .map((o) => o.trim());
+  const defaultOrigins = [
+    'https://dealflow.xenokev.workers.dev',
+    'http://localhost:3000',
+  ];
+  const envOrigins = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(',').map((o) => o.trim())
+    : [];
+  const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
   app.enableCors({
     origin: allowedOrigins,
     credentials: true,
