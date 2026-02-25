@@ -34,7 +34,6 @@ interface SidebarProps {
 
 const navItems: Record<string, NavItem[]> = {
   organizer: [
-    { label: '대시보드', href: '/organizer', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: '행사 관리', href: '/organizer/events', icon: <Calendar className="w-5 h-5" /> },
     { label: '알림', href: '/organizer/notifications', icon: <Bell className="w-5 h-5" />, badgeKey: 'unreadNotifications' },
     { label: '마이페이지', href: '/organizer/settings', icon: <Building2 className="w-5 h-5" /> },
@@ -51,7 +50,7 @@ const navItems: Record<string, NavItem[]> = {
     { label: '가입 승인/관리', href: '/admin/organizers', icon: <UserCheck className="w-5 h-5" />, badgeKey: 'pendingApprovals' },
     { label: '사용자 관리', href: '/admin/users', icon: <Users className="w-5 h-5" /> },
     { label: '행사 관리', href: '/admin/events', icon: <Calendar className="w-5 h-5" /> },
-    { label: '계약 관리', href: '/admin/contracts', icon: <FileText className="w-5 h-5" /> },
+    { label: '개별계약 관리', href: '/admin/contracts', icon: <FileText className="w-5 h-5" /> },
     { label: '통합 계약', href: '/admin/ic-contracts', icon: <FileSpreadsheet className="w-5 h-5" /> },
     { label: '알림', href: '/admin/notifications', icon: <Bell className="w-5 h-5" />, badgeKey: 'unreadNotifications' },
     { label: '활동 로그', href: '/admin/logs', icon: <ClipboardList className="w-5 h-5" /> },
@@ -127,28 +126,32 @@ export default function Sidebar({ role }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed bottom-20 left-4 z-30 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition-colors"
-      >
-        <Menu className="w-5 h-5" />
-      </button>
+      {/* Mobile: BottomNav is used instead for partner/organizer/customer */}
+      {/* Admin still uses the mobile sidebar toggle */}
+      {role === 'admin' && (
+        <>
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="lg:hidden fixed bottom-4 left-4 z-30 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition-colors"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
 
-      {/* Mobile Overlay */}
-      {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-xl py-4">
-            <div className="flex items-center justify-between px-4 mb-4">
-              <span className="text-lg font-bold text-blue-600">DealFlow</span>
-              <button onClick={() => setMobileOpen(false)} className="p-1 rounded-lg hover:bg-gray-100">
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
+          {mobileOpen && (
+            <div className="lg:hidden fixed inset-0 z-50">
+              <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+              <aside className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-xl py-4">
+                <div className="flex items-center justify-between px-4 mb-4">
+                  <span className="text-lg font-bold text-blue-600">DealFlow</span>
+                  <button onClick={() => setMobileOpen(false)} className="p-1 rounded-lg hover:bg-gray-100">
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+                <NavList items={items} role={role} badges={badges} onNavigate={() => setMobileOpen(false)} />
+              </aside>
             </div>
-            <NavList items={items} role={role} badges={badges} onNavigate={() => setMobileOpen(false)} />
-          </aside>
-        </div>
+          )}
+        </>
       )}
 
       {/* Desktop Sidebar */}

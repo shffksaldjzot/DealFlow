@@ -5,6 +5,7 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
+import PageHeader from '@/components/layout/PageHeader';
 import { User, Mail, Phone, Shield, MapPin, Lock } from 'lucide-react';
 import api from '@/lib/api';
 
@@ -108,10 +109,7 @@ export default function CustomerProfile() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-800">프로필</h2>
-        <p className="text-sm text-gray-500 mt-1">내 정보를 관리하세요</p>
-      </div>
+      <PageHeader title="프로필" subtitle="내 정보를 관리하세요" backHref="/customer" />
 
       {/* Profile Card */}
       <Card className="mb-4">

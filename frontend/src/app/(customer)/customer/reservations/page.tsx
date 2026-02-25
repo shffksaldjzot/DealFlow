@@ -37,7 +37,7 @@ export default function ReservationsPage() {
 
   return (
     <div>
-      <PageHeader title="방문 예약" subtitle="행사 방문 예약 내역" />
+      <PageHeader title="방문 예약" subtitle="행사 방문 예약 내역" backHref="/customer" />
 
       {loading ? (
         <div className="space-y-3">

@@ -56,31 +56,31 @@ export default function AdminDashboard() {
 
   const cards = [
     {
-      label: '전체 사용자',
+      label: '사용자',
       value: stats?.totalUsers || 0,
       icon: Users,
       color: 'text-blue-600 bg-blue-100',
       href: '/admin/users',
     },
     {
-      label: '전체 업체',
+      label: '업체',
       value: stats?.totalOrganizations || 0,
       icon: Building2,
       color: 'text-purple-600 bg-purple-100',
       href: '/admin/organizers',
     },
     {
-      label: '전체 행사',
+      label: '행사',
       value: stats?.totalEvents || 0,
-      sub: `진행 중: ${stats?.activeEvents || 0}`,
+      sub: `진행 ${stats?.activeEvents || 0}`,
       icon: Calendar,
       color: 'text-success bg-success-light',
       href: '/admin/events',
     },
     {
-      label: '전체 계약',
+      label: '계약',
       value: stats?.totalContracts || 0,
-      sub: `오늘 서명: ${stats?.signedContractsToday || 0}`,
+      sub: `오늘 ${stats?.signedContractsToday || 0}`,
       icon: FileText,
       color: 'text-orange-600 bg-orange-100',
       href: '/admin/contracts',
@@ -107,38 +107,34 @@ export default function AdminDashboard() {
       {/* Pending Approvals Alert */}
       {!loading && totalPending > 0 && (
         <div
-          className="mb-4 p-4 bg-error-light border border-error rounded-xl flex items-center gap-4 cursor-pointer hover:bg-error-light transition-colors"
+          className="mb-4 p-3 sm:p-4 bg-error-light border border-error rounded-xl flex items-center gap-3 cursor-pointer hover:bg-error-light transition-colors"
           onClick={() => router.push('/admin/organizers')}
         >
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-error-light">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-error-light shrink-0">
             <AlertCircle className="w-5 h-5 text-error" />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-error">
               승인 대기 {totalPending}건
             </p>
-            <p className="text-xs text-error">
-              주관사 {stats?.pendingOrganizations || 0}건, 협력업체 {stats?.pendingPartners || 0}건 - 클릭하여 처리
+            <p className="text-xs text-error truncate">
+              주관사 {stats?.pendingOrganizations || 0}, 협력업체 {stats?.pendingPartners || 0}
             </p>
           </div>
-          <span className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-sm font-bold text-white bg-error-light0 rounded-full">
-            {totalPending}
-          </span>
         </div>
       )}
 
       {/* Password Reset Requests */}
       {!loading && stats?.passwordResetRequests && stats.passwordResetRequests.length > 0 && (
-        <div className="mb-4 p-4 bg-warning-light border border-amber-200 rounded-xl">
+        <div className="mb-4 p-3 sm:p-4 bg-warning-light border border-amber-200 rounded-xl">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-100">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-100 shrink-0">
               <KeyRound className="w-5 h-5 text-amber-600" />
             </div>
             <div>
               <p className="text-sm font-bold text-amber-800">
-                비밀번호 초기화 요청 {stats.passwordResetRequests.length}건
+                비밀번호 초기화 {stats.passwordResetRequests.length}건
               </p>
-              <p className="text-xs text-amber-600">사용자 관리에서 비밀번호를 초기화해주세요</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -148,9 +144,9 @@ export default function AdminDashboard() {
                 className="flex items-center justify-between p-3 bg-white rounded-xl cursor-pointer hover:bg-amber-50 transition-colors"
                 onClick={() => router.push(`/admin/users/${req.metadata?.targetUserId}`)}
               >
-                <div>
-                  <p className="text-sm font-medium text-gray-800">{req.metadata?.targetUserName}</p>
-                  <p className="text-xs text-gray-500">{req.metadata?.targetUserEmail}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-gray-800 truncate">{req.metadata?.targetUserName}</p>
+                  <p className="text-xs text-gray-500 truncate">{req.metadata?.targetUserEmail}</p>
                 </div>
                 <Button size="sm" variant="secondary">처리</Button>
               </div>
@@ -159,19 +155,20 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* Stats Grid - responsive */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {cards.map((c, i) => {
           const Icon = c.icon;
           return (
             <Card key={i} hoverable onClick={() => router.push(c.href)}>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${c.color}`}>
-                  <Icon className="w-6 h-6" />
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center shrink-0 ${c.color}`}>
+                  <Icon className="w-5 h-5 lg:w-6 lg:h-6" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">{c.label}</p>
-                  <p className="text-2xl font-bold text-gray-800">{loading ? '-' : c.value}</p>
-                  {c.sub && <p className="text-xs text-gray-400">{loading ? '' : c.sub}</p>}
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500">{c.label}</p>
+                  <p className="text-xl lg:text-2xl font-bold text-gray-800">{loading ? '-' : c.value}</p>
+                  {c.sub && <p className="text-[11px] text-gray-400 truncate">{loading ? '' : c.sub}</p>}
                 </div>
               </div>
             </Card>
@@ -179,94 +176,87 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      {/* Additional Info Cards */}
-      {!loading && stats && (
-        <>
-          {/* Contracts by Status */}
-          {stats.contractsByStatus && Object.keys(stats.contractsByStatus).length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">상태별 계약 분포</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                {Object.entries(stats.contractsByStatus).map(([status, count]) => (
-                  <Card key={status}>
-                    <div className="text-center">
-                      <Badge status={status} />
-                      <p className="text-xl font-bold text-gray-800 mt-1">{count}</p>
-                      <p className="text-xs text-gray-400">{statusLabels[status] || status}</p>
-                    </div>
-                  </Card>
-                ))}
+      {/* Contracts by Status */}
+      {!loading && stats?.contractsByStatus && Object.keys(stats.contractsByStatus).length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">계약 상태</h3>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(stats.contractsByStatus).map(([status, count]) => (
+              <div key={status} className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2">
+                <Badge status={status} />
+                <span className="text-sm font-bold text-gray-800">{count}</span>
               </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent data - stack on mobile, side by side on desktop */}
+      {!loading && stats && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Recent Users */}
+          {stats.recentUsers && stats.recentUsers.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">최근 가입</h3>
+              <Card>
+                <div className="divide-y divide-gray-100">
+                  {stats.recentUsers.slice(0, 5).map((u: any) => {
+                    const roleMap: Record<string, { label: string; color: string }> = {
+                      admin: { label: '관리자', color: 'bg-purple-100 text-purple-800' },
+                      organizer: { label: '주관사', color: 'bg-blue-100 text-blue-800' },
+                      partner: { label: '업체', color: 'bg-success-light text-success' },
+                      customer: { label: '고객', color: 'bg-gray-100 text-gray-600' },
+                    };
+                    const role = roleMap[u.role] || { label: u.role, color: 'bg-gray-100 text-gray-600' };
+                    return (
+                      <div
+                        key={u.id}
+                        className="flex items-center justify-between py-2.5 cursor-pointer hover:bg-gray-50 -mx-4 px-4 rounded-lg transition-colors"
+                        onClick={() => router.push(`/admin/users/${u.id}`)}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-800 truncate">{u.name}</p>
+                          <p className="text-xs text-gray-400 truncate">{u.email}</p>
+                        </div>
+                        <div className="text-right shrink-0 ml-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${role.color}`}>
+                            {role.label}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Recent Users */}
-            {stats.recentUsers && stats.recentUsers.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 가입 사용자</h3>
-                <Card>
-                  <div className="divide-y divide-gray-100">
-                    {stats.recentUsers.map((u: any) => {
-                      const roleMap: Record<string, { label: string; color: string }> = {
-                        admin: { label: '관리자', color: 'bg-purple-100 text-purple-800' },
-                        organizer: { label: '주관사', color: 'bg-blue-100 text-blue-800' },
-                        partner: { label: '협력업체', color: 'bg-success-light text-success' },
-                        customer: { label: '고객', color: 'bg-gray-100 text-gray-600' },
-                      };
-                      const role = roleMap[u.role] || { label: u.role, color: 'bg-gray-100 text-gray-600' };
-                      return (
-                        <div
-                          key={u.id}
-                          className="flex items-center justify-between py-2.5 cursor-pointer hover:bg-gray-50 -mx-4 px-4 rounded-lg transition-colors"
-                          onClick={() => router.push(`/admin/users/${u.id}`)}
-                        >
-                          <div>
-                            <p className="text-sm font-medium text-gray-800">{u.name}</p>
-                            <p className="text-xs text-gray-400">{u.email}</p>
-                          </div>
-                          <div className="text-right">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${role.color}`}>
-                              {role.label}
-                            </span>
-                            <p className="text-xs text-gray-400 mt-0.5">{formatDateTime(u.createdAt)}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </Card>
-              </div>
-            )}
-
-            {/* Recent Contracts */}
-            {stats.recentContracts && stats.recentContracts.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">최근 계약</h3>
-                <Card>
-                  <div className="divide-y divide-gray-100">
-                    {stats.recentContracts.map((c: any) => (
-                      <div
-                        key={c.id}
-                        className="flex items-center justify-between py-2.5 cursor-pointer hover:bg-gray-50 -mx-4 px-4 rounded-lg transition-colors"
-                        onClick={() => router.push(`/admin/contracts/${c.id}`)}
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-gray-800">{c.event?.name || '계약서'}</p>
-                          <p className="text-xs text-gray-400 font-mono">{c.contractNumber}</p>
-                        </div>
-                        <div className="text-right">
-                          <Badge status={c.status} />
-                          <p className="text-xs text-gray-400 mt-0.5">{formatDateTime(c.createdAt)}</p>
-                        </div>
+          {/* Recent Contracts */}
+          {stats.recentContracts && stats.recentContracts.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">최근 계약</h3>
+              <Card>
+                <div className="divide-y divide-gray-100">
+                  {stats.recentContracts.slice(0, 5).map((c: any) => (
+                    <div
+                      key={c.id}
+                      className="flex items-center justify-between py-2.5 cursor-pointer hover:bg-gray-50 -mx-4 px-4 rounded-lg transition-colors"
+                      onClick={() => router.push(`/admin/contracts/${c.id}`)}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-800 truncate">{c.event?.name || '계약서'}</p>
+                        <p className="text-xs text-gray-400 font-mono">{c.contractNumber}</p>
                       </div>
-                    ))}
-                  </div>
-                </Card>
-              </div>
-            )}
-          </div>
-        </>
+                      <div className="shrink-0 ml-2">
+                        <Badge status={c.status} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

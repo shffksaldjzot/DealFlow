@@ -56,7 +56,7 @@ export default function AdminContractsPage() {
 
   return (
     <div>
-      <PageHeader title="계약 관리" subtitle={`총 ${total}건`} />
+      <PageHeader title="개별계약 관리" subtitle={`총 ${total}건`} backHref="/admin" />
 
       <div className="flex flex-wrap items-end gap-3 mb-4">
         <div className="max-w-xs flex-1">

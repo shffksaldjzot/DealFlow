@@ -1,17 +1,11 @@
 'use client';
 import { useState } from 'react';
 import { HelpCircle, X } from 'lucide-react';
+import { parsePopupContent } from '@/lib/ic-utils';
 
 interface PopupViewerProps {
   content: string;
   optionName: string;
-}
-
-function parseContent(content: string): { text: string; image: string | null } {
-  const separator = '\n---IMAGE---\n';
-  const idx = content.indexOf(separator);
-  if (idx === -1) return { text: content, image: null };
-  return { text: content.slice(0, idx), image: content.slice(idx + separator.length) };
 }
 
 export default function PopupViewer({ content, optionName }: PopupViewerProps) {
@@ -19,7 +13,7 @@ export default function PopupViewer({ content, optionName }: PopupViewerProps) {
 
   if (!content) return null;
 
-  const { text, image } = parseContent(content);
+  const { text, image } = parsePopupContent(content);
 
   return (
     <>

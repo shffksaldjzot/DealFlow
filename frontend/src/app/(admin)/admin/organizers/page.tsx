@@ -147,7 +147,7 @@ export default function AdminOrganizersPage() {
 
   return (
     <div>
-      <PageHeader title="가입 승인/관리" subtitle={`총 ${total}개 업체`} />
+      <PageHeader title="가입 승인/관리" subtitle={`총 ${total}개 업체`} backHref="/admin" />
 
       {/* Status Tabs */}
       <div className="flex gap-1 mb-4 bg-gray-100 rounded-xl p-1 max-w-md">

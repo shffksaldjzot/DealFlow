@@ -29,7 +29,7 @@ export default function CustomerContractsPage() {
 
   return (
     <div>
-      <PageHeader title="내 계약" />
+      <PageHeader title="내 계약" backHref="/customer" />
 
       {/* Tabs */}
       {!loading && hasAny && (

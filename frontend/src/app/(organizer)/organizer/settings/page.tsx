@@ -158,7 +158,7 @@ export default function OrganizerSettingsPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="마이페이지" />
+        <PageHeader title="마이페이지" backHref="/organizer" />
         <div className="h-64 bg-white rounded-xl animate-pulse" />
       </div>
     );
@@ -167,7 +167,7 @@ export default function OrganizerSettingsPage() {
   if (!org) {
     return (
       <div>
-        <PageHeader title="마이페이지" />
+        <PageHeader title="마이페이지" backHref="/organizer" />
         <Card>
           <div className="text-center py-8">
             <Building2 className="w-8 h-8 text-gray-300 mx-auto mb-2" />
@@ -180,7 +180,7 @@ export default function OrganizerSettingsPage() {
 
   return (
     <div>
-      <PageHeader title="마이페이지" subtitle="사업자 정보와 연락처를 관리할 수 있습니다" />
+      <PageHeader title="마이페이지" subtitle="사업자 정보와 연락처를 관리할 수 있습니다" backHref="/organizer" />
 
       {/* Business Info Card */}
       <Card className="mb-4">

@@ -146,7 +146,7 @@ export default function Header() {
 
           {/* Dropdown */}
           {showDropdown && (
-            <div className="absolute right-0 top-12 w-80 bg-white rounded-xl shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)] border border-gray-200 overflow-hidden z-50">
+            <div className="fixed sm:absolute right-2 sm:right-0 left-2 sm:left-auto top-14 sm:top-12 sm:w-80 bg-white rounded-xl shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)] border border-gray-200 overflow-hidden z-50">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                 <h3 className="text-sm font-bold text-gray-800">알림</h3>
                 {unreadCount > 0 && (

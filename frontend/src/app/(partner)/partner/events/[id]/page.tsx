@@ -128,7 +128,7 @@ export default function PartnerEventDetailPage() {
       key: 'customer',
       header: '고객',
       render: (item: Contract) => (
-        <span className="text-gray-600 truncate block min-w-0">
+        <span className="text-gray-600 truncate block max-w-[80px]">
           {item.customerName || item.customer?.name || '미지정'}
         </span>
       ),
@@ -137,7 +137,7 @@ export default function PartnerEventDetailPage() {
       key: 'totalAmount',
       header: '금액',
       render: (item: Contract) => (
-        <span className="text-gray-600">
+        <span className="text-gray-600 text-xs whitespace-nowrap">
           {item.totalAmount ? formatCurrency(item.totalAmount) : '-'}
         </span>
       ),
@@ -153,8 +153,9 @@ export default function PartnerEventDetailPage() {
     {
       key: 'template',
       header: '템플릿',
+      className: 'hidden sm:table-cell',
       render: (item: Contract) => (
-        <span className="text-gray-600 truncate block min-w-0">{item.template?.name || '-'}</span>
+        <span className="text-gray-600 truncate block max-w-[80px]">{item.template?.name || '-'}</span>
       ),
     },
     {
@@ -162,7 +163,7 @@ export default function PartnerEventDetailPage() {
       header: '생성일',
       className: 'hidden sm:table-cell',
       render: (item: Contract) => (
-        <span className="text-gray-500">{formatDate(item.createdAt)}</span>
+        <span className="text-gray-500 text-xs">{formatDate(item.createdAt)}</span>
       ),
     },
     {
@@ -182,77 +183,63 @@ export default function PartnerEventDetailPage() {
   ];
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <PageHeader
         title={event.name}
         backHref="/partner/events"
         actions={
-          <Button onClick={() => router.push(`/partner/events/${id}/contracts/new`)}>
-            <Plus className="w-4 h-4 mr-1" />
-            계약 생성
+          <Button size="sm" onClick={() => router.push(`/partner/events/${id}/contracts/new`)}>
+            <Plus className="w-3.5 h-3.5 mr-0.5" />
+            <span className="text-xs">개별계약</span>
           </Button>
         }
       />
 
-      {/* Event Info */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <div className="flex items-center gap-3">
-            <Calendar className="w-5 h-5 text-blue-500" />
-            <div>
-              <p className="text-xs text-gray-500">기간</p>
-              <p className="text-sm font-medium">
-                {formatDate(event.startDate)} ~ {formatDate(event.endDate)}
-              </p>
-            </div>
+      {/* 행사 개요 (와이어프레임 2-2: 블루 카드) */}
+      <div className="bg-blue-100 rounded-xl p-5 mb-6">
+        <h2 className="text-lg font-bold text-blue-900 mb-3">행사 개요</h2>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-blue-800">
+            <Calendar className="w-4 h-4" />
+            <span>{formatDate(event.startDate)} ~ {formatDate(event.endDate)}</span>
           </div>
-        </Card>
-        <Card>
-          <div className="flex items-center gap-3">
-            <MapPin className="w-5 h-5 text-success" />
-            <div>
-              <p className="text-xs text-gray-500">장소</p>
-              <p className="text-sm font-medium">{event.venue || '-'}</p>
+          {event.venue && (
+            <div className="flex items-center gap-2 text-sm text-blue-800">
+              <MapPin className="w-4 h-4" />
+              <span>{event.venue}</span>
             </div>
+          )}
+          <div className="flex items-center gap-2 text-sm text-blue-800">
+            <Percent className="w-4 h-4" />
+            <span>수수료율: {event.commissionRate}%</span>
           </div>
-        </Card>
-        <Card>
-          <div className="flex items-center gap-3">
-            <Percent className="w-5 h-5 text-purple-500" />
-            <div>
-              <p className="text-xs text-gray-500">수수료율</p>
-              <p className="text-sm font-medium">{event.commissionRate}%</p>
-            </div>
-          </div>
-        </Card>
+        </div>
+        <div className="mt-3 pt-3 border-t border-blue-200">
+          <Badge status={event.status} />
+        </div>
       </div>
 
-      <div className="mb-2">
-        <Badge status={event.status} />
-      </div>
-
-      {/* Integrated Contract Sheet */}
-      <div className="mt-6">
-        <Card hoverable onClick={() => router.push(`/partner/events/${id}/sheet`)}>
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-indigo-50 rounded-xl">
-              <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
-            </div>
-            <div className="flex-1">
-              <p className="font-bold text-gray-800">통합 계약 시트</p>
-              <p className="text-sm text-gray-500">품목별 옵션 + 가격 시트를 편집합니다</p>
-            </div>
-            <span className="text-gray-400">→</span>
+      {/* 품목 설정하기 (와이어프레임 2-2) */}
+      <h3 className="text-sm font-semibold text-gray-700 mb-3">품목 설정하기</h3>
+      <Card hoverable onClick={() => router.push(`/partner/events/${id}/sheet`)} className="mb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-indigo-50 rounded-xl">
+            <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
           </div>
-        </Card>
-      </div>
+          <div className="flex-1">
+            <p className="font-bold text-gray-800">통합 계약 시트</p>
+            <p className="text-sm text-gray-500">품목별 옵션 + 가격 시트를 편집합니다</p>
+          </div>
+          <span className="text-gray-400">→</span>
+        </div>
+      </Card>
 
       {/* Contract Templates Section */}
       <div className="mt-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
             <FileText className="w-5 h-5 text-gray-600" />
-            계약서 템플릿
+            개별계약 템플릿
           </h3>
           <Button
             variant="secondary"
@@ -267,7 +254,7 @@ export default function PartnerEventDetailPage() {
           <Card>
             <EmptyState
               title="등록된 템플릿이 없습니다"
-              description="계약서 템플릿을 먼저 등록하세요"
+              description="개별계약 템플릿을 먼저 등록하세요"
               action={
                 <Button
                   size="sm"
@@ -295,7 +282,7 @@ export default function PartnerEventDetailPage() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
             <QrCode className="w-5 h-5 text-gray-600" />
-            계약 현황
+            개별계약 현황
           </h3>
           <Button
             variant="secondary"
@@ -303,20 +290,20 @@ export default function PartnerEventDetailPage() {
             onClick={() => router.push(`/partner/events/${id}/contracts/new`)}
           >
             <Plus className="w-4 h-4 mr-1" />
-            새 계약
+            새 개별계약
           </Button>
         </div>
         {contracts.length === 0 ? (
           <Card>
             <EmptyState
-              title="생성된 계약이 없습니다"
-              description="템플릿을 선택하여 새 계약을 생성하세요"
+              title="생성된 개별계약이 없습니다"
+              description="템플릿을 선택하여 새 개별계약을 생성하세요"
               action={
                 <Button
                   size="sm"
                   onClick={() => router.push(`/partner/events/${id}/contracts/new`)}
                 >
-                  계약 생성하기
+                  개별계약 생성
                 </Button>
               }
             />

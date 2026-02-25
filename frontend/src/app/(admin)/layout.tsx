@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <Header />
       <div className="flex">
         <Sidebar role="admin" />
-        <main className="flex-1 p-6 max-w-6xl">{children}</main>
+        <main className="flex-1 px-4 py-5 lg:p-6 max-w-6xl">{children}</main>
       </div>
     </div>
   );

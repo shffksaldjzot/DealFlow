@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import CustomerSheetView from '@/components/integrated-contract/CustomerSheetView';
 import SelectionSummary from '@/components/integrated-contract/SelectionSummary';
 import { useToast } from '@/components/ui/Toast';
-import { ArrowLeft, PenTool, CheckCircle, Home } from 'lucide-react';
+import { ArrowLeft, PenTool, CheckCircle, Home, ChevronRight } from 'lucide-react';
 import type { IcContractFlow, IcSelectedItem, IcApartmentType } from '@/types/integrated-contract';
 
 interface SelectedRow {
@@ -28,7 +28,7 @@ export default function OptionsPage() {
   const [flow, setFlow] = useState<IcContractFlow | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState<SelectedRow[]>([]);
-  const [step, setStep] = useState<'select' | 'sign'>('select');
+  const [step, setStep] = useState<'type' | 'select' | 'sign'>('type');
   const [signing, setSigning] = useState(false);
   const [legalAgreed, setLegalAgreed] = useState(false);
   const [customerName, setCustomerName] = useState('');
@@ -36,7 +36,7 @@ export default function OptionsPage() {
   const [unitNumber, setUnitNumber] = useState('');
   const [specialNotes, setSpecialNotes] = useState('');
 
-  // Apartment type selection (in signature step)
+  // Apartment type selection
   const [selectedTypeId, setSelectedTypeId] = useState<string>('');
 
   // Signature canvas
@@ -44,7 +44,7 @@ export default function OptionsPage() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
 
-  // Redirect to login if not authenticated (before selecting options)
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace(`/login?redirect=/events/${code}/options`);
@@ -57,9 +57,12 @@ export default function OptionsPage() {
       .then((res) => {
         const data = extractData<IcContractFlow>(res);
         setFlow(data);
-        // Auto-select if only one type
+        // Auto-select and skip type step if only one type
         if (data.apartmentTypes.length === 1) {
           setSelectedTypeId(data.apartmentTypes[0].id);
+          setStep('select');
+        } else if (data.apartmentTypes.length === 0) {
+          setStep('select');
         }
       })
       .catch(() => {})
@@ -89,7 +92,7 @@ export default function OptionsPage() {
     });
   };
 
-  // Parse price from cellValues (handles comma-formatted strings like "150,000")
+  // Parse price from cellValues
   const parsePrice = (val: any): number => {
     if (val === undefined || val === null || val === '') return 0;
     if (typeof val === 'number') return val;
@@ -110,7 +113,6 @@ export default function OptionsPage() {
           let columnId = col?.id || '';
           let unitPrice = 0;
 
-          // Try exact column match first
           if (col && (col.columnType === 'amount' || !col.columnType)) {
             const cellVal = opt.cellValues?.[columnId];
             unitPrice = cellVal !== undefined
@@ -118,7 +120,6 @@ export default function OptionsPage() {
               : parsePrice(opt.prices?.[columnId]);
           }
 
-          // Fallback: search ALL amount columns (runs even if no column matched the type)
           if (unitPrice === 0) {
             const amtCols = cat.columns.filter((c: any) => c.columnType === 'amount' || !c.columnType);
             for (const amtCol of amtCols) {
@@ -195,7 +196,7 @@ export default function OptionsPage() {
     setHasSignature(false);
   };
 
-  // Phone number formatting: auto-format to 010-xxxx-xxxx
+  // Phone number formatting
   const formatPhoneNumber = (value: string) => {
     const nums = value.replace(/[^0-9]/g, '');
     if (nums.length <= 3) return nums;
@@ -205,6 +206,12 @@ export default function OptionsPage() {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCustomerPhone(formatPhoneNumber(e.target.value));
+  };
+
+  const handleBack = () => {
+    if (step === 'sign') setStep('select');
+    else if (step === 'select' && flow && flow.apartmentTypes.length > 1) setStep('type');
+    else router.back();
   };
 
   const handleSubmit = async () => {
@@ -297,85 +304,163 @@ export default function OptionsPage() {
   }
 
   const resolvedItems = selectedTypeId ? resolveSelectedItems(selectedTypeId) : [];
+  const stepLabels = ['타입 선택', '옵션 선택', '서명'];
+  const currentStepIndex = step === 'type' ? 0 : step === 'select' ? 1 : 2;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto p-4 space-y-4">
         {/* Back */}
         <button
-          onClick={() => step === 'sign' ? setStep('select') : router.back()}
+          onClick={handleBack}
           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
         >
           <ArrowLeft className="w-4 h-4" />
-          {step === 'sign' ? '옵션 선택으로' : '뒤로'}
+          {step === 'sign' ? '옵션 선택으로' : step === 'select' ? '뒤로' : '뒤로'}
         </button>
 
-        {step === 'select' && (
+        {/* Step indicator */}
+        {flow.apartmentTypes.length > 1 && (
+          <div className="flex items-center gap-2 text-xs">
+            {stepLabels.map((label, i) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className={`flex items-center gap-1.5 ${
+                  i <= currentStepIndex ? 'text-blue-600 font-semibold' : 'text-gray-400'
+                }`}>
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    i < currentStepIndex ? 'bg-blue-600 text-white' :
+                    i === currentStepIndex ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-600' :
+                    'bg-gray-200 text-gray-400'
+                  }`}>
+                    {i < currentStepIndex ? '✓' : i + 1}
+                  </span>
+                  {label}
+                </div>
+                {i < stepLabels.length - 1 && (
+                  <ChevronRight className="w-3 h-3 text-gray-300" />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ─── Step: Type Selection ─── */}
+        {step === 'type' && (
           <>
             <div>
-              <h1 className="text-xl font-bold text-gray-800">옵션 선택</h1>
-              <p className="text-sm text-gray-500 mt-1">전체 가격표에서 원하시는 품목을 선택해주세요</p>
+              <h1 className="text-xl font-bold text-gray-800">{flow.config.event?.name || '옵션 계약'}</h1>
+              <p className="text-sm text-gray-500 mt-1">계약 타입을 선택해주세요</p>
             </div>
 
-            {/* Full price table view */}
-            <CustomerSheetView
-              partners={flow.partners}
-              selectedRows={selectedRows.map((s) => ({ sheetId: s.sheetId, rowId: s.rowId }))}
-              onToggleRow={handleToggleRow}
-            />
+            <div className="space-y-3">
+              {flow.apartmentTypes.map((type) => (
+                <button
+                  key={type.id}
+                  onClick={() => setSelectedTypeId(type.id)}
+                  className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                    selectedTypeId === type.id
+                      ? 'border-blue-500 bg-blue-50 shadow-sm'
+                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        selectedTypeId === type.id
+                          ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                      }`}>
+                        {selectedTypeId === type.id && (
+                          <CheckCircle className="w-3.5 h-3.5 text-white" />
+                        )}
+                      </div>
+                      <span className={`font-medium ${
+                        selectedTypeId === type.id ? 'text-blue-700' : 'text-gray-800'
+                      }`}>
+                        {type.name}
+                      </span>
+                    </div>
+                    <ChevronRight className={`w-4 h-4 ${
+                      selectedTypeId === type.id ? 'text-blue-500' : 'text-gray-300'
+                    }`} />
+                  </div>
+                </button>
+              ))}
+            </div>
 
-            {/* Selection count */}
-            {selectedRows.length > 0 && (
-              <div className="text-sm text-gray-500 text-center">
-                {selectedRows.length}개 품목 선택됨
-              </div>
-            )}
-
-            {/* Next */}
             <Button
               fullWidth
               size="lg"
-              disabled={selectedRows.length === 0}
-              onClick={() => setStep('sign')}
+              disabled={!selectedTypeId}
+              onClick={() => setStep('select')}
             >
-              <PenTool className="w-5 h-5 mr-2" />
-              서명하기 ({selectedRows.length}개 선택)
+              다음
+              <ChevronRight className="w-5 h-5 ml-1" />
             </Button>
           </>
         )}
 
+        {/* ─── Step: Option Selection ─── */}
+        {step === 'select' && (
+          <>
+            <div>
+              <h1 className="text-xl font-bold text-gray-800">옵션 선택</h1>
+              <p className="text-sm text-gray-500 mt-1">원하시는 품목을 선택해주세요</p>
+            </div>
+
+            {/* Card-based product selection */}
+            <CustomerSheetView
+              partners={flow.partners}
+              selectedRows={selectedRows.map((s) => ({ sheetId: s.sheetId, rowId: s.rowId }))}
+              onToggleRow={handleToggleRow}
+              selectedTypeId={selectedTypeId}
+            />
+
+            {/* Bottom buttons (와이어프레임 1-3: 계약 목록보기 / 계약 하기) */}
+            <div className="sticky bottom-4 z-10 flex gap-3">
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1 shadow-lg bg-white"
+                onClick={() => router.push('/customer/integrated-contracts')}
+              >
+                계약 목록보기
+                {selectedRows.length > 0 && (
+                  <span className="ml-1.5 bg-blue-100 text-blue-600 text-xs px-1.5 py-0.5 rounded-full">
+                    {selectedRows.length}
+                  </span>
+                )}
+              </Button>
+              <Button
+                size="lg"
+                className="flex-1 shadow-lg"
+                disabled={selectedRows.length === 0}
+                onClick={() => setStep('sign')}
+              >
+                계약 하기
+              </Button>
+            </div>
+          </>
+        )}
+
+        {/* ─── Step: Sign ─── */}
         {step === 'sign' && (
           <>
             <div>
               <h1 className="text-xl font-bold text-gray-800">계약 서명</h1>
-              <p className="text-sm text-gray-500 mt-1">타입을 선택하고, 내용을 확인한 후 서명해주세요</p>
+              <p className="text-sm text-gray-500 mt-1">내용을 확인하고 서명해주세요</p>
             </div>
 
-            {/* Apartment Type Selection */}
-            {flow.apartmentTypes.length > 0 && (
-              <Card>
-                <h3 className="font-bold text-gray-800 mb-3">타입 선택</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {flow.apartmentTypes.map((type) => (
-                    <button
-                      key={type.id}
-                      onClick={() => setSelectedTypeId(type.id)}
-                      className={`p-3 rounded-xl border-2 text-left transition-colors ${
-                        selectedTypeId === type.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <p className={`text-sm font-medium ${selectedTypeId === type.id ? 'text-blue-700' : 'text-gray-700'}`}>
-                        {type.name}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </Card>
+            {/* Selected type info */}
+            {selectedTypeId && flow.apartmentTypes.length > 1 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+                <p className="text-xs text-blue-500 font-medium">선택 타입</p>
+                <p className="text-sm font-bold text-blue-700">
+                  {flow.apartmentTypes.find((t) => t.id === selectedTypeId)?.name}
+                </p>
+              </div>
             )}
 
-            {/* Summary (with type-specific prices) */}
+            {/* Summary */}
             {selectedTypeId && resolvedItems.length > 0 && (
               <Card>
                 <SelectionSummary
@@ -383,12 +468,6 @@ export default function OptionsPage() {
                   paymentStages={flow.config.paymentStages || []}
                 />
               </Card>
-            )}
-
-            {!selectedTypeId && flow.apartmentTypes.length > 1 && (
-              <div className="bg-warning-light border border-amber-200 rounded-xl p-3 text-center">
-                <p className="text-sm text-warning">타입을 선택하면 가격이 표시됩니다.</p>
-              </div>
             )}
 
             {/* Customer Info */}

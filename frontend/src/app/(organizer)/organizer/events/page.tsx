@@ -28,6 +28,7 @@ export default function OrganizerEventsPage() {
       <PageHeader
         title="행사 관리"
         subtitle="생성한 행사를 관리하세요"
+        backHref="/organizer"
         actions={
           <Button onClick={() => router.push('/organizer/events/new')}>
             <Plus className="w-4 h-4 mr-1" />
@@ -53,39 +54,49 @@ export default function OrganizerEventsPage() {
           }
         />
       ) : (
-        <div className="space-y-3">
-          {events.map((event) => (
-            <Card
-              key={event.id}
-              hoverable
-              onClick={() => router.push(`/organizer/events/${event.id}`)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-gray-800">{event.name}</h3>
-                    <Badge status={event.status} />
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {formatDate(event.startDate)} ~ {formatDate(event.endDate)}
-                    </span>
+        <>
+          {/* Tile-style event cards (와이어프레임 3-2) */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {events.map((event) => {
+              const daysLeft = Math.ceil(
+                (new Date(event.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+              );
+              return (
+                <button
+                  key={event.id}
+                  onClick={() => router.push(`/organizer/events/${event.id}`)}
+                  className="relative bg-blue-100 hover:bg-blue-200 rounded-xl p-4 text-left transition-all aspect-[3/2] flex flex-col justify-between"
+                >
+                  <div>
+                    <h3 className="font-bold text-blue-900 text-sm leading-tight line-clamp-2">
+                      {event.name}
+                    </h3>
                     {event.venue && (
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5" />
+                      <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
                         {event.venue}
-                      </span>
+                      </p>
                     )}
                   </div>
-                </div>
-                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-lg font-mono">
-                  {event.inviteCode}
-                </span>
-              </div>
-            </Card>
-          ))}
-        </div>
+                  <div className="flex items-center justify-between">
+                    <Badge status={event.status} />
+                    {daysLeft > 0 && event.status !== 'cancelled' && (
+                      <span className="text-xs font-bold text-blue-700">D-{daysLeft}</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* + 행사 생성 버튼 (와이어프레임 3-2) */}
+          <button
+            onClick={() => router.push('/organizer/events/new')}
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-xl p-4 text-center text-lg font-bold transition-colors"
+          >
+            +
+          </button>
+        </>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import api, { extractData } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import PageHeader from '@/components/layout/PageHeader';
 import { Bell, Check, CheckCheck, ChevronRight } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import type { Notification } from '@/types/notification';
@@ -49,19 +50,18 @@ export default function CustomerNotifications() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-gray-800">알림</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            {unread > 0 ? `읽지 않은 알림 ${unread}개` : '모든 알림을 확인했습니다'}
-          </p>
-        </div>
-        {unread > 0 && (
-          <Button variant="secondary" size="sm" onClick={handleMarkAllRead}>
-            <CheckCheck className="w-4 h-4 mr-1" /> 모두 읽음
-          </Button>
-        )}
-      </div>
+      <PageHeader
+        title="알림"
+        subtitle={unread > 0 ? `읽지 않은 알림 ${unread}개` : '모든 알림을 확인했습니다'}
+        backHref="/customer"
+        actions={
+          unread > 0 ? (
+            <Button variant="secondary" size="sm" onClick={handleMarkAllRead}>
+              <CheckCheck className="w-4 h-4 mr-1" /> 모두 읽음
+            </Button>
+          ) : undefined
+        }
+      />
 
       {loading ? (
         <div className="space-y-3">

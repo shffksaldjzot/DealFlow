@@ -24,7 +24,7 @@ export default function CustomerIntegratedContractsPage() {
 
   return (
     <div>
-      <PageHeader title="통합 계약" />
+      <PageHeader title="통합 계약" backHref="/customer" />
 
       {loading ? (
         <div className="space-y-3">

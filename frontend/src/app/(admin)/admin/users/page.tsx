@@ -98,6 +98,7 @@ export default function AdminUsersPage() {
       <PageHeader
         title="사용자 관리"
         subtitle={`총 ${total}명`}
+        backHref="/admin"
         actions={
           <Button size="sm" onClick={() => setCreateModal(true)}>계정 생성</Button>
         }

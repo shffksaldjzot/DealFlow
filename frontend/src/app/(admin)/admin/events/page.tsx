@@ -47,7 +47,7 @@ export default function AdminEventsPage() {
 
   return (
     <div>
-      <PageHeader title="이벤트 관리" subtitle={`총 ${total}개 행사`} />
+      <PageHeader title="이벤트 관리" subtitle={`총 ${total}개 행사`} backHref="/admin" />
 
       <div className="mb-4 max-w-sm">
         <Input

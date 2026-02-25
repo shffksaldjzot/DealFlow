@@ -116,7 +116,7 @@ export default function PartnerSettingsPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="업체 정보 관리" />
+        <PageHeader title="업체 정보 관리" backHref="/partner" />
         <div className="h-64 bg-white rounded-xl animate-pulse" />
       </div>
     );
@@ -125,7 +125,7 @@ export default function PartnerSettingsPage() {
   if (!org) {
     return (
       <div>
-        <PageHeader title="업체 정보 관리" />
+        <PageHeader title="업체 정보 관리" backHref="/partner" />
         <Card>
           <div className="text-center py-8">
             <Building2 className="w-8 h-8 text-gray-300 mx-auto mb-2" />
@@ -138,7 +138,7 @@ export default function PartnerSettingsPage() {
 
   return (
     <div>
-      <PageHeader title="업체 정보 관리" subtitle="사업자 정보와 연락처를 관리할 수 있습니다" />
+      <PageHeader title="업체 정보 관리" subtitle="사업자 정보와 연락처를 관리할 수 있습니다" backHref="/partner" />
 
       <Card>
         <div className="flex items-center justify-between mb-4">

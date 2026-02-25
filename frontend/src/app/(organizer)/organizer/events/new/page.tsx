@@ -60,18 +60,20 @@ export default function CreateEventPage() {
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
               label="시작일 *"
               type="date"
               value={form.startDate}
               onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+              className="min-h-[44px]"
             />
             <Input
               label="종료일 *"
               type="date"
               value={form.endDate}
               onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+              className="min-h-[44px]"
             />
           </div>
 

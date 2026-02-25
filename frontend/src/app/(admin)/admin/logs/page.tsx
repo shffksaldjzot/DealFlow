@@ -87,7 +87,7 @@ export default function AdminLogsPage() {
 
   return (
     <div>
-      <PageHeader title="활동 로그" subtitle={`총 ${total}건`} />
+      <PageHeader title="활동 로그" subtitle={`총 ${total}건`} backHref="/admin" />
 
       {/* Search */}
       <div className="mb-4 max-w-sm">

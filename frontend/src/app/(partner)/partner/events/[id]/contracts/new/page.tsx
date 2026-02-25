@@ -235,7 +235,7 @@ export default function NewContractPage() {
   if (templates.length === 0) {
     return (
       <div>
-        <PageHeader title="새 계약 생성" backHref={`/partner/events/${id}`} />
+        <PageHeader title="새 개별계약 생성" backHref={`/partner/events/${id}`} />
         <Card>
           <div className="text-center py-12">
             <p className="text-gray-500 mb-4">사용 가능한 템플릿이 없습니다.</p>
@@ -254,7 +254,7 @@ export default function NewContractPage() {
   return (
     <div>
       <PageHeader
-        title="새 계약 생성"
+        title="새 개별계약 생성"
         backHref={step === 'select' ? `/partner/events/${id}` : undefined}
         subtitle={STEP_LABELS[step]}
       />
@@ -644,7 +644,7 @@ export default function NewContractPage() {
                 행사로 돌아가기
               </Button>
               <Button onClick={resetAll}>
-                새 계약 생성
+                새 개별계약 생성
               </Button>
             </div>
           </div>

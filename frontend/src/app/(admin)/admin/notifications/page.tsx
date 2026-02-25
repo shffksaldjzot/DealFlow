@@ -44,6 +44,7 @@ export default function AdminNotifications() {
       <PageHeader
         title="알림"
         subtitle={unread > 0 ? `읽지 않은 알림 ${unread}개` : '모든 알림을 확인했습니다'}
+        backHref="/admin"
         actions={
           unread > 0 ? (
             <Button variant="secondary" size="sm" onClick={handleMarkAllRead}>

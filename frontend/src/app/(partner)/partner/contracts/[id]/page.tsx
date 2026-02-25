@@ -77,7 +77,7 @@ export default function PartnerContractDetailPage() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="계약 상세" backHref="/partner/events" />
+        <PageHeader title="개별계약 상세" backHref="/partner/events" />
         <div className="space-y-4">
           {[1, 2, 3].map((i) => <div key={i} className="h-32 bg-white rounded-xl animate-pulse" />)}
         </div>
@@ -88,7 +88,7 @@ export default function PartnerContractDetailPage() {
   if (!contract) {
     return (
       <div>
-        <PageHeader title="계약 상세" backHref="/partner/events" />
+        <PageHeader title="개별계약 상세" backHref="/partner/events" />
         <Card>
           <div className="text-center py-8">
             <p className="text-gray-500 mb-3">{error || '계약서를 찾을 수 없습니다'}</p>
@@ -107,7 +107,7 @@ export default function PartnerContractDetailPage() {
     <>
     <div className="print-hidden">
       <PageHeader
-        title="계약 상세"
+        title="개별계약 상세"
         backHref={`/partner/events/${contract.eventId}`}
         actions={
           <div className="flex items-center gap-2">

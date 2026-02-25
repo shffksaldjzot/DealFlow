@@ -8,8 +8,8 @@ import Modal from '@/components/ui/Modal';
 import PageHeader from '@/components/layout/PageHeader';
 import { useToast } from '@/components/ui/Toast';
 import PaymentStageEditor from '@/components/integrated-contract/PaymentStageEditor';
-import SheetEditor from '@/components/integrated-contract/SheetEditor';
 import CustomerSheetView from '@/components/integrated-contract/CustomerSheetView';
+import PartnerProductCard from '@/components/integrated-contract/PartnerProductCard';
 import {
   Save, Plus, Trash2, ChevronDown, ChevronUp,
   Copy, Check, Link2, Building2, FileSpreadsheet,
@@ -274,12 +274,6 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
     }
   };
 
-  const saveSheetColumns = async (sheetId: string, columns: any[]): Promise<any[]> => {
-    if (!config) return [];
-    const res = await api.put(`/ic/configs/${config.id}/sheets/${sheetId}/columns`, { columns });
-    return res.data?.data || [];
-  };
-
   const [savingCommissions, setSavingCommissions] = useState(false);
 
   const saveAllCommissions = async () => {
@@ -299,13 +293,6 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
     } finally {
       setSavingCommissions(false);
     }
-  };
-
-  const saveSheetRows = async (sheetId: string, rows: any[]): Promise<any[]> => {
-    if (!config) return [];
-    const res = await api.put(`/ic/configs/${config.id}/sheets/${sheetId}/rows`, { rows });
-    toast('시트가 저장되었습니다.', 'success');
-    return res.data?.data || [];
   };
 
   // ── Copy public URL ──
@@ -584,6 +571,50 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         설정 저장
       </Button>
 
+      {/* ── Section: 품목 테이블 (와이어프레임 4-3) ── */}
+      {sheets.length > 0 && (
+        <Card className="mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <FileSpreadsheet className="w-5 h-5 text-amber-500" />
+            <h3 className="font-semibold text-gray-800">품목 설정하기</h3>
+          </div>
+          {/* Table header */}
+          <div className="border-b-2 border-gray-800 pb-2 mb-1">
+            <div className="grid grid-cols-[1fr_80px_60px_90px] gap-2 text-xs font-bold text-gray-700">
+              <span>품목</span>
+              <span>업체명</span>
+              <span className="text-center">계약건</span>
+              <span className="text-right">집계</span>
+            </div>
+          </div>
+          {/* Table rows */}
+          {sheets.flatMap((sheet) =>
+            (sheet.rows || []).map((row: any) => {
+              const totalPrice = Object.values(row.prices || {}).reduce<number>((sum: number, v: any) => sum + (Number(v) || 0), 0);
+              return (
+                <div
+                  key={`${sheet.id}-${row.id}`}
+                  className="grid grid-cols-[1fr_80px_60px_90px] gap-2 items-center py-2.5 border-b border-gray-100 text-sm"
+                >
+                  <span className="text-gray-800 truncate">{row.optionName}</span>
+                  <span className="text-gray-600 text-xs truncate">{sheet.partner?.name || '—'}</span>
+                  <span className="text-gray-600 text-xs text-center">—</span>
+                  <button
+                    onClick={() => setExpandedSheet(expandedSheet === sheet.id ? null : sheet.id)}
+                    className="text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg font-medium text-right transition-colors"
+                  >
+                    상세보기
+                  </button>
+                </div>
+              );
+            })
+          )}
+          {sheets.flatMap(s => s.rows || []).length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-4">등록된 품목이 없습니다.</p>
+          )}
+        </Card>
+      )}
+
       {/* ── Section: 협력업체 시트 관리 ── */}
       <Card>
         <button
@@ -732,17 +763,34 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                     <span className="text-xs text-gray-400">%</span>
                   </div>
 
-                  {/* Sheet Editor (expanded) */}
+                  {/* Sheet Products (expanded) */}
                   {expandedSheet === sheet.id && (
-                    <div className="p-4 border-t border-gray-200">
-                      <SheetEditor
-                        apartmentTypes={apartmentTypes}
-                        initialColumns={sheet.columns || []}
-                        initialRows={sheet.rows || []}
-                        onSaveColumns={(cols) => saveSheetColumns(sheet.id, cols)}
-                        onSaveRows={(rows) => saveSheetRows(sheet.id, rows)}
-                        onError={(msg) => toast(msg, 'error')}
-                      />
+                    <div className="p-4 border-t border-gray-200 space-y-2">
+                      {(sheet.rows || []).length === 0 ? (
+                        <p className="text-sm text-gray-400 text-center py-4">등록된 품목이 없습니다.</p>
+                      ) : (
+                        (sheet.rows || []).map((row: any) => (
+                          <PartnerProductCard
+                            key={row.id}
+                            optionName={row.optionName}
+                            popupContent={row.popupContent}
+                            prices={row.prices || {}}
+                            cellValues={row.cellValues}
+                            columns={(sheet.columns || []).map((c: any) => ({
+                              id: c.id,
+                              customName: c.customName || c.apartmentType?.name,
+                              columnType: c.columnType || 'amount',
+                              apartmentTypeId: c.apartmentTypeId,
+                            }))}
+                            apartmentTypes={apartmentTypes}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
+                          />
+                        ))
+                      )}
+                      <p className="text-xs text-gray-400 text-center pt-2">
+                        {(sheet.columns || []).length}열 · {(sheet.rows || []).length}행
+                      </p>
                     </div>
                   )}
                 </div>
