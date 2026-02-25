@@ -29,6 +29,17 @@ const THEME_COLORS = [
   { name: 'indigo', class: 'bg-indigo-400' },
 ];
 
+const CARD_COLORS: Record<string, { bg: string; title: string; sub: string; border: string }> = {
+  blue: { bg: 'bg-blue-100', title: 'text-blue-900', sub: 'text-blue-600', border: 'border-blue-200' },
+  purple: { bg: 'bg-purple-100', title: 'text-purple-900', sub: 'text-purple-600', border: 'border-purple-200' },
+  green: { bg: 'bg-green-100', title: 'text-green-900', sub: 'text-green-600', border: 'border-green-200' },
+  orange: { bg: 'bg-orange-100', title: 'text-orange-900', sub: 'text-orange-600', border: 'border-orange-200' },
+  red: { bg: 'bg-red-100', title: 'text-red-900', sub: 'text-red-600', border: 'border-red-200' },
+  pink: { bg: 'bg-pink-100', title: 'text-pink-900', sub: 'text-pink-600', border: 'border-pink-200' },
+  teal: { bg: 'bg-teal-100', title: 'text-teal-900', sub: 'text-teal-600', border: 'border-teal-200' },
+  indigo: { bg: 'bg-indigo-100', title: 'text-indigo-900', sub: 'text-indigo-600', border: 'border-indigo-200' },
+};
+
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -215,33 +226,36 @@ export default function EventDetailPage() {
         }
       />
 
-      {/* 행사 개요 (와이어프레임 3-3: 블루 카드) */}
-      <div className="bg-blue-100 rounded-xl p-5 mb-6">
-        <h2 className="text-lg font-bold text-blue-900 mb-3">행사 개요</h2>
+      {/* 행사 개요 (동적 카드 색상) */}
+      {(() => {
+        const c = CARD_COLORS[event.themeColor || 'blue'] || CARD_COLORS.blue;
+        return (
+      <div className={`${c.bg} rounded-xl p-5 mb-6`}>
+        <h2 className={`text-lg font-bold ${c.title} mb-3`}>행사 개요</h2>
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-blue-800">
+          <div className={`flex items-center gap-2 text-sm ${c.title}`}>
             <Calendar className="w-4 h-4" />
             <span>{formatDate(event.startDate)} ~ {formatDate(event.endDate)}</span>
           </div>
           {event.venue && (
-            <div className="flex items-center gap-2 text-sm text-blue-800">
+            <div className={`flex items-center gap-2 text-sm ${c.title}`}>
               <MapPin className="w-4 h-4" />
               <span>{event.venue}</span>
             </div>
           )}
-          <div className="flex items-center gap-2 text-sm text-blue-800">
+          <div className={`flex items-center gap-2 text-sm ${c.title}`}>
             <Copy className="w-4 h-4" />
             <span className="font-mono font-bold tracking-wider">{event.inviteCode}</span>
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t border-blue-200 flex items-center gap-2">
+        <div className={`mt-3 pt-3 border-t ${c.border} flex items-center gap-2`}>
           <Badge status={event.status} />
-          <span className="text-xs text-blue-600">수수료율: {event.commissionRate}%</span>
+          <span className={`text-xs ${c.sub}`}>수수료율: {event.commissionRate}%</span>
         </div>
 
         {/* Theme Color Picker */}
-        <div className="mt-3 pt-3 border-t border-blue-200">
-          <p className="text-xs text-blue-600 mb-2">카드 색상</p>
+        <div className={`mt-3 pt-3 border-t ${c.border}`}>
+          <p className={`text-xs ${c.sub} mb-2`}>카드 색상</p>
           <div className="flex gap-1.5">
             {THEME_COLORS.map((color) => (
               <button
@@ -265,6 +279,8 @@ export default function EventDetailPage() {
           </div>
         </div>
       </div>
+        );
+      })()}
 
       {/* 초대코드 확인 버튼 */}
       <div className="mb-6">
