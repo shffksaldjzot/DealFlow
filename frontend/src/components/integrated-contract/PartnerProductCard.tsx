@@ -29,9 +29,11 @@ export default function PartnerProductCard({
   onDelete,
 }: PartnerProductCardProps) {
   const { image } = popupContent ? parsePopupContent(popupContent) : { image: null };
-  const typeName = apartmentTypeId
-    ? apartmentTypes.find(t => t.id === apartmentTypeId)?.name
-    : null;
+  // Support comma-separated type IDs
+  const typeIds = apartmentTypeId ? apartmentTypeId.split(',').filter(Boolean) : [];
+  const typeNames = typeIds
+    .map(id => apartmentTypes.find(t => t.id === id)?.name)
+    .filter(Boolean);
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-sm transition-shadow">
@@ -47,12 +49,12 @@ export default function PartnerProductCard({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <h4 className="text-sm font-semibold text-gray-800 truncate">{optionName}</h4>
-              <div className="flex items-center gap-2 mt-1">
-                {typeName && (
-                  <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">
-                    {typeName}
+              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                {typeNames.map((name, i) => (
+                  <span key={i} className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">
+                    {name}
                   </span>
-                )}
+                ))}
                 {(price != null && price > 0) && (
                   <span className="text-xs font-semibold text-gray-700">
                     {formatPrice(price)}

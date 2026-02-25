@@ -76,6 +76,50 @@ export class EventPartnersService {
       where: { eventId: event.id, partnerId: orgId },
     });
     if (existing) {
+      // Allow re-request for cancelled or rejected partnerships
+      if (
+        existing.status === EventPartnerStatus.CANCELLED ||
+        existing.status === EventPartnerStatus.REJECTED
+      ) {
+        existing.status = EventPartnerStatus.PENDING;
+        existing.cancelledAt = null;
+        existing.cancelledBy = null;
+        existing.cancelReason = null;
+        if (items) existing.items = items;
+        const saved = await this.eventPartnerRepository.save(existing);
+
+        const partnerOrg = await this.orgRepository.findOne({ where: { id: orgId } });
+        const partnerName = partnerOrg?.name || '협력업체';
+
+        try {
+          const organizerOwner = await this.memberRepository.findOne({
+            where: { organizationId: event.organizerId, role: MemberRole.OWNER },
+          });
+          if (organizerOwner) {
+            await this.notificationsService.createNotification({
+              userId: organizerOwner.userId,
+              type: 'partner_joined',
+              title: `[${event.name}] 협력업체 재참가 요청`,
+              message: `"${partnerName}"이(가) 행사 "${event.name}"에 재참가를 요청했습니다.`,
+              relatedId: event.id,
+              relatedType: 'event',
+            });
+          }
+        } catch {}
+
+        await this.activityLogService.log(
+          'partner_rejoin_request',
+          `"${partnerName}"이(가) 행사 "${event.name}" 재참가 신청`,
+          userId,
+          'event_partner',
+          saved.id,
+        );
+
+        return this.eventPartnerRepository.findOne({
+          where: { id: saved.id },
+          relations: ['event', 'event.organizer', 'partner'],
+        });
+      }
       throw new ConflictException('이미 참가한 이벤트입니다.');
     }
 

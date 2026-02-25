@@ -195,9 +195,9 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
       });
       setApartmentTypes(prev => [...prev, res.data.data]);
       setNewTypeName('');
-      toast('행사제목이 추가되었습니다.', 'success');
+      toast('타입이 추가되었습니다.', 'success');
     } catch {
-      toast('행사제목 추가에 실패했습니다.', 'error');
+      toast('타입 추가에 실패했습니다.', 'error');
     }
   };
 
@@ -211,9 +211,9 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         prev.map(t => t.id === editingType.id ? { ...t, name: editingType.name } : t),
       );
       setEditingType(null);
-      toast('행사제목이 수정되었습니다.', 'success');
+      toast('타입이 수정되었습니다.', 'success');
     } catch {
-      toast('행사제목 수정에 실패했습니다.', 'error');
+      toast('타입 수정에 실패했습니다.', 'error');
     }
   };
 
@@ -222,9 +222,9 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
     try {
       await api.delete(`/ic/configs/${config.id}/apartment-types/${typeId}`);
       setApartmentTypes(prev => prev.filter(t => t.id !== typeId));
-      toast('행사제목이 삭제되었습니다.', 'success');
+      toast('타입이 삭제되었습니다.', 'success');
     } catch {
-      toast('행사제목 삭제에 실패했습니다.', 'error');
+      toast('타입 삭제에 실패했습니다.', 'error');
     }
   };
 
@@ -422,7 +422,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         >
           <div className="flex items-center gap-2">
             <Building2 className="w-5 h-5 text-indigo-500" />
-            <h3 className="font-semibold text-gray-800">행사제목</h3>
+            <h3 className="font-semibold text-gray-800">타입</h3>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
               {apartmentTypes.length}개
             </span>
@@ -433,10 +433,10 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         {sections.types && (
           <div className="mt-4 space-y-3">
             {apartmentTypes.length === 0 ? (
-              <p className="text-sm text-gray-400">등록된 행사제목이 없습니다.</p>
+              <p className="text-sm text-gray-400">등록된 타입이 없습니다.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {apartmentTypes.map((type) => (
+                {apartmentTypes.map((type, idx) => (
                   <div
                     key={type.id}
                     className="border border-gray-200 rounded-lg p-3 flex items-center justify-between"
@@ -457,7 +457,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                       <>
                         <div className="flex items-center gap-2">
                           <span className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
-                            {type.sortOrder + 1}
+                            {idx + 1}
                           </span>
                           <span className="font-medium text-gray-800">{type.name}</span>
                           {type.floorPlanFileId && (
@@ -490,7 +490,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                 type="text"
                 value={newTypeName}
                 onChange={(e) => setNewTypeName(e.target.value)}
-                placeholder="예: 래미안 옵션계약, 힐스테이트 인테리어"
+                placeholder="예: 59A, 84B, 펜트하우스"
                 className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onKeyDown={(e) => e.key === 'Enter' && addApartmentType()}
               />
@@ -571,46 +571,57 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         설정 저장
       </Button>
 
-      {/* ── Section: 품목 테이블 (와이어프레임 4-3) ── */}
+      {/* ── Section: 품목 테이블 (업체별 그룹) ── */}
       {sheets.length > 0 && (
         <Card className="mb-4">
           <div className="flex items-center gap-2 mb-3">
             <FileSpreadsheet className="w-5 h-5 text-amber-500" />
             <h3 className="font-semibold text-gray-800">품목 설정하기</h3>
           </div>
-          {/* Table header */}
-          <div className="border-b-2 border-gray-800 pb-2 mb-1">
-            <div className="grid grid-cols-[1fr_80px_60px_90px] gap-2 text-xs font-bold text-gray-700">
-              <span>품목</span>
-              <span>업체명</span>
-              <span className="text-center">계약건</span>
-              <span className="text-right">집계</span>
-            </div>
-          </div>
-          {/* Table rows */}
-          {sheets.flatMap((sheet) =>
-            (sheet.rows || []).map((row: any) => {
-              const totalPrice = Object.values(row.prices || {}).reduce<number>((sum: number, v: any) => sum + (Number(v) || 0), 0);
-              return (
-                <div
-                  key={`${sheet.id}-${row.id}`}
-                  className="grid grid-cols-[1fr_80px_60px_90px] gap-2 items-center py-2.5 border-b border-gray-100 text-sm"
-                >
-                  <span className="text-gray-800 truncate">{row.optionName}</span>
-                  <span className="text-gray-600 text-xs truncate">{sheet.partner?.name || '—'}</span>
-                  <span className="text-gray-600 text-xs text-center">—</span>
-                  <button
-                    onClick={() => setExpandedSheet(expandedSheet === sheet.id ? null : sheet.id)}
-                    className="text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg font-medium text-right transition-colors"
-                  >
-                    상세보기
-                  </button>
-                </div>
-              );
-            })
-          )}
-          {sheets.flatMap(s => s.rows || []).length === 0 && (
+          {sheets.flatMap(s => s.rows || []).length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-4">등록된 품목이 없습니다.</p>
+          ) : (
+            <div className="space-y-4">
+              {sheets.filter(s => (s.rows || []).length > 0).map((sheet) => (
+                <div key={sheet.id}>
+                  {/* Partner group header */}
+                  <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 mb-1">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm font-bold text-gray-800">{sheet.partner?.name || '업체'}</span>
+                      <span className="text-xs text-gray-400">({sheet.categoryName})</span>
+                    </div>
+                    <button
+                      onClick={() => setExpandedSheet(expandedSheet === sheet.id ? null : sheet.id)}
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      상세보기
+                    </button>
+                  </div>
+                  {/* Table header */}
+                  <div className="border-b border-gray-200 pb-1.5 mb-1 px-1">
+                    <div className="grid grid-cols-[1fr_60px_90px] gap-2 text-[11px] font-semibold text-gray-500">
+                      <span>품목</span>
+                      <span className="text-center">계약건</span>
+                      <span className="text-right">계약금액</span>
+                    </div>
+                  </div>
+                  {/* Rows */}
+                  {(sheet.rows || []).map((row: any) => (
+                    <div
+                      key={`${sheet.id}-${row.id}`}
+                      className="grid grid-cols-[1fr_60px_90px] gap-2 items-center py-2 border-b border-gray-50 px-1 text-sm"
+                    >
+                      <span className="text-gray-800 truncate">{row.optionName}</span>
+                      <span className="text-gray-500 text-xs text-center">0건</span>
+                      <span className="text-gray-700 text-xs text-right font-medium">
+                        {row.price ? `${Number(row.price).toLocaleString('ko-KR')}원` : '—'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           )}
         </Card>
       )}
@@ -749,15 +760,17 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                   <div className="px-4 py-2 border-t border-gray-200 bg-white flex items-center gap-3">
                     <span className="text-xs text-gray-500 whitespace-nowrap">수수료율</span>
                     <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      value={sheet.commissionRate || 0}
+                      type="text"
+                      inputMode="numeric"
+                      value={sheet.commissionRate ? String(sheet.commissionRate) : ''}
                       onChange={(e) => {
-                        const val = parseFloat(e.target.value) || 0;
-                        setSheets(prev => prev.map(s => s.id === sheet.id ? { ...s, commissionRate: val } : s));
+                        let raw = e.target.value.replace(/[^0-9.]/g, '');
+                        // Remove leading zeros (but keep "0." for decimals)
+                        raw = raw.replace(/^0+(\d)/, '$1');
+                        const val = parseFloat(raw);
+                        setSheets(prev => prev.map(s => s.id === sheet.id ? { ...s, commissionRate: isNaN(val) ? 0 : Math.min(val, 100) } : s));
                       }}
+                      placeholder="0"
                       className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-xs text-gray-400">%</span>

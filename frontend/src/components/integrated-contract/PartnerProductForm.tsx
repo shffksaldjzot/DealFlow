@@ -21,7 +21,7 @@ interface PartnerProductFormProps {
   initialData?: {
     optionName: string;
     popupContent?: string;
-    apartmentTypeId?: string;
+    apartmentTypeId?: string; // comma-separated IDs for multi-type
     price?: number;
     prices: Record<string, number>;
     cellValues?: Record<string, string>;
@@ -48,7 +48,7 @@ export default function PartnerProductForm({
 }: PartnerProductFormProps) {
   const [optionName, setOptionName] = useState('');
   const [popupContent, setPopupContent] = useState('');
-  const [selectedTypeId, setSelectedTypeId] = useState<string>('');
+  const [selectedTypeIds, setSelectedTypeIds] = useState<string[]>([]);
   const [price, setPrice] = useState<number>(0);
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [cellValues, setCellValues] = useState<Record<string, string>>({});
@@ -58,20 +58,33 @@ export default function PartnerProductForm({
       if (initialData) {
         setOptionName(initialData.optionName);
         setPopupContent(initialData.popupContent || '');
-        setSelectedTypeId(initialData.apartmentTypeId || '');
+        // Parse comma-separated IDs
+        setSelectedTypeIds(
+          initialData.apartmentTypeId
+            ? initialData.apartmentTypeId.split(',').filter(Boolean)
+            : []
+        );
         setPrice(initialData.price || 0);
         setPrices(initialData.prices || {});
         setCellValues(initialData.cellValues || {});
       } else {
         setOptionName('');
         setPopupContent('');
-        setSelectedTypeId(apartmentTypes.length > 0 ? apartmentTypes[0].id : '');
+        setSelectedTypeIds([]);
         setPrice(0);
         setPrices({});
         setCellValues({});
       }
     }
   }, [isOpen, initialData, apartmentTypes]);
+
+  const toggleTypeId = (typeId: string) => {
+    setSelectedTypeIds(prev =>
+      prev.includes(typeId)
+        ? prev.filter(id => id !== typeId)
+        : [...prev, typeId]
+    );
+  };
 
   if (!isOpen) return null;
 
@@ -88,7 +101,7 @@ export default function PartnerProductForm({
     onSave({
       optionName: optionName.trim(),
       popupContent,
-      apartmentTypeId: selectedTypeId,
+      apartmentTypeId: selectedTypeIds.join(','),
       price,
       prices,
       cellValues,
@@ -137,22 +150,35 @@ export default function PartnerProductForm({
             )}
           </div>
 
-          {/* Type dropdown - always show when types exist */}
+          {/* Type multi-select checkboxes */}
           {apartmentTypes.length > 0 && (
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                타입 <span className="text-red-500">*</span>
+                적용 타입 <span className="text-red-500">*</span>
               </label>
-              <select
-                value={selectedTypeId}
-                onChange={(e) => setSelectedTypeId(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              >
-                <option value="">타입을 선택하세요</option>
-                {apartmentTypes.map((type) => (
-                  <option key={type.id} value={type.id}>{type.name}</option>
-                ))}
-              </select>
+              <div className="flex flex-wrap gap-2">
+                {apartmentTypes.map((type) => {
+                  const isChecked = selectedTypeIds.includes(type.id);
+                  return (
+                    <button
+                      key={type.id}
+                      type="button"
+                      onClick={() => toggleTypeId(type.id)}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                        isChecked
+                          ? 'bg-indigo-50 border-indigo-400 text-indigo-700'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      {isChecked && <span className="mr-1">&#10003;</span>}
+                      {type.name}
+                    </button>
+                  );
+                })}
+              </div>
+              {selectedTypeIds.length === 0 && (
+                <p className="text-xs text-red-400 mt-1">최소 1개 이상의 타입을 선택하세요</p>
+              )}
             </div>
           )}
 
@@ -210,7 +236,7 @@ export default function PartnerProductForm({
             <Button
               fullWidth
               onClick={handleSave}
-              disabled={!optionName.trim() || (apartmentTypes.length > 0 && !selectedTypeId)}
+              disabled={!optionName.trim() || (apartmentTypes.length > 0 && selectedTypeIds.length === 0)}
             >
               저장
             </Button>

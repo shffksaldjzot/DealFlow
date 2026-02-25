@@ -5,14 +5,15 @@ import api, { extractData } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
-import { Calendar } from 'lucide-react';
+import { Calendar, RotateCcw } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { useToast } from '@/components/ui/Toast';
 
 interface MyEvent {
   id: string;
   eventId: string;
   status: string;
-  event: { id: string; name: string; startDate: string; endDate: string; venue?: string };
+  event: { id: string; name: string; startDate: string; endDate: string; venue?: string; inviteCode?: string };
 }
 
 type TabKey = 'approved' | 'pending' | 'rejected' | 'cancelled' | 'all';
@@ -27,9 +28,11 @@ const tabs: { key: TabKey; label: string }[] = [
 
 export default function PartnerEventsPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [events, setEvents] = useState<MyEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('approved');
+  const [reRequesting, setReRequesting] = useState<string | null>(null);
 
   useEffect(() => {
     api.get('/event-partners/my-events')
@@ -46,6 +49,27 @@ export default function PartnerEventsPage() {
   const filteredEvents = activeTab === 'all'
     ? events
     : events.filter((e) => e.status === activeTab);
+
+  const handleReRequest = async (ep: MyEvent) => {
+    if (!ep.event.inviteCode) {
+      toast('초대코드 정보가 없어 재요청할 수 없습니다.', 'error');
+      return;
+    }
+    setReRequesting(ep.id);
+    try {
+      await api.post('/event-partners/join', {
+        inviteCode: ep.event.inviteCode,
+      });
+      toast('재참가 요청이 완료되었습니다.', 'success');
+      // Update local state
+      setEvents(prev => prev.map(e => e.id === ep.id ? { ...e, status: 'pending' } : e));
+    } catch (err: any) {
+      const msg = err.response?.data?.message;
+      toast(typeof msg === 'string' ? msg : '재요청에 실패했습니다.', 'error');
+    } finally {
+      setReRequesting(null);
+    }
+  };
 
   return (
     <div>
@@ -99,23 +123,23 @@ export default function PartnerEventsPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 overflow-hidden">
           {filteredEvents.map((ep) => {
             const isApproved = ep.status === 'approved';
             const daysLeft = Math.ceil(
               (new Date(ep.event.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
             );
             return (
-              <button
+              <div
                 key={ep.id}
                 onClick={() => isApproved ? router.push(`/partner/events/${ep.eventId}`) : undefined}
-                className={`rounded-xl p-3 text-left transition-all flex flex-col justify-between min-h-[100px] ${
+                className={`rounded-xl p-3 text-left transition-all flex flex-col justify-between min-h-[100px] min-w-0 overflow-hidden cursor-pointer ${
                   isApproved
                     ? 'bg-blue-100 hover:bg-blue-200'
                     : 'bg-gray-50 border border-gray-200 opacity-75'
                 }`}
               >
-                <h3 className={`font-bold text-sm leading-tight line-clamp-2 ${
+                <h3 className={`font-bold text-sm leading-tight line-clamp-2 break-words ${
                   isApproved ? 'text-blue-900' : 'text-gray-700'
                 }`}>
                   {ep.event.name}
@@ -130,7 +154,17 @@ export default function PartnerEventsPage() {
                     <span className="text-[10px] font-bold text-blue-700">D-{daysLeft}</span>
                   )}
                 </div>
-              </button>
+                {(ep.status === 'cancelled' || ep.status === 'rejected') && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleReRequest(ep); }}
+                    disabled={reRequesting === ep.id}
+                    className="mt-2 w-full flex items-center justify-center gap-1 text-[11px] font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg py-1.5 transition-colors disabled:opacity-50"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    {reRequesting === ep.id ? '요청 중...' : '재요청'}
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>
