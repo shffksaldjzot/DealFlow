@@ -3841,13 +3841,13 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/settlement/page_client-reference-manifest.js": {
-      "bytes": 12084,
+    ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/partners/page_client-reference-manifest.js": {
+      "bytes": 12077,
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/partners/page_client-reference-manifest.js": {
-      "bytes": 12077,
+    ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/settlement/page_client-reference-manifest.js": {
+      "bytes": 12084,
       "imports": [],
       "format": "cjs"
     },
@@ -4185,14 +4185,14 @@
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/ic-contracts/page_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/settlement/page_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/settlement/page_client-reference-manifest.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/partners/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/partners/page_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/settlement/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "/home/user/claud-deal/frontend/.open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/settlement/page_client-reference-manifest.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/ic-contracts/page_client-reference-manifest.js",
@@ -14425,11 +14425,11 @@
         ".open-next/server-functions/default/.next/server/app/(partner)/partner/events/[id]/ic-contracts/page_client-reference-manifest.js": {
           "bytesInOutput": 11546
         },
-        ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/settlement/page_client-reference-manifest.js": {
-          "bytesInOutput": 11559
-        },
         ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/partners/page_client-reference-manifest.js": {
           "bytesInOutput": 11550
+        },
+        ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/settlement/page_client-reference-manifest.js": {
+          "bytesInOutput": 11559
         },
         ".open-next/server-functions/default/.next/server/app/(organizer)/organizer/events/[id]/ic-contracts/page_client-reference-manifest.js": {
           "bytesInOutput": 11578
