@@ -11,7 +11,7 @@ import EmptyState from '@/components/common/EmptyState';
 import PartnerProductCard from '@/components/integrated-contract/PartnerProductCard';
 import PartnerProductForm from '@/components/integrated-contract/PartnerProductForm';
 import { useToast } from '@/components/ui/Toast';
-import { Eye, FileSpreadsheet, Plus, Trash2, Save, Loader2, ChevronDown } from 'lucide-react';
+import { Eye, FileSpreadsheet, Plus, Trash2, Save, Loader2, ChevronDown, X } from 'lucide-react';
 import type { IcConfig, IcPartnerSheet, IcSheetColumn, IcSheetRow } from '@/types/integrated-contract';
 
 let _keyCounter = 0;
@@ -120,7 +120,7 @@ export default function PartnerSheetPage() {
       }
 
       const colsToSave = columns.map((col, i) => ({
-        id: col.id,
+        ...(col.id ? { id: col.id } : {}),
         apartmentTypeId: col.apartmentTypeId,
         customName: col.customName,
         columnType: col.columnType || 'amount',
@@ -253,7 +253,33 @@ export default function PartnerSheetPage() {
   }
 
   const configCategories = config.categories || [];
+  const configApartmentTypes = config.apartmentTypes || [];
   const editingRow = editingRowIndex !== null ? rows[editingRowIndex] : null;
+
+  // Which apartment type IDs are already added as columns
+  const usedTypeIds = new Set(columns.map((c) => c.apartmentTypeId).filter(Boolean));
+  const availableTypes = configApartmentTypes.filter((t) => !usedTypeIds.has(t.id));
+
+  const handleAddTypeColumn = (typeId: string) => {
+    const type = configApartmentTypes.find((t) => t.id === typeId);
+    if (!type) return;
+    setColumns((prev) => [
+      ...prev,
+      {
+        id: '', // new column, will be assigned by backend on save
+        sheetId: sheet?.id || '',
+        apartmentTypeId: type.id,
+        customName: type.name,
+        columnType: 'amount' as const,
+        sortOrder: prev.length,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+  };
+
+  const handleRemoveTypeColumn = (typeId: string) => {
+    setColumns((prev) => prev.filter((c) => c.apartmentTypeId !== typeId));
+  };
 
   return (
     <div>
@@ -363,6 +389,61 @@ export default function PartnerSheetPage() {
                 <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
                   선택된 품목: <span className="font-semibold text-gray-800">{selectedCategory}</span>
                 </div>
+              </Card>
+
+              {/* 타입 선택 (P33에서 설정한 타입을 드롭다운으로 선택) */}
+              <Card>
+                <h3 className="font-bold text-gray-800 mb-2">타입 설정</h3>
+                <p className="text-xs text-gray-500 mb-3">
+                  주관사가 설정한 타입을 선택하세요. 상세 품목의 가격이 타입별로 입력됩니다.
+                </p>
+
+                {/* Currently added types as tags */}
+                {columns.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {columns.map((col) => {
+                      const typeName = col.customName
+                        || configApartmentTypes.find((t) => t.id === col.apartmentTypeId)?.name
+                        || '타입';
+                      return (
+                        <div
+                          key={col.apartmentTypeId || col.id}
+                          className="flex items-center gap-1 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-medium"
+                        >
+                          <span>{typeName}</span>
+                          <button
+                            onClick={() => col.apartmentTypeId && handleRemoveTypeColumn(col.apartmentTypeId)}
+                            className="ml-0.5 hover:text-red-500 transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Dropdown to add types */}
+                {configApartmentTypes.length > 0 ? (
+                  availableTypes.length > 0 ? (
+                    <select
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value) handleAddTypeColumn(e.target.value);
+                      }}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="">타입을 추가하세요</option>
+                      {availableTypes.map((type) => (
+                        <option key={type.id} value={type.id}>{type.name}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="text-xs text-gray-400">모든 타입이 추가되었습니다.</p>
+                  )
+                ) : (
+                  <p className="text-xs text-gray-400">주관사가 설정한 타입이 없습니다.</p>
+                )}
               </Card>
 
               {/* Product list - vertical layout (no horizontal scroll) */}
