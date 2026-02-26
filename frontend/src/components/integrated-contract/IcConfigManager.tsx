@@ -345,6 +345,7 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
 
   const handleDeleteRow = async (sheet: any, row: any) => {
     if (!config) return;
+    if (!window.confirm(`"${row.optionName}" 품목을 삭제하시겠습니까?`)) return;
     const remainingRows = (sheet.rows || []).filter((r: any) => r.id !== row.id);
     try {
       const res = await api.put(`/ic/configs/${config.id}/sheets/${sheet.id}/rows`, {
@@ -692,17 +693,18 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                   </div>
                   {/* Table header */}
                   <div className="border-b border-gray-200 pb-1.5 mb-1 px-1">
-                    <div className="grid grid-cols-[1fr_60px_90px] gap-2 text-[11px] font-semibold text-gray-500">
+                    <div className="grid grid-cols-[1fr_60px_90px_28px] gap-2 text-[11px] font-semibold text-gray-500">
                       <span>품목</span>
                       <span className="text-center">계약건</span>
                       <span className="text-right">계약금액</span>
+                      <span></span>
                     </div>
                   </div>
                   {/* Rows */}
                   {(sheet.rows || []).map((row: any) => (
                     <div
                       key={`${sheet.id}-${row.id}`}
-                      className="grid grid-cols-[1fr_60px_90px] gap-2 items-center py-2 border-b border-gray-50 px-1 text-sm"
+                      className="grid grid-cols-[1fr_60px_90px_28px] gap-2 items-center py-2 border-b border-gray-50 px-1 text-sm"
                     >
                       <span className="text-gray-800 truncate">{row.optionName}</span>
                       <span className="text-gray-500 text-xs text-center">0건</span>
@@ -719,6 +721,13 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                           return row.price ? `${Number(row.price).toLocaleString('ko-KR')}원` : '—';
                         })()}
                       </span>
+                      <button
+                        onClick={() => handleEditRow(sheet, row)}
+                        className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+                        title="수정"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
                     </div>
                   ))}
                 </div>
