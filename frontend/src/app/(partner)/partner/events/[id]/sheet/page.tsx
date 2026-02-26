@@ -158,7 +158,7 @@ export default function PartnerSheetPage() {
           ...(row.id ? { id: row.id } : {}),
           apartmentTypeId: row.apartmentTypeId,
           optionName: row.optionName,
-          price: row.price || 0,
+          price: Number(row.price) || 0,
           popupContent: row.popupContent,
           sortOrder: i,
           prices: remappedPrices,
