@@ -4,10 +4,10 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { IcContract, IcContractStatus } from './entities/ic-contract.entity';
 import { IcConfig } from './entities/ic-config.entity';
-import { IcPartnerSheet, IcSheetStatus } from './entities/ic-partner-sheet.entity';
+import { IcPartnerSheet } from './entities/ic-partner-sheet.entity';
 import { IcSheetColumn } from './entities/ic-sheet-column.entity';
 import { IcSheetRow } from './entities/ic-sheet-row.entity';
 import { IcApartmentType } from './entities/ic-apartment-type.entity';
@@ -78,7 +78,7 @@ export class IcContractService {
     }
 
     const sheets = await this.sheetRepository.find({
-      where: { configId: config.id, status: In([IcSheetStatus.ACTIVE, IcSheetStatus.DRAFT]) },
+      where: { configId: config.id },
       relations: ['columns', 'columns.apartmentType', 'rows', 'partner'],
       order: { createdAt: 'ASC' },
     });

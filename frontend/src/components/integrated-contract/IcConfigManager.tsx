@@ -66,6 +66,11 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
   // Copy state
   const [copied, setCopied] = useState(false);
 
+  // Row edit/delete state
+  const [editingRow, setEditingRow] = useState<{ sheet: any; row: any } | null>(null);
+  const [editRowForm, setEditRowForm] = useState<{ optionName: string; prices: Record<string, number>; cellValues: Record<string, string> }>({ optionName: '', prices: {}, cellValues: {} });
+  const [savingRow, setSavingRow] = useState(false);
+
   // Sections collapsed state
   const [sections, setSections] = useState({
     types: true,
@@ -293,6 +298,71 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
       toast('수수료율 저장에 실패했습니다.', 'error');
     } finally {
       setSavingCommissions(false);
+    }
+  };
+
+  // ── Row Edit/Delete ──
+  const handleEditRow = (sheet: any, row: any) => {
+    setEditingRow({ sheet, row });
+    setEditRowForm({
+      optionName: row.optionName || '',
+      prices: { ...(row.prices || {}) },
+      cellValues: { ...(row.cellValues || {}) },
+    });
+  };
+
+  const handleSaveEditedRow = async () => {
+    if (!editingRow || !config) return;
+    setSavingRow(true);
+    try {
+      const { sheet, row } = editingRow;
+      const updatedRows = (sheet.rows || []).map((r: any) =>
+        r.id === row.id
+          ? { ...r, optionName: editRowForm.optionName, prices: editRowForm.prices, cellValues: editRowForm.cellValues }
+          : r
+      );
+      const res = await api.put(`/ic/configs/${config.id}/sheets/${sheet.id}/rows`, {
+        rows: updatedRows.map((r: any, idx: number) => ({
+          optionName: r.optionName,
+          prices: r.prices || {},
+          cellValues: r.cellValues || {},
+          sortOrder: r.sortOrder ?? idx,
+          popupContent: r.popupContent || undefined,
+        })),
+      });
+      const savedRows = res.data?.data || updatedRows;
+      setSheets(prev => prev.map(s =>
+        s.id === sheet.id ? { ...s, rows: savedRows } : s
+      ));
+      setEditingRow(null);
+      toast('품목이 수정되었습니다.', 'success');
+    } catch {
+      toast('수정에 실패했습니다.', 'error');
+    } finally {
+      setSavingRow(false);
+    }
+  };
+
+  const handleDeleteRow = async (sheet: any, row: any) => {
+    if (!config) return;
+    const remainingRows = (sheet.rows || []).filter((r: any) => r.id !== row.id);
+    try {
+      const res = await api.put(`/ic/configs/${config.id}/sheets/${sheet.id}/rows`, {
+        rows: remainingRows.map((r: any, idx: number) => ({
+          optionName: r.optionName,
+          prices: r.prices || {},
+          cellValues: r.cellValues || {},
+          sortOrder: r.sortOrder ?? idx,
+          popupContent: r.popupContent || undefined,
+        })),
+      });
+      const savedRows = res.data?.data || remainingRows;
+      setSheets(prev => prev.map(s =>
+        s.id === sheet.id ? { ...s, rows: savedRows } : s
+      ));
+      toast('품목이 삭제되었습니다.', 'success');
+    } catch {
+      toast('삭제에 실패했습니다.', 'error');
     }
   };
 
@@ -637,7 +707,17 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                       <span className="text-gray-800 truncate">{row.optionName}</span>
                       <span className="text-gray-500 text-xs text-center">0건</span>
                       <span className="text-gray-700 text-xs text-right font-medium">
-                        {row.price ? `${Number(row.price).toLocaleString('ko-KR')}원` : '—'}
+                        {(() => {
+                          const priceVals = Object.values(row.prices || {}).filter((v: any) => Number(v) > 0).map(Number);
+                          if (priceVals.length > 0) {
+                            const min = Math.min(...priceVals);
+                            const max = Math.max(...priceVals);
+                            return min === max
+                              ? `${min.toLocaleString('ko-KR')}원`
+                              : `${min.toLocaleString('ko-KR')}~${max.toLocaleString('ko-KR')}원`;
+                          }
+                          return row.price ? `${Number(row.price).toLocaleString('ko-KR')}원` : '—';
+                        })()}
                       </span>
                     </div>
                   ))}
@@ -818,8 +898,8 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                               apartmentTypeId: c.apartmentTypeId,
                             }))}
                             apartmentTypes={apartmentTypes}
-                            onEdit={() => {}}
-                            onDelete={() => {}}
+                            onEdit={() => handleEditRow(sheet, row)}
+                            onDelete={() => handleDeleteRow(sheet, row)}
                           />
                         ))
                       )}
@@ -917,6 +997,81 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
             />
           )}
         </div>
+      </Modal>
+
+      {/* Row Edit Modal */}
+      <Modal
+        isOpen={!!editingRow}
+        onClose={() => setEditingRow(null)}
+        title="품목 수정"
+      >
+        {editingRow && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">품목명</label>
+              <input
+                type="text"
+                value={editRowForm.optionName}
+                onChange={(e) => setEditRowForm(prev => ({ ...prev, optionName: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            {(editingRow.sheet.columns || []).length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">타입별 금액</label>
+                <div className="space-y-2">
+                  {(editingRow.sheet.columns || []).map((col: any) => {
+                    const colName = col.customName || col.apartmentType?.name || '열';
+                    const isAmount = (col.columnType || 'amount') === 'amount';
+                    const key = isAmount ? (col.apartmentTypeId || col.id) : col.id;
+                    const value = isAmount
+                      ? (editRowForm.prices[key] ?? '')
+                      : (editRowForm.cellValues[key] ?? '');
+                    return (
+                      <div key={col.id} className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 w-24 shrink-0 truncate">{colName}</span>
+                        {isAmount ? (
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={value ? Number(value).toLocaleString('ko-KR') : ''}
+                            onChange={(e) => {
+                              const num = Number(e.target.value.replace(/[^0-9]/g, ''));
+                              setEditRowForm(prev => ({
+                                ...prev,
+                                prices: { ...prev.prices, [key]: num || 0 },
+                              }));
+                            }}
+                            placeholder="0"
+                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            value={value}
+                            onChange={(e) => setEditRowForm(prev => ({
+                              ...prev,
+                              cellValues: { ...prev.cellValues, [key]: e.target.value },
+                            }))}
+                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        )}
+                        {isAmount && <span className="text-xs text-gray-400">원</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            <div className="flex gap-2 justify-end pt-2">
+              <Button variant="outline" onClick={() => setEditingRow(null)}>취소</Button>
+              <Button onClick={handleSaveEditedRow} loading={savingRow} disabled={!editRowForm.optionName.trim()}>
+                <Save className="w-4 h-4 mr-1" />
+                저장
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
 
       {/* Delete Config Confirmation Modal */}

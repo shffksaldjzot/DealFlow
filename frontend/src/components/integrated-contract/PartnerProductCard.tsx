@@ -61,6 +61,32 @@ export default function PartnerProductCard({
                   </span>
                 )}
               </div>
+              {/* Per-column prices and values */}
+              {columns.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+                  {columns.map(col => {
+                    const isAmount = col.columnType === 'amount';
+                    if (isAmount) {
+                      const p = prices[col.apartmentTypeId || col.id];
+                      if (!p || Number(p) === 0) return null;
+                      return (
+                        <span key={col.id} className="text-xs text-gray-500">
+                          <span className="text-gray-400">{col.customName}:</span>{' '}
+                          <span className="font-medium text-gray-700">{formatPrice(p)}</span>
+                        </span>
+                      );
+                    } else {
+                      const v = cellValues?.[col.id];
+                      if (!v) return null;
+                      return (
+                        <span key={col.id} className="text-xs text-gray-500">
+                          <span className="text-gray-400">{col.customName}:</span> {v}
+                        </span>
+                      );
+                    }
+                  })}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               <button
