@@ -17,21 +17,21 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @Throttle({ short: { ttl: 1000, limit: 1 }, medium: { ttl: 60000, limit: 5 } })
+  @Throttle({ short: { ttl: 1000, limit: 3 }, medium: { ttl: 60000, limit: 15 } })
   @Post('login/social')
   socialLogin(@Body() dto: SocialLoginDto) {
     return this.authService.socialLogin(dto);
   }
 
   @Public()
-  @Throttle({ short: { ttl: 1000, limit: 1 }, medium: { ttl: 60000, limit: 5 } })
+  @Throttle({ short: { ttl: 1000, limit: 3 }, medium: { ttl: 60000, limit: 15 } })
   @Post('login/email')
   emailLogin(@Body() dto: EmailLoginDto) {
     return this.authService.emailLogin(dto);
   }
 
   @Public()
-  @Throttle({ short: { ttl: 1000, limit: 1 }, medium: { ttl: 60000, limit: 3 } })
+  @Throttle({ short: { ttl: 1000, limit: 3 }, medium: { ttl: 60000, limit: 10 } })
   @Post('signup')
   signup(@Body() dto: SignupDto) {
     return this.authService.signup(dto);
