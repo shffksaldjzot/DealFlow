@@ -36,9 +36,13 @@ export default function PartnerProductCard({
     .filter(col => col.columnType === 'amount' && col.apartmentTypeId && (prices[col.id] || prices[col.apartmentTypeId]))
     .map(col => apartmentTypes.find(t => t.id === col.apartmentTypeId)?.name)
     .filter(Boolean);
+  // When no columns, show all apartment type names
+  const fallbackTypeNames = columns.length === 0
+    ? apartmentTypes.map(t => t.name)
+    : [];
   const typeNames = typeIds.length > 0
     ? typeIds.map(id => apartmentTypes.find(t => t.id === id)?.name).filter(Boolean)
-    : colTypeNames;
+    : colTypeNames.length > 0 ? colTypeNames : fallbackTypeNames;
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-sm transition-shadow">
@@ -67,7 +71,7 @@ export default function PartnerProductCard({
                 )}
               </div>
               {/* Per-column prices and values */}
-              {columns.length > 0 && (
+              {columns.length > 0 ? (
                 <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
                   {columns.map(col => {
                     const isAmount = col.columnType === 'amount';
@@ -91,7 +95,20 @@ export default function PartnerProductCard({
                     }
                   })}
                 </div>
-              )}
+              ) : Object.keys(prices).length > 0 ? (
+                <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+                  {apartmentTypes.map(t => {
+                    const p = prices[t.id];
+                    if (!p || Number(p) === 0) return null;
+                    return (
+                      <span key={t.id} className="text-xs text-gray-500">
+                        <span className="text-gray-400">{t.name}:</span>{' '}
+                        <span className="font-medium text-gray-700">{formatPrice(p)}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              ) : null}
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               <button

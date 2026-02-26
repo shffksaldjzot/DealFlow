@@ -1017,53 +1017,68 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            {(editingRow.sheet.columns || []).length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">타입별 금액</label>
-                <div className="space-y-2">
-                  {(editingRow.sheet.columns || []).map((col: any) => {
-                    const colName = col.customName || col.apartmentType?.name || '열';
-                    const isAmount = (col.columnType || 'amount') === 'amount';
-                    const key = isAmount ? (col.apartmentTypeId || col.id) : col.id;
-                    const value = isAmount
-                      ? (editRowForm.prices[key] ?? '')
-                      : (editRowForm.cellValues[key] ?? '');
-                    return (
-                      <div key={col.id} className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 w-24 shrink-0 truncate">{colName}</span>
-                        {isAmount ? (
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={value ? Number(value).toLocaleString('ko-KR') : ''}
-                            onChange={(e) => {
-                              const num = Number(e.target.value.replace(/[^0-9]/g, ''));
-                              setEditRowForm(prev => ({
+            {(() => {
+              const cols = editingRow.sheet.columns || [];
+              const hasColumns = cols.length > 0;
+              const items = hasColumns
+                ? cols.map((col: any) => ({
+                    key: (col.columnType || 'amount') === 'amount' ? (col.apartmentTypeId || col.id) : col.id,
+                    name: col.customName || col.apartmentType?.name || '열',
+                    isAmount: (col.columnType || 'amount') === 'amount',
+                    colId: col.id,
+                  }))
+                : apartmentTypes.map((t) => ({
+                    key: t.id,
+                    name: t.name,
+                    isAmount: true,
+                    colId: t.id,
+                  }));
+              if (items.length === 0) return null;
+              return (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">타입별 금액</label>
+                  <div className="space-y-2">
+                    {items.map((item: any) => {
+                      const value = item.isAmount
+                        ? (editRowForm.prices[item.key] ?? '')
+                        : (editRowForm.cellValues[item.key] ?? '');
+                      return (
+                        <div key={item.colId} className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500 w-24 shrink-0 truncate">{item.name}</span>
+                          {item.isAmount ? (
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={value ? Number(value).toLocaleString('ko-KR') : ''}
+                              onChange={(e) => {
+                                const num = Number(e.target.value.replace(/[^0-9]/g, ''));
+                                setEditRowForm(prev => ({
+                                  ...prev,
+                                  prices: { ...prev.prices, [item.key]: num || 0 },
+                                }));
+                              }}
+                              placeholder="0"
+                              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          ) : (
+                            <input
+                              type="text"
+                              value={value}
+                              onChange={(e) => setEditRowForm(prev => ({
                                 ...prev,
-                                prices: { ...prev.prices, [key]: num || 0 },
-                              }));
-                            }}
-                            placeholder="0"
-                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          />
-                        ) : (
-                          <input
-                            type="text"
-                            value={value}
-                            onChange={(e) => setEditRowForm(prev => ({
-                              ...prev,
-                              cellValues: { ...prev.cellValues, [key]: e.target.value },
-                            }))}
-                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          />
-                        )}
-                        {isAmount && <span className="text-xs text-gray-400">원</span>}
-                      </div>
-                    );
-                  })}
+                                cellValues: { ...prev.cellValues, [item.key]: e.target.value },
+                              }))}
+                              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          )}
+                          {item.isAmount && <span className="text-xs text-gray-400">원</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
             <div className="flex gap-2 justify-end pt-2">
               <Button variant="outline" onClick={() => setEditingRow(null)}>취소</Button>
               <Button onClick={handleSaveEditedRow} loading={savingRow} disabled={!editRowForm.optionName.trim()}>
