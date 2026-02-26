@@ -29,11 +29,16 @@ export default function PartnerProductCard({
   onDelete,
 }: PartnerProductCardProps) {
   const { image } = popupContent ? parsePopupContent(popupContent) : { image: null };
-  // Support comma-separated type IDs
+  // Support comma-separated type IDs from prop
   const typeIds = apartmentTypeId ? apartmentTypeId.split(',').filter(Boolean) : [];
-  const typeNames = typeIds
-    .map(id => apartmentTypes.find(t => t.id === id)?.name)
+  // Also extract type names from amount columns that have prices
+  const colTypeNames = columns
+    .filter(col => col.columnType === 'amount' && col.apartmentTypeId && (prices[col.id] || prices[col.apartmentTypeId]))
+    .map(col => apartmentTypes.find(t => t.id === col.apartmentTypeId)?.name)
     .filter(Boolean);
+  const typeNames = typeIds.length > 0
+    ? typeIds.map(id => apartmentTypes.find(t => t.id === id)?.name).filter(Boolean)
+    : colTypeNames;
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-sm transition-shadow">
@@ -67,7 +72,7 @@ export default function PartnerProductCard({
                   {columns.map(col => {
                     const isAmount = col.columnType === 'amount';
                     if (isAmount) {
-                      const p = prices[col.apartmentTypeId || col.id];
+                      const p = prices[col.id] ?? prices[col.apartmentTypeId || ''];
                       if (!p || Number(p) === 0) return null;
                       return (
                         <span key={col.id} className="text-xs text-gray-500">
