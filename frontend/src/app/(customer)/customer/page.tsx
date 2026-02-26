@@ -7,8 +7,8 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import ConfirmModal from '@/components/ui/ConfirmModal';
-import { FileText, ChevronRight, AlertCircle, Camera, X, XCircle, Layers, QrCode } from 'lucide-react';
-import { formatDateTime, formatCurrency } from '@/lib/utils';
+import { FileText, ChevronRight, AlertCircle, Camera, X, XCircle, Layers, QrCode, Calendar, Building2, Ticket } from 'lucide-react';
+import { formatDateTime, formatDate, formatCurrency } from '@/lib/utils';
 import type { Contract } from '@/types/contract';
 import { useToast } from '@/components/ui/Toast';
 import type { IcContract } from '@/types/integrated-contract';
@@ -19,6 +19,7 @@ export default function CustomerHome() {
   const { toast } = useToast();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [icContracts, setIcContracts] = useState<IcContract[]>([]);
+  const [visits, setVisits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [visitCode, setVisitCode] = useState('');
   const [showScanner, setShowScanner] = useState(false);
@@ -35,6 +36,7 @@ export default function CustomerHome() {
     Promise.all([
       api.get('/customer/contracts').then((res) => setContracts(extractData(res))).catch(() => {}),
       api.get('/ic/contracts/my').then((res) => setIcContracts(extractData(res))).catch(() => {}),
+      api.get('/event-visits/my').then((res) => setVisits(extractData(res))).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, []);
 
@@ -65,7 +67,7 @@ export default function CustomerHome() {
   const handleVisitCodeSubmit = () => {
     const trimmed = visitCode.trim().replace(/\s/g, '');
     if (trimmed.length >= 4) {
-      router.push(`/events/${trimmed}/options`);
+      router.push(`/events/${trimmed}/visit`);
     }
   };
 
@@ -200,6 +202,68 @@ export default function CustomerHome() {
           </Button>
         </div>
       </Card>
+
+      {/* 참여 행사 섹션 */}
+      {!loading && visits.filter((v: any) => v.status === 'reserved').length > 0 && (
+        <div className="mb-5">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">참여 행사</h3>
+          <div className="space-y-2">
+            {visits
+              .filter((v: any) => v.status === 'reserved')
+              .map((visit: any) => {
+                const eventData = visit.event;
+                if (!eventData) return null;
+                // 해당 행사의 IC 계약 찾기
+                const matchingIc = icContracts.find(
+                  (ic) => (ic as any).config?.event?.id === eventData.id || (ic as any).config?.eventId === eventData.id,
+                );
+                return (
+                  <Card
+                    key={visit.id}
+                    hoverable
+                    onClick={() => {
+                      if (matchingIc) {
+                        router.push(`/customer/integrated-contracts/${matchingIc.id}`);
+                      } else {
+                        router.push(`/events/${eventData.inviteCode}/options`);
+                      }
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                        <Ticket className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-800 text-sm truncate">{eventData.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          {eventData.organizer?.name && (
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              <Building2 className="w-3 h-3" />
+                              {eventData.organizer.name}
+                            </span>
+                          )}
+                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {formatDate(visit.visitDate)}
+                          </span>
+                        </div>
+                        {matchingIc ? (
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <Badge status={matchingIc.status} />
+                            <span className="text-xs font-medium text-blue-600">{formatCurrency(matchingIc.totalAmount)}</span>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-blue-600 font-medium mt-1.5">옵션 선택 &rarr;</p>
+                        )}
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-300 shrink-0 mt-1" />
+                    </div>
+                  </Card>
+                );
+              })}
+          </div>
+        </div>
+      )}
 
       {/* Pending Contracts Alert */}
       {!loading && pendingContracts.length > 0 && (

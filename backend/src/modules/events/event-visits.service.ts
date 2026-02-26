@@ -35,6 +35,15 @@ export class EventVisitsService {
       throw new BadRequestException('현재 접수 중인 행사가 아닙니다.');
     }
 
+    // 중복 방문 방지: 같은 행사에 이미 방문 등록이 있으면 기존 것 반환
+    const existing = await this.visitRepository.findOne({
+      where: { eventId: event.id, customerId: userId, status: 'reserved' },
+      relations: ['event', 'event.organizer'],
+    });
+    if (existing) {
+      return existing;
+    }
+
     const visit = this.visitRepository.create({
       eventId: event.id,
       customerId: userId,
@@ -56,14 +65,14 @@ export class EventVisitsService {
 
     return this.visitRepository.findOne({
       where: { id: saved.id },
-      relations: ['event'],
+      relations: ['event', 'event.organizer'],
     });
   }
 
   async listMyReservations(userId: string): Promise<EventVisit[]> {
     return this.visitRepository.find({
       where: { customerId: userId },
-      relations: ['event'],
+      relations: ['event', 'event.organizer'],
       order: { createdAt: 'DESC' },
     });
   }

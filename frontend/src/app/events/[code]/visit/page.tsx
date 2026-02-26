@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
-import { Calendar, MapPin, Building2, Ticket } from 'lucide-react';
+import { Calendar, MapPin, Building2, Ticket, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
 interface PublicEventInfo {
@@ -28,10 +28,10 @@ export default function EventVisitPage() {
   const [event, setEvent] = useState<PublicEventInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [visitDate, setVisitDate] = useState('');
+  const [showDetail, setShowDetail] = useState(false);
+  const [visitDate, setVisitDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [guestCount, setGuestCount] = useState('1');
   const [memo, setMemo] = useState('');
-  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     fetch(`/api/events/public/${code}`)
@@ -41,16 +41,9 @@ export default function EventVisitPage() {
       .finally(() => setLoading(false));
   }, [code]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     if (!isAuthenticated || !user) {
       router.push(`/login?redirect=/events/${code}/visit`);
-      return;
-    }
-
-    if (!visitDate) {
-      toast('방문 날짜를 선택해주세요.', 'error');
       return;
     }
 
@@ -62,11 +55,11 @@ export default function EventVisitPage() {
         guestCount: Number(guestCount),
         memo: memo || undefined,
       });
-      setSubmitted(true);
-      toast('방문예약이 완료되었습니다.', 'success');
+      toast('방문 등록이 완료되었습니다.', 'success');
+      router.push('/customer');
     } catch (err: any) {
       const msg = err.response?.data?.message;
-      toast(typeof msg === 'string' ? msg : '예약에 실패했습니다.', 'error');
+      toast(typeof msg === 'string' ? msg : '등록에 실패했습니다.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -90,27 +83,6 @@ export default function EventVisitPage() {
     );
   }
 
-  if (submitted) {
-    return (
-      <div className="space-y-4 pt-4">
-        <Card>
-          <div className="text-center py-8">
-            <div className="w-14 h-14 rounded-xl bg-success-light flex items-center justify-center mx-auto mb-3">
-              <Ticket className="w-7 h-7 text-success" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">예약 완료</h2>
-            <p className="text-sm text-gray-500 mb-6">
-              {event.name} 방문예약이 완료되었습니다.
-            </p>
-            <Button onClick={() => router.push('/customer')}>
-              홈으로 이동
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4 pt-4">
       <Card>
@@ -119,7 +91,7 @@ export default function EventVisitPage() {
             <Ticket className="w-7 h-7 text-success" />
           </div>
           <h2 className="text-xl font-bold text-gray-800">{event.name}</h2>
-          <p className="text-sm text-gray-500 mt-1">방문예약</p>
+          <p className="text-sm text-gray-500 mt-1">방문 등록</p>
         </div>
 
         <div className="space-y-3 mb-6">
@@ -150,43 +122,56 @@ export default function EventVisitPage() {
 
         {isAuthenticated && user ? (
           user.role === 'customer' ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                label="방문 날짜"
-                type="date"
-                value={visitDate}
-                onChange={(e) => setVisitDate(e.target.value)}
-              />
-              <Input
-                label="방문 인원"
-                type="number"
-                min="1"
-                value={guestCount}
-                onChange={(e) => setGuestCount(e.target.value)}
-              />
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">메모 (선택)</label>
-                <textarea
-                  value={memo}
-                  onChange={(e) => setMemo(e.target.value)}
-                  placeholder="요청사항이나 메모를 입력하세요"
-                  rows={3}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                />
-              </div>
-              <Button fullWidth size="xl" type="submit" loading={submitting} disabled={!visitDate}>
-                예약하기
+            <div className="space-y-4">
+              <Button fullWidth size="xl" onClick={handleSubmit} loading={submitting}>
+                방문 등록하기
               </Button>
-            </form>
+
+              <button
+                onClick={() => setShowDetail(!showDetail)}
+                className="w-full flex items-center justify-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors py-1"
+              >
+                상세 입력
+                {showDetail ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+
+              {showDetail && (
+                <div className="space-y-3 pt-1">
+                  <Input
+                    label="방문 날짜"
+                    type="date"
+                    value={visitDate}
+                    onChange={(e) => setVisitDate(e.target.value)}
+                  />
+                  <Input
+                    label="방문 인원"
+                    type="number"
+                    min="1"
+                    value={guestCount}
+                    onChange={(e) => setGuestCount(e.target.value)}
+                  />
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">메모 (선택)</label>
+                    <textarea
+                      value={memo}
+                      onChange={(e) => setMemo(e.target.value)}
+                      placeholder="요청사항이나 메모를 입력하세요"
+                      rows={3}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="text-center">
-              <p className="text-sm text-gray-500 mb-3">고객 계정으로만 예약할 수 있습니다.</p>
+              <p className="text-sm text-gray-500 mb-3">고객 계정으로만 등록할 수 있습니다.</p>
               <p className="text-xs text-gray-400">현재 로그인: {user.email} ({user.role})</p>
             </div>
           )
         ) : (
           <Button fullWidth size="xl" onClick={() => router.push(`/login?redirect=/events/${code}/visit`)}>
-            로그인 후 예약하기
+            로그인 후 방문 등록
           </Button>
         )}
       </Card>

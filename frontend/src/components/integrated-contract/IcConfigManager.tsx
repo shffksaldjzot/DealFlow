@@ -384,39 +384,53 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
         }
       />
 
-      {/* Public URL */}
-      {publicUrl && (
+      {/* Public URL & QR */}
+      {event?.inviteCode && (
         <Card className="mb-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
-            <p className="text-xs text-gray-500">고객 옵션 선택 링크</p>
-          </div>
-          <p className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-1.5 rounded-lg truncate mb-2 break-all">
-            {publicUrl}
-          </p>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button size="sm" variant="outline" onClick={copyPublicUrl}>
-              {copied
-                ? <><Check className="w-3.5 h-3.5 mr-1" /> 복사됨</>
-                : <><Copy className="w-3.5 h-3.5 mr-1" /> 복사</>
-              }
-            </Button>
-            <a href={publicUrl} target="_blank" rel="noopener noreferrer">
-              <Button size="sm" variant="outline">
-                <ExternalLink className="w-3.5 h-3.5 mr-1" /> 열기
-              </Button>
-            </a>
-            <Button size="sm" variant="outline" onClick={() => setPreviewModal(true)}>
-              <Eye className="w-3.5 h-3.5 mr-1" />
-              미리보기
-            </Button>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
-              <QrCode className="w-3.5 h-3.5" /> 고객 옵션 선택 QR코드
+          {/* 방문 QR코드 */}
+          <div className="mb-4">
+            <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <QrCode className="w-3.5 h-3.5" /> 고객 방문 QR코드
+            </p>
+            <p className="text-[11px] text-gray-400 mb-2">
+              고객이 스캔하면 방문 등록 → 홈 화면에서 옵션 선택으로 이어집니다
             </p>
             <div className="flex justify-center bg-gray-50 rounded-lg p-3">
-              <QRCodeSVG value={publicUrl} size={160} level="H" includeMargin fgColor="#1B3460" />
+              <QRCodeSVG
+                value={`${typeof window !== 'undefined' ? window.location.origin : ''}/events/${event.inviteCode}/visit`}
+                size={160}
+                level="H"
+                includeMargin
+                fgColor="#1B3460"
+              />
+            </div>
+          </div>
+
+          {/* 옵션 직접 링크 */}
+          <div className="pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-2 mb-2">
+              <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
+              <p className="text-xs text-gray-500">고객 옵션 선택 링크</p>
+            </div>
+            <p className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-1.5 rounded-lg truncate mb-2 break-all">
+              {publicUrl}
+            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button size="sm" variant="outline" onClick={copyPublicUrl}>
+                {copied
+                  ? <><Check className="w-3.5 h-3.5 mr-1" /> 복사됨</>
+                  : <><Copy className="w-3.5 h-3.5 mr-1" /> 복사</>
+                }
+              </Button>
+              <a href={publicUrl} target="_blank" rel="noopener noreferrer">
+                <Button size="sm" variant="outline">
+                  <ExternalLink className="w-3.5 h-3.5 mr-1" /> 열기
+                </Button>
+              </a>
+              <Button size="sm" variant="outline" onClick={() => setPreviewModal(true)}>
+                <Eye className="w-3.5 h-3.5 mr-1" />
+                미리보기
+              </Button>
             </div>
           </div>
         </Card>

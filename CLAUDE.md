@@ -16,3 +16,7 @@
 - Backend: NestJS + TypeORM + SQLite (dev) / PostgreSQL (prod)
 - Frontend: Next.js + OpenNext + Cloudflare Workers
 - Global prefix: `/api`
+
+## Design
+- 디자인 가이드라인: `DESIGN.md` 참고
+- UI 작업 시 반드시 DESIGN.md의 컬러, 타이포, 여백, 컴포넌트 규격을 따를 것
