@@ -7,6 +7,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { Calendar, FileText, QrCode, ChevronRight, Plus, Eye, MapPin } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { getEventColor } from '@/lib/eventColors';
 
 export default function PartnerDashboard() {
   const router = useRouter();
@@ -77,14 +78,16 @@ export default function PartnerDashboard() {
             )}
           </div>
           <div className="space-y-3">
-            {activeEvents.slice(0, 3).map((ep: any) => (
+            {activeEvents.slice(0, 3).map((ep: any) => {
+              const color = getEventColor(ep.event.themeColor);
+              return (
               <Card key={ep.id} className="!p-0 overflow-hidden">
-                <div className="p-4">
+                <div className={`p-4 ${color.bg} rounded-xl`}>
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-bold text-gray-800 text-[15px]">{ep.event.name}</h4>
+                    <h4 className={`font-bold text-[15px] ${color.title}`}>{ep.event.name}</h4>
                     <Badge status="approved" />
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                  <div className={`flex items-center gap-3 text-xs mb-3 ${color.sub}`}>
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       {formatDate(ep.event.startDate)} ~ {formatDate(ep.event.endDate)}
@@ -116,7 +119,8 @@ export default function PartnerDashboard() {
                   </div>
                 </div>
               </Card>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

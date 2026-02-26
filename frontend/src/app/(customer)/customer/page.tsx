@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { FileText, ChevronRight, AlertCircle, Camera, X, XCircle, Layers, QrCode, Calendar, Building2, Ticket } from 'lucide-react';
 import { formatDateTime, formatDate, formatCurrency } from '@/lib/utils';
+import { getEventColor } from '@/lib/eventColors';
 import type { Contract } from '@/types/contract';
 import { useToast } from '@/components/ui/Toast';
 import type { IcContract } from '@/types/integrated-contract';
@@ -213,6 +214,7 @@ export default function CustomerHome() {
               .map((visit: any) => {
                 const eventData = visit.event;
                 if (!eventData) return null;
+                const color = getEventColor(eventData.themeColor);
                 // 해당 행사의 IC 계약 찾기
                 const matchingIc = icContracts.find(
                   (ic) => (ic as any).config?.event?.id === eventData.id || (ic as any).config?.eventId === eventData.id,
@@ -230,8 +232,8 @@ export default function CustomerHome() {
                     }}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                        <Ticket className="w-5 h-5 text-blue-500" />
+                      <div className={`w-10 h-10 rounded-xl ${color.iconBg} flex items-center justify-center shrink-0`}>
+                        <Ticket className={`w-5 h-5 ${color.icon}`} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-800 text-sm truncate">{eventData.name}</p>

@@ -8,12 +8,13 @@ import EmptyState from '@/components/common/EmptyState';
 import { Calendar, RotateCcw } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/components/ui/Toast';
+import { getEventColor } from '@/lib/eventColors';
 
 interface MyEvent {
   id: string;
   eventId: string;
   status: string;
-  event: { id: string; name: string; startDate: string; endDate: string; venue?: string; inviteCode?: string };
+  event: { id: string; name: string; startDate: string; endDate: string; venue?: string; inviteCode?: string; themeColor?: string };
 }
 
 type TabKey = 'approved' | 'pending' | 'rejected' | 'cancelled' | 'all';
@@ -126,6 +127,7 @@ export default function PartnerEventsPage() {
         <div className="grid grid-cols-2 gap-3 overflow-hidden">
           {filteredEvents.map((ep) => {
             const isApproved = ep.status === 'approved';
+            const color = getEventColor(ep.event.themeColor);
             const daysLeft = Math.ceil(
               (new Date(ep.event.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
             );
@@ -135,23 +137,23 @@ export default function PartnerEventsPage() {
                 onClick={() => isApproved ? router.push(`/partner/events/${ep.eventId}`) : undefined}
                 className={`rounded-xl p-3 text-left transition-all flex flex-col justify-between min-h-[100px] min-w-0 overflow-hidden cursor-pointer ${
                   isApproved
-                    ? 'bg-blue-100 hover:bg-blue-200'
+                    ? `${color.bg} ${color.hover}`
                     : 'bg-gray-50 border border-gray-200 opacity-75'
                 }`}
               >
                 <h3 className={`font-bold text-sm leading-tight line-clamp-2 break-words ${
-                  isApproved ? 'text-blue-900' : 'text-gray-700'
+                  isApproved ? color.title : 'text-gray-700'
                 }`}>
                   {ep.event.name}
                 </h3>
                 <div className="flex items-center justify-between mt-2">
                   <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap ${
-                    isApproved ? 'bg-blue-200 text-blue-800' : 'bg-gray-200 text-gray-600'
+                    isApproved ? `${color.bg} ${color.badge}` : 'bg-gray-200 text-gray-600'
                   }`}>
                     {isApproved ? '진행중' : ep.status === 'pending' ? '대기' : ep.status === 'rejected' ? '거절' : '취소'}
                   </span>
                   {isApproved && daysLeft > 0 && (
-                    <span className="text-[10px] font-bold text-blue-700">D-{daysLeft}</span>
+                    <span className={`text-[10px] font-bold ${color.badge}`}>D-{daysLeft}</span>
                   )}
                 </div>
                 {(ep.status === 'cancelled' || ep.status === 'rejected') && (

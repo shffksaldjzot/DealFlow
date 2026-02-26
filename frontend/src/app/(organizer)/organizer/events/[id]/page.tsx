@@ -10,6 +10,7 @@ import PageHeader from '@/components/layout/PageHeader';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/utils';
+import { getEventColor } from '@/lib/eventColors';
 import type { Event } from '@/types/event';
 import type { IcConfig, IcApartmentType } from '@/types/integrated-contract';
 import {
@@ -28,17 +29,6 @@ const THEME_COLORS = [
   { name: 'teal', class: 'bg-teal-400' },
   { name: 'indigo', class: 'bg-indigo-400' },
 ];
-
-const CARD_COLORS: Record<string, { bg: string; title: string; sub: string; border: string }> = {
-  blue: { bg: 'bg-blue-100', title: 'text-blue-900', sub: 'text-blue-600', border: 'border-blue-200' },
-  purple: { bg: 'bg-purple-100', title: 'text-purple-900', sub: 'text-purple-600', border: 'border-purple-200' },
-  green: { bg: 'bg-green-100', title: 'text-green-900', sub: 'text-green-600', border: 'border-green-200' },
-  orange: { bg: 'bg-orange-100', title: 'text-orange-900', sub: 'text-orange-600', border: 'border-orange-200' },
-  red: { bg: 'bg-red-100', title: 'text-red-900', sub: 'text-red-600', border: 'border-red-200' },
-  pink: { bg: 'bg-pink-100', title: 'text-pink-900', sub: 'text-pink-600', border: 'border-pink-200' },
-  teal: { bg: 'bg-teal-100', title: 'text-teal-900', sub: 'text-teal-600', border: 'border-teal-200' },
-  indigo: { bg: 'bg-indigo-100', title: 'text-indigo-900', sub: 'text-indigo-600', border: 'border-indigo-200' },
-};
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -228,7 +218,7 @@ export default function EventDetailPage() {
 
       {/* 행사 개요 (동적 카드 색상) */}
       {(() => {
-        const c = CARD_COLORS[event.themeColor || 'blue'] || CARD_COLORS.blue;
+        const c = getEventColor(event.themeColor);
         return (
       <div className={`${c.bg} rounded-xl p-5 mb-6`}>
         <h2 className={`text-lg font-bold ${c.title} mb-3`}>행사 개요</h2>

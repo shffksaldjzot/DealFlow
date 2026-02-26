@@ -11,6 +11,7 @@ import EmptyState from '@/components/common/EmptyState';
 import { Calendar, MapPin, Percent, FileText, Plus, QrCode, XCircle, FileSpreadsheet } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import { getEventColor } from '@/lib/eventColors';
 import type { Event } from '@/types/event';
 import type { Contract, ContractTemplate } from '@/types/contract';
 
@@ -195,29 +196,34 @@ export default function PartnerEventDetailPage() {
         }
       />
 
-      {/* 행사 개요 (와이어프레임 2-2: 블루 카드) */}
-      <div className="bg-blue-100 rounded-xl p-5 mb-6">
-        <h2 className="text-lg font-bold text-blue-900 mb-3">행사 개요</h2>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-blue-800">
-            <Calendar className="w-4 h-4" />
-            <span>{formatDate(event.startDate)} ~ {formatDate(event.endDate)}</span>
-          </div>
-          {event.venue && (
-            <div className="flex items-center gap-2 text-sm text-blue-800">
-              <MapPin className="w-4 h-4" />
-              <span>{event.venue}</span>
+      {/* 행사 개요 */}
+      {(() => {
+        const color = getEventColor(event.themeColor);
+        return (
+        <div className={`${color.bg} rounded-xl p-5 mb-6`}>
+          <h2 className={`text-lg font-bold ${color.title} mb-3`}>행사 개요</h2>
+          <div className="space-y-2">
+            <div className={`flex items-center gap-2 text-sm ${color.sub}`}>
+              <Calendar className="w-4 h-4" />
+              <span>{formatDate(event.startDate)} ~ {formatDate(event.endDate)}</span>
             </div>
-          )}
-          <div className="flex items-center gap-2 text-sm text-blue-800">
-            <Percent className="w-4 h-4" />
-            <span>수수료율: {event.commissionRate}%</span>
+            {event.venue && (
+              <div className={`flex items-center gap-2 text-sm ${color.sub}`}>
+                <MapPin className="w-4 h-4" />
+                <span>{event.venue}</span>
+              </div>
+            )}
+            <div className={`flex items-center gap-2 text-sm ${color.sub}`}>
+              <Percent className="w-4 h-4" />
+              <span>수수료율: {event.commissionRate}%</span>
+            </div>
+          </div>
+          <div className={`mt-3 pt-3 border-t ${color.border}`}>
+            <Badge status={event.status} />
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t border-blue-200">
-          <Badge status={event.status} />
-        </div>
-      </div>
+        );
+      })()}
 
       {/* 품목 설정하기 (와이어프레임 2-2) */}
       <h3 className="text-sm font-semibold text-gray-700 mb-3">품목 설정하기</h3>

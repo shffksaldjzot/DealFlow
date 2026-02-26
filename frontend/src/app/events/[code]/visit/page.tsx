@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
-import api from '@/lib/api';
+import api, { extractData } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
@@ -34,9 +34,8 @@ export default function EventVisitPage() {
   const [memo, setMemo] = useState('');
 
   useEffect(() => {
-    fetch(`/api/events/public/${code}`)
-      .then((res) => res.json())
-      .then((data) => setEvent(data))
+    api.get(`/events/public/${code}`)
+      .then((res) => setEvent(extractData(res)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [code]);

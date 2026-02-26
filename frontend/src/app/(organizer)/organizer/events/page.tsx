@@ -9,22 +9,8 @@ import PageHeader from '@/components/layout/PageHeader';
 import EmptyState from '@/components/common/EmptyState';
 import { Plus, Calendar, MapPin } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { getEventColor } from '@/lib/eventColors';
 import type { Event } from '@/types/event';
-
-const EVENT_COLORS: Record<string, { bg: string; hover: string; title: string; sub: string; badge: string }> = {
-  blue: { bg: 'bg-blue-100', hover: 'hover:bg-blue-200', title: 'text-blue-900', sub: 'text-blue-600', badge: 'text-blue-700' },
-  purple: { bg: 'bg-purple-100', hover: 'hover:bg-purple-200', title: 'text-purple-900', sub: 'text-purple-600', badge: 'text-purple-700' },
-  green: { bg: 'bg-green-100', hover: 'hover:bg-green-200', title: 'text-green-900', sub: 'text-green-600', badge: 'text-green-700' },
-  orange: { bg: 'bg-orange-100', hover: 'hover:bg-orange-200', title: 'text-orange-900', sub: 'text-orange-600', badge: 'text-orange-700' },
-  red: { bg: 'bg-red-100', hover: 'hover:bg-red-200', title: 'text-red-900', sub: 'text-red-600', badge: 'text-red-700' },
-  pink: { bg: 'bg-pink-100', hover: 'hover:bg-pink-200', title: 'text-pink-900', sub: 'text-pink-600', badge: 'text-pink-700' },
-  teal: { bg: 'bg-teal-100', hover: 'hover:bg-teal-200', title: 'text-teal-900', sub: 'text-teal-600', badge: 'text-teal-700' },
-  indigo: { bg: 'bg-indigo-100', hover: 'hover:bg-indigo-200', title: 'text-indigo-900', sub: 'text-indigo-600', badge: 'text-indigo-700' },
-};
-
-function getEventColor(themeColor?: string) {
-  return EVENT_COLORS[themeColor || 'blue'] || EVENT_COLORS.blue;
-}
 
 export default function OrganizerEventsPage() {
   const router = useRouter();
