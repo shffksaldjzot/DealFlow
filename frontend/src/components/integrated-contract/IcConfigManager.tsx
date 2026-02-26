@@ -890,6 +890,8 @@ export default function IcConfigManager({ eventId, backHref }: IcConfigManagerPr
                             key={row.id}
                             optionName={row.optionName}
                             popupContent={row.popupContent}
+                            apartmentTypeId={row.apartmentTypeId}
+                            price={row.price ? Number(row.price) : undefined}
                             prices={row.prices || {}}
                             cellValues={row.cellValues}
                             columns={(sheet.columns || []).map((c: any) => ({

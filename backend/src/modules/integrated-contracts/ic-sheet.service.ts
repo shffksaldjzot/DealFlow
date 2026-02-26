@@ -184,7 +184,9 @@ export class IcSheetService {
     const rows = dto.rows.map((row, index) =>
       this.rowRepository.create({
         sheetId,
+        apartmentTypeId: row.apartmentTypeId || null,
         optionName: row.optionName,
+        price: row.price ?? 0,
         popupContent: row.popupContent || null,
         sortOrder: row.sortOrder ?? index,
         prices: row.prices || {},
@@ -351,7 +353,9 @@ export class IcSheetService {
     const rows = dto.rows.map((row, index) =>
       this.rowRepository.create({
         sheetId,
+        apartmentTypeId: row.apartmentTypeId || null,
         optionName: row.optionName,
+        price: row.price ?? 0,
         popupContent: row.popupContent || null,
         sortOrder: row.sortOrder ?? index,
         prices: row.prices || {},
