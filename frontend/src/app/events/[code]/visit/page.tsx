@@ -119,7 +119,12 @@ export default function EventVisitPage() {
           </div>
         </div>
 
-        {isAuthenticated && user ? (
+        {event.status !== 'active' ? (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500">현재 접수 중인 행사가 아닙니다.</p>
+            <p className="text-xs text-gray-400 mt-1">행사가 시작되면 방문 등록이 가능합니다.</p>
+          </div>
+        ) : isAuthenticated && user ? (
           user.role === 'customer' ? (
             <div className="space-y-4">
               <Button fullWidth size="xl" onClick={handleSubmit} loading={submitting}>
